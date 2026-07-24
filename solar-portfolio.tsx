@@ -252,12 +252,12 @@ const PLANETS=[
       desc:"Built for GMTK Game Jam 2026 around the theme \"Loop\". The goal was to create a **modular kit** that could generate varied levels quickly without duplicating modeling work. The entire system, from concept to textured assets, was designed and produced in a **single afternoon**.",
       tags:["Blender","Unity","Modular Kit","Game Jam"],
       features:["Full kit built in a single afternoon","One geometry set, many configurations","Pieces designed for combinatorial flexibility","Snap-ready scale consistency across all parts"],
-      imgs:[],cta:"View on ArtStation",ctaHref:"https://www.artstation.com/artwork/bgvy9E",
-      categories:[
-        {id:"kit",label:"Modular Kit",caption:"The complete piece library, designed around a simple constraint: every asset had to justify its existence. Built under game jam conditions, the kit prioritizes **combinatorial flexibility**, allowing a small number of pieces to generate a wide variety of layouts.",imgs:[{label:"Modular Pieces",src:gh("environments/gmtk-kit/kit/01-modular-pieces.png"),bg:"radial-gradient(ellipse at 55% 40%,#081408,#040a04)"}],videoId:null},
-        {id:"assembly",label:"Assembly",caption:"An example room assembled from the modular kit, demonstrating how a **small set of pieces** can create varied spaces.",imgs:[{label:"Room Assembly",src:gh("environments/gmtk-kit/assembly/01-room-assembly.png"),bg:"radial-gradient(ellipse at 45% 60%,#0a1408,#050a04)"}],videoId:null},
-        {id:"showcase",label:"Showcase",caption:"The final in-game environment built entirely from the kit. In the context of a game jam, the value of the system lies not only in the final result, but in **how quickly it allowed new spaces to be designed, iterated, and assembled**.",imgs:[{label:"Final Level",src:gh("environments/gmtk-kit/showcase/01-final-level.png"),bg:"radial-gradient(ellipse at 50% 50%,#060e08,#030704)"}],videoId:null},
-      ]},
+      imgs:[
+        {label:"Modular Kit",src:gh("environments/gmtk-kit/01-modular-kit-1.png"),bg:"radial-gradient(ellipse at 55% 40%,#081408,#040a04)",caption:"The complete piece library, designed around a simple constraint: every asset had to justify its existence. Built under game jam conditions, the kit prioritizes **combinatorial flexibility**, allowing a small number of pieces to generate a wide variety of layouts."},
+        {label:"Modular Kit",src:gh("environments/gmtk-kit/02-modular-kit-2.png"),bg:"radial-gradient(ellipse at 45% 55%,#0a1206,#050a04)",caption:"The complete piece library, designed around a simple constraint: every asset had to justify its existence. Built under game jam conditions, the kit prioritizes **combinatorial flexibility**, allowing a small number of pieces to generate a wide variety of layouts."},
+        {label:"Assembly",src:gh("environments/gmtk-kit/03-assembly-1.png"),bg:"radial-gradient(ellipse at 45% 60%,#0a1408,#050a04)",caption:"An example room assembled from the modular kit, demonstrating how a **small set of pieces** can create varied spaces."},
+        {label:"Assembly",src:gh("environments/gmtk-kit/04-assembly-2.png"),bg:"radial-gradient(ellipse at 55% 45%,#081206,#040a04)",caption:"An example room assembled from the modular kit, demonstrating how a **small set of pieces** can create varied spaces."},
+      ],cta:"View on ArtStation",ctaHref:"https://www.artstation.com/artwork/bgvy9E"},
   ]},
   {id:"games",label:"Games",icon:"🎮",hex:"#5944A6",orbitRadius:22,orbitSpeed:.0022,startAngle:.8,radius:1.8,desc:"Game development projects.",moons:[
     {id:"hollow-end",label:"Hollow End",icon:"🎮",orbitRadius:3.4,orbitSpeed:.009,startAngle:1,inclination:.24,radius:.40,hex:"#aa88cc",
