@@ -19,6 +19,8 @@ const VERT=`varying vec3 vN;varying vec3 vP;void main(){vN=normalize(normalMatri
 const FRAG=`uniform float u_t;varying vec3 vN;varying vec3 vP;vec3 h33(vec3 p){p=fract(p*vec3(443.897,397.297,491.187));p+=dot(p.zxy,p.yxz+19.19);return fract(p.xxy*p.yyz*p.zyx);}float vor(vec3 x,float t){vec3 n=floor(x),f=fract(x);float md=8.0;for(int k=-1;k<=1;k++)for(int j=-1;j<=1;j++)for(int i=-1;i<=1;i++){vec3 g=vec3(float(i),float(j),float(k));vec3 o=h33(n+g);o=0.5+0.5*sin(t*0.3+6.28318*o);md=min(md,length(g+o-f));}return md;}void main(){float t=u_t;vec3 p=vP*5.0;float v1=vor(p,t),v2=vor(p*2.1+vec3(3.7,1.1,5.3),t*1.4),v3=vor(p*4.7+vec3(7.1,2.4,3.6),t*.75);float v=v1*.5+v2*.32+v3*.18;vec3 c=vec3(1.0,0.97,0.85);c=mix(c,vec3(1.0,0.78,0.12),smoothstep(0.0,0.38,v));c=mix(c,vec3(1.0,0.40,0.04),smoothstep(0.32,0.62,v));c=mix(c,vec3(0.5,0.08,0.01),smoothstep(0.55,0.88,v));float prm=smoothstep(0.6,0.15,v1)*(0.5+0.5*sin(vP.y*16.0+t*2.0));c+=vec3(0.6,0.2,0.0)*prm*0.7;float blu=smoothstep(0.75,0.25,v2)*(0.5+0.5*cos(vP.x*20.0+t*1.5));c+=vec3(0.05,0.15,0.9)*blu*0.12;float rim=dot(normalize(vN),vec3(0.0,0.0,1.0));c*=0.4+0.6*pow(max(rim,0.0),0.4);gl_FragColor=vec4(c*1.5,1.0);}`;
 
 const gd=id=>`https://drive.google.com/thumbnail?id=${id}&sz=w1200`;
+const GH_USER="CompCube",GH_REPO="Interactive-Porfolio",GH_BRANCH="main";
+const gh=path=>`https://raw.githubusercontent.com/${GH_USER}/${GH_REPO}/${GH_BRANCH}/portfolio-media/${path}`;
 const TARGET_DATE="2026-10-31T00:00:00";
 const bgEnv="radial-gradient(ellipse at 50% 50%,#041408,#020a04)";
 const bgTeal="radial-gradient(ellipse at 50% 50%,#041410,#020a08)";
@@ -165,7 +167,7 @@ const HE_CATEGORIES=[
    ]},
 ];
 
-const STAR={hex:"#E2943D",name:"JORDI",
+const STAR={hex:"#EDC32B",name:"JORDI",
 bio:"Game Developer and Technical Artist from Barcelona with experience building real-time pipelines and tools in Unity. My background combines Computer Engineering and a Bachelor's degree in Game Design and Development at the University of Girona, where I discovered my focus at the intersection of art and engineering. I specialize in Unity HDRP workflows, VFX, environment art, and C# tooling, with a strong interest in improving production efficiency through custom tools and scalable pipelines.",
 bioExtended:"Game Developer and Technical Artist from Barcelona with a strong focus on real-time pipelines, Unity HDRP production workflows, and technical problem-solving across environment art and VFX systems. I started in Computer Engineering in Girona, but after one year I realized I was more interested in creating interactive experiences than working on abstract systems. That led me to switch to Game Design and Development at the University of Girona, where I spent five years working across programming, game design, 3D art, level design, and technical implementation, gradually shaping a multidisciplinary approach.\n\nA key turning point came from a Riot Games talk on Technical Art, which clarified the role I had naturally been moving toward: bridging art and engineering to ensure both visual quality and technical performance. Since then, I've focused on that intersection through Unity (especially HDRP), Blender (3,000+ hours), Substance 3D Painter, and C# development. My Final Degree Project, Hollow End, brought all of this together as a solo photorealistic horror game featuring custom tools, VFX systems, shaders, modular environment pipelines, and full production ownership, earning High Honors in 2025.\n\nOutside of game development, I enjoy exploring disciplines that push me to think differently. I'm naturally curious and tend to move across creative and technical spaces, from piano and languages to web development, AI experiments, and side projects that start with curiosity and usually end with me going far too deep into them. While this portfolio focuses on games, I believe those interests shape the way I work: staying adaptable, connecting ideas across fields, and constantly learning. My goal is to join a studio as a Technical Artist and keep growing alongside talented teams, building better tools, workflows, and experiences over time.",
 skills:[{s:"Unity / C#",p:88},{s:"Blender / 3D Art",p:86},{s:"Shader Graph / VFX",p:80},{s:"Substance 3D Painter",p:78},{s:"Game Design",p:85},{s:"React / Web",p:76},{s:"Python / AI",p:72},{s:"Git",p:82}],
@@ -173,7 +175,7 @@ langs:[{l:"Catalan",lv:"Native"},{l:"Spanish",lv:"Native"},{l:"English",lv:"C1"}
 timeline:[{y:"2019",l:"Computer Engineering",d:"One year. Not the right path, but an important signal."},{y:"2020",l:"Game Design & Dev · UdG",d:"Moved to Girona. Five years building interactive experiences."},{y:"2022",l:"Internship · ServiceNow",d:"Enterprise apps for Santander, CaixaBank, Europastry, AEMET."},{y:"2023",l:"Technical Art realization",d:"A Riot Games video made everything click."},{y:"2024",l:"Hollow End begins",d:"Final degree project · solo HDRP first-person horror game."},{y:"2025",l:"Graduation · High Honors",d:"Matrícula d\'Honor · University of Girona."},{y:"2026",l:"Steam release",d:"Hollow End · planned Q4 2026."}]};
 
 const PLANETS=[
-  {id:"props",label:"Props",icon:"🧱",hex:"#C2724D",orbitRadius:8,orbitSpeed:.006,startAngle:3.5,radius:.62,desc:"Game-ready prop kits.",moons:[
+  {id:"props",label:"Props",icon:"🧱",hex:"#C79CD9",orbitRadius:8,orbitSpeed:.006,startAngle:3.5,radius:.62,desc:"Game-ready prop kits.",moons:[
     {id:"subway-props-kit",label:"Subway Props Kit",icon:"📦",orbitRadius:1.7,orbitSpeed:.014,startAngle:2.5,inclination:-.24,radius:.24,hex:"#d99f88",
       type:"Game-Ready Props",status:"",devPct:null,
       desc:"A collection of **80+ optimized game-ready props** created for **Hollow End** using a **low-poly to high-poly production workflow**, **texture atlases**, and a scalable asset pipeline tailored for large **Unity HDRP** environments. Each prop was designed with both **clean and abandoned variants**, allowing the same asset library to be reused across multiple locations while supporting environmental storytelling and reducing production overhead.",
@@ -187,7 +189,7 @@ const PLANETS=[
         {id:"results",label:"Results",caption:"Final integration of the prop set across both *Hollow End* environments: **L1 (Abandoned)** and **L2 (New)**. Using the same shared asset library, each space achieves a **distinct visual identity** through material variation, lighting and environmental dressing.",imgs:[{label:"L2 — View 1",src:gd("1A9wfaqn1LkuszRtDCBrpXLFBscfIC4U2")},{label:"L2 — View 2",src:gd("1Qnye20j8pV88D5j9ug3howC7pvip3xtP")}],videoId:null},
       ]},
   ]},
-  {id:"environments",label:"Environments",icon:"🌍",hex:"#9C574F",orbitRadius:13,orbitSpeed:.004,startAngle:1.8,radius:.74,desc:"Modular environment kits for Unity HDRP.",moons:[
+  {id:"environments",label:"Environments",icon:"🌍",hex:"#9A89D9",orbitRadius:13,orbitSpeed:.004,startAngle:1.8,radius:.74,desc:"Modular environment kits for Unity HDRP.",moons:[
     {id:"subway-modular-kit",label:"Subway Modular Kit",icon:"🏗️",orbitRadius:2.1,orbitSpeed:.011,startAngle:.8,inclination:.16,radius:.26,hex:"#c4948e",
       type:"Environment Art",status:"",devPct:null,
       desc:"The structural foundation of *Hollow End* is built from a **reusable modular kit** designed to create **large interconnected subway environments** in Unity HDRP. The same geometry constructs both **The Backroom (L2)** and **The Abandoned Zone (L1 & L3)**, with distinct identities achieved through materials, lighting, and environmental dressing instead of additional meshes.",
@@ -195,72 +197,69 @@ const PLANETS=[
       features:["78 modular pieces covering full environmental construction","9 trim sheets with progressive degradation variants","4096px trim sheets at 512 px/m texel density","Two complete environments: Backroom & Abandoned","Material-driven variation using a single UV framework"],
       imgs:[],cta:"View on ArtStation",
       categories:[
-        {id:"overview",label:"OVERVIEW",hex:"#c4948e",isOverview:true,
-         shortDesc:"A **modular environment pipeline** designed to build **two visually distinct subway environments** from a single shared geometry set.",
-         imgs:[{label:"Showcase",src:null,bg:bgEnv},{label:"Showcase",src:null,bg:"radial-gradient(ellipse at 60% 40%,#041810,#020a06)"},{label:"Showcase",src:null,bg:"radial-gradient(ellipse at 40% 60%,#061408,#030a04)"}],videoId:null},
         {id:"core-idea",label:"CORE IDEA",hex:"#bb8880",
          text:"*Hollow End* was built around a simple production challenge: create multiple narrative environments from a single modular kit without duplicating geometry. Instead of relying on unique assets for each level, the project focuses on reuse, allowing materials, lighting, and environmental dressing to define each space while the underlying structure remains the same.",
          subcategories:[
            {id:"concepts",label:"Concepts",imgs:[
-             {label:"Backrooms",src:null,bg:"radial-gradient(ellipse at 50% 30%,#0a1a10,#040a06)",caption:"The Backrooms is an internet horror concept describing a seemingly **infinite, surreal space** detached from reality. In *Hollow End*, the goal was to create spaces that feel familiar enough to be believable, yet subtly disconnected from reality."},
-             {label:"Liminal Spaces",src:null,bg:"radial-gradient(ellipse at 50% 70%,#081414,#040808)",caption:"Liminal spaces became one of the project's main design pillars. Empty corridors, platforms, and transitional spaces were used to create unease through **atmosphere, lighting** and **silence** instead of relying on traditional horror elements."},
+             {label:"Backrooms",src:gh("environments/subway-modular-kit/core-idea/concepts/01-backrooms.jpg"),bg:"radial-gradient(ellipse at 50% 30%,#0a1a10,#040a06)",caption:"The Backrooms is an internet horror concept describing a seemingly **infinite, surreal space** detached from reality. In *Hollow End*, the goal was to create spaces that feel familiar enough to be believable, yet subtly disconnected from reality."},
+             {label:"Liminal Spaces",src:gh("environments/subway-modular-kit/core-idea/concepts/02-liminal-spaces.jpg"),bg:"radial-gradient(ellipse at 50% 70%,#081414,#040808)",caption:"Liminal spaces became one of the project's main design pillars. Empty corridors, platforms, and transitional spaces were used to create unease through **atmosphere, lighting** and **silence** instead of relying on traditional horror elements."},
            ]},
            {id:"moodboard-refs",label:"Moodboard & References",imgs:[
-             {label:"U-Bahn (Berlin)",src:null,bg:"radial-gradient(ellipse at 40% 60%,#0a0a18,#040408)",caption:"Berlin's U-Bahn became the **primary architectural reference** for the project. Its modular construction, clean geometry, and restrained visual language naturally translated into a reusable environment system."},
-             {label:"Ghost Stations (Barcelona)",src:null,bg:"radial-gradient(ellipse at 60% 40%,#100808,#080404)",caption:"Barcelona's abandoned and inaccessible stations inspired the deteriorated areas of the game, introducing unfinished spaces and signs of long-term neglect."},
-             {label:"Moodboard",src:null,bg:"radial-gradient(ellipse at 50% 50%,#080a14,#040608)",caption:"The moodboard combines real-world transit architecture with liminal horror references, establishing a clear visual language before production began and guiding every design decision throughout development."},
+             {label:"U-Bahn (Berlin)",src:gh("environments/subway-modular-kit/core-idea/moodboard-refs/01-u-bahn-berlin.png"),bg:"radial-gradient(ellipse at 40% 60%,#0a0a18,#040408)",caption:"Berlin's U-Bahn became the **primary architectural reference** for the project. Its modular construction, clean geometry, and restrained visual language naturally translated into a reusable environment system."},
+             {label:"Ghost Stations (Barcelona)",src:gh("environments/subway-modular-kit/core-idea/moodboard-refs/02-ghost-stations-barcelona.png"),bg:"radial-gradient(ellipse at 60% 40%,#100808,#080404)",caption:"Barcelona's abandoned and inaccessible stations inspired the deteriorated areas of the game, introducing unfinished spaces and signs of long-term neglect."},
+             {label:"Moodboard",src:gh("environments/subway-modular-kit/core-idea/moodboard-refs/03-moodboard.png"),bg:"radial-gradient(ellipse at 50% 50%,#080a14,#040608)",caption:"The moodboard combines real-world transit architecture with liminal horror references, establishing a clear visual language before production began and guiding every design decision throughout development."},
            ]},
            {id:"game-feeling",label:"Game Feeling",imgs:[
-             {label:"Kenopsia",src:null,bg:"radial-gradient(ellipse at 50% 50%,#060c0a,#030604)",caption:"The atmosphere of *Hollow End* is built around **Kenopsia**: the unsettling feeling of **a place that should be full of life but is now completely empty**. Rather than relying on monsters or jump scares, the environment creates tension through silence, familiarity, and the absence of people."},
+             {label:"Kenopsia",src:gh("environments/subway-modular-kit/core-idea/game-feeling/01-kenopsia.png"),bg:"radial-gradient(ellipse at 50% 50%,#060c0a,#030604)",caption:"The atmosphere of *Hollow End* is built around **Kenopsia**: the unsettling feeling of **a place that should be full of life but is now completely empty**. Rather than relying on monsters or jump scares, the environment creates tension through silence, familiarity, and the absence of people."},
            ]},
          ]},
         {id:"modular-kit",label:"MODULAR KIT SYSTEM",hex:"#7abba8",
          text:"The Modular Kit is the **structural backbone** of *Hollow End*, consisting of **78 reusable pieces** used to construct every playable environment. Organized into two main sets (New and Abandoned) and built around a strict **4-meter grid**, the system ensures predictable snapping, consistent UV layouts, and a uniform texel density across the entire project.\n\nRather than creating unique assets for each area, the kit prioritizes **modularity and reuse**. The same geometry supports multiple environments, with materials, lighting, and environmental dressing providing each space with its own visual identity.",
          subcategories:[
-           {id:"backroom-l2",label:"Backroom (L2)",imgs:[{label:"Backroom (L2)",src:null,bg:"radial-gradient(ellipse at 50% 50%,#0a1a0a,#040a04)",caption:"The Backroom showcases the modular system in its purest form. Clean materials, uniform lighting, and repetitive architectural elements intentionally expose the underlying structure, reinforcing the **artificial and unsettling atmosphere** of the space."}]},
-           {id:"abandoned-l1",label:"Abandoned (L1)",imgs:[{label:"Abandoned (L1)",src:null,bg:"radial-gradient(ellipse at 50% 50%,#1a0a08,#0a0504)",caption:"The Abandoned Zone is built from the **exact same modular pieces**, recontextualized through material degradation, lighting, and environmental dressing. This demonstrates the core strength of the system: creating a completely different atmosphere without increasing the structural asset count."}]},
+           {id:"backroom-l2",label:"Backroom (L2)",imgs:[{label:"Backroom (L2)",src:gh("environments/subway-modular-kit/modular-kit/backroom-l2/01-backroom-l2.png"),bg:"radial-gradient(ellipse at 50% 50%,#0a1a0a,#040a04)",caption:"The Backroom showcases the modular system in its purest form. Clean materials, uniform lighting, and repetitive architectural elements intentionally expose the underlying structure, reinforcing the **artificial and unsettling atmosphere** of the space."}]},
+           {id:"abandoned-l1",label:"Abandoned (L1)",imgs:[{label:"Abandoned (L1)",src:gh("environments/subway-modular-kit/modular-kit/abandoned-l1/01-abandoned-l1.png"),bg:"radial-gradient(ellipse at 50% 50%,#1a0a08,#0a0504)",caption:"The Abandoned Zone is built from the **exact same modular pieces**, recontextualized through material degradation, lighting, and environmental dressing. This demonstrates the core strength of the system: creating a completely different atmosphere without increasing the structural asset count."}]},
          ]},
         {id:"trim-sheets",label:"TRIM SHEETS & MATERIALS",hex:"#88aadd",
          text:"The material pipeline was defined **before any modeling began**. By designing the trim sheets first, every asset could share the same UV logic from the start, ensuring consistent texel density, reducing material count, and keeping the entire environment scalable through a **unified material framework**.",
          subcategories:[
-           {id:"ts-overview",label:"Overview",imgs:[{label:"Material Workflow",src:null,bg:bgBlue,caption:"Instead of creating materials after the assets were modeled, the trim sheet library became the **foundation of the entire environment pipeline**. This approach kept UV layouts and texture resolution consistent across the kit while reducing the material count from **78 individual materials** to just **9 trim sheets**."}]},
-           {id:"tech-aspects",label:"Technical Aspects",imgs:[{label:"Technical Specifications",src:null,bg:"radial-gradient(ellipse at 45% 55%,#040c1a,#020608)",caption:"All trim sheets were authored at **4096×4096** and designed around the project's **4-meter modular standard**, maintaining a consistent **512 px/m texel density** throughout the environment. Each material follows Unity HDRP's standard **Base Map, Normal Map, and Mask Map** workflow, allowing the entire modular kit to share a compact material library without sacrificing visual quality."}]},
+           {id:"ts-overview",label:"Overview",imgs:[{label:"Material Workflow",src:gh("environments/subway-modular-kit/trim-sheets/ts-overview/01-material-workflow.png"),bg:bgBlue,caption:"Instead of creating materials after the assets were modeled, the trim sheet library became the **foundation of the entire environment pipeline**. This approach kept UV layouts and texture resolution consistent across the kit while reducing the material count from **78 individual materials** to just **9 trim sheets**."}]},
+           {id:"tech-aspects",label:"Technical Aspects",imgs:[{label:"Technical Specifications",src:gh("environments/subway-modular-kit/trim-sheets/tech-aspects/01-technical-specifications.png"),bg:"radial-gradient(ellipse at 45% 55%,#040c1a,#020608)",caption:"All trim sheets were authored at **4096×4096** and designed around the project's **4-meter modular standard**, maintaining a consistent **512 px/m texel density** throughout the environment. Each material follows Unity HDRP's standard **Base Map, Normal Map, and Mask Map** workflow, allowing the entire modular kit to share a compact material library without sacrificing visual quality."}]},
            {id:"first-attempts",label:"First Attempts",imgs:[
-             {label:"Backroom Iterations",src:null,bg:"radial-gradient(ellipse at 45% 55%,#040c1a,#020608)",caption:"Finding the right balance between repetition and readability required several iterations. Early versions either felt too noisy or too uniform, leading to multiple refinements before arriving at a trim sheet that remained **modular without becoming visually repetitive**."},
-             {label:"Abandoned Iterations",src:null,bg:"radial-gradient(ellipse at 55% 45%,#030a14,#020508)",caption:"For the Abandoned Zone, the main challenge wasn't adding damage — it was making **deterioration feel natural** while preserving the modular workflow. Several iterations focused on balancing wear, rust, and water damage without breaking consistency across large connected surfaces."},
+             {label:"Backroom Iterations",src:gh("environments/subway-modular-kit/trim-sheets/first-attempts/01-backroom-iterations.png"),bg:"radial-gradient(ellipse at 45% 55%,#040c1a,#020608)",caption:"Finding the right balance between repetition and readability required several iterations. Early versions either felt too noisy or too uniform, leading to multiple refinements before arriving at a trim sheet that remained **modular without becoming visually repetitive**."},
+             {label:"Abandoned Iterations",src:gh("environments/subway-modular-kit/trim-sheets/first-attempts/02-abandoned-iterations.png"),bg:"radial-gradient(ellipse at 55% 45%,#030a14,#020508)",caption:"For the Abandoned Zone, the main challenge wasn't adding damage — it was making **deterioration feel natural** while preserving the modular workflow. Several iterations focused on balancing wear, rust, and water damage without breaking consistency across large connected surfaces."},
            ]},
            {id:"final-trimsheets",label:"Final Trim Sheets",imgs:[
-             {label:"Backroom Trim Sheets",src:null,bg:"radial-gradient(ellipse at 55% 45%,#040a18,#020508)",caption:"The final Backroom trim sheets prioritize **clean surfaces, subtle variation, and controlled repetition**, reinforcing the sterile and artificial atmosphere while remaining highly reusable across the environment."},
-             {label:"Abandoned Trim Sheets",src:null,bg:"radial-gradient(ellipse at 50% 50%,#180a06,#0c0504)",caption:"The Abandoned trim sheets build upon the **same UV framework**, introducing progressive surface wear, rust, and water damage without requiring any changes to the underlying geometry."},
+             {label:"Backroom Trim Sheets",src:gh("environments/subway-modular-kit/trim-sheets/final-trimsheets/01-backroom-trim-sheets.png"),bg:"radial-gradient(ellipse at 55% 45%,#040a18,#020508)",caption:"The final Backroom trim sheets prioritize **clean surfaces, subtle variation, and controlled repetition**, reinforcing the sterile and artificial atmosphere while remaining highly reusable across the environment."},
+             {label:"Abandoned Trim Sheets",src:gh("environments/subway-modular-kit/trim-sheets/final-trimsheets/02-abandoned-trim-sheets.png"),bg:"radial-gradient(ellipse at 50% 50%,#180a06,#0c0504)",caption:"The Abandoned trim sheets build upon the **same UV framework**, introducing progressive surface wear, rust, and water damage without requiring any changes to the underlying geometry."},
            ]},
-           {id:"mat-variations",label:"Material Variations",imgs:[{label:"Progressive Degradation Variants",src:null,bg:"radial-gradient(ellipse at 50% 50%,#040a18,#020508)",caption:"To break visual repetition while keeping the geometry and material workflow unchanged, **four material variants** were derived from a single base trim sheet to represent different stages of aging and environmental wear."}]},
+           {id:"mat-variations",label:"Material Variations",imgs:[{label:"Progressive Degradation Variants",src:gh("environments/subway-modular-kit/trim-sheets/mat-variations/01-progressive-degradation-variants.png"),bg:"radial-gradient(ellipse at 50% 50%,#040a18,#020508)",caption:"To break visual repetition while keeping the geometry and material workflow unchanged, **four material variants** were derived from a single base trim sheet to represent different stages of aging and environmental wear."}]},
          ]},
         {id:"dual-env",label:"Dual Environment",hex:"#66bbcc",
          text:"A single modular kit. Two completely different environments. **The Backroom** and **The Abandoned Zone** share the exact same structural geometry, with their identities defined entirely through materials, lighting, and environmental dressing.",
          subcategories:[
-           {id:"backroom",label:"Backroom",imgs:[{label:"Backroom",src:null,bg:"radial-gradient(ellipse at 50% 50%,#0a1a0a,#040a04)",caption:"The Backroom exposes the modular system at its purest. **Bright lighting, clean materials, and repetitive architecture** create a space that feels functional, familiar, and subtly disconnected from reality."}]},
-           {id:"abandoned",label:"Abandoned",imgs:[{label:"Abandoned",src:null,bg:"radial-gradient(ellipse at 50% 50%,#1a0a08,#0a0504)",caption:"The **exact same geometry** is transformed through material degradation and lighting. The passage of time is what changes the space."}]},
+           {id:"backroom",label:"Backroom",imgs:[{label:"Backroom",src:gh("environments/subway-modular-kit/dual-env/backroom/01-backroom.png"),bg:"radial-gradient(ellipse at 50% 50%,#0a1a0a,#040a04)",caption:"The Backroom exposes the modular system at its purest. **Bright lighting, clean materials, and repetitive architecture** create a space that feels functional, familiar, and subtly disconnected from reality."}]},
+           {id:"abandoned",label:"Abandoned",imgs:[{label:"Abandoned",src:gh("environments/subway-modular-kit/dual-env/abandoned/01-abandoned.png"),bg:"radial-gradient(ellipse at 50% 50%,#1a0a08,#0a0504)",caption:"The **exact same geometry** is transformed through material degradation and lighting. The passage of time is what changes the space."}]},
          ]},
         {id:"results",label:"Results",hex:"#99bbaa",
          text:"The final modular pipeline enabled **two visually distinct environments** to be built from a **single shared geometry set** while keeping production scalable, material count low, and the scene efficient to manage in Unity HDRP.",
          subcategories:[
-           {id:"final-shots",label:"Final Shots",imgs:[{label:"Final Shots",src:null,bg:bgEnv,caption:"The completed environments with lighting, post-processing, and all details in place. At this stage, the **modular system fades into the background**, leaving atmosphere and storytelling to define the experience."}]},
-           {id:"metrics",label:"Metrics",imgs:[{label:"Metrics",src:null,bg:bgTeal,caption:"• **78 modular pieces**\n• **9 trim sheets** with progressive degradation variants\n• **4096×4096** trim sheet resolution\n• **512 px/m** consistent texel density\n• **2 complete environments** built from a single shared geometry set\n• Low material count through a **trim sheet workflow**"}]},
+           {id:"final-shots",label:"Final Shots",imgs:[{label:"Final Shots",src:gh("environments/subway-modular-kit/results/final-shots/01-final-shots.png"),bg:bgEnv,caption:"The completed environments with lighting, post-processing, and all details in place. At this stage, the **modular system fades into the background**, leaving atmosphere and storytelling to define the experience."}]},
+           {id:"metrics",label:"Metrics",imgs:[{label:"Metrics",src:gh("environments/subway-modular-kit/results/metrics/01-metrics.png"),bg:bgTeal,caption:"• **78 modular pieces**\n• **9 trim sheets** with progressive degradation variants\n• **4096×4096** trim sheet resolution\n• **512 px/m** consistent texel density\n• **2 complete environments** built from a single shared geometry set\n• Low material count through a **trim sheet workflow**"}]},
          ]},
       ]},
-    {id:"env-kit-2",label:"GMTK Loop Kit",icon:"🔁",orbitRadius:2.9,orbitSpeed:.008,startAngle:3.8,inclination:-.36,radius:.20,hex:"#bb8880",
+    {id:"gmtk-kit",label:"GMTK Loop Kit",icon:"🔁",orbitRadius:2.9,orbitSpeed:.008,startAngle:3.8,inclination:-.36,radius:.20,hex:"#bb8880",
       type:"Environment Art",status:"GMTK 2026",devPct:null,
       desc:"Built for GMTK Game Jam 2026 around the theme \"Loop\". The goal was to create a **modular kit** that could generate varied levels quickly without duplicating modeling work. The entire system, from concept to textured assets, was designed and produced in a **single afternoon**.",
       tags:["Blender","Unity","Modular Kit","Game Jam"],
       features:["Full kit built in a single afternoon","One geometry set, many configurations","Pieces designed for combinatorial flexibility","Snap-ready scale consistency across all parts"],
       imgs:[],cta:"View on ArtStation",ctaHref:"https://www.artstation.com/artwork/bgvy9E",
       categories:[
-        {id:"kit",label:"Modular Kit",caption:"The complete piece library, designed around a simple constraint: every asset had to justify its existence. Built under game jam conditions, the kit prioritizes **combinatorial flexibility**, allowing a small number of pieces to generate a wide variety of layouts.",imgs:[{label:"Modular Pieces",src:null,bg:"radial-gradient(ellipse at 55% 40%,#081408,#040a04)"}],videoId:null},
-        {id:"assembly",label:"Assembly",caption:"An example room assembled from the modular kit, demonstrating how a **small set of pieces** can create varied spaces.",imgs:[{label:"Room Assembly",src:null,bg:"radial-gradient(ellipse at 45% 60%,#0a1408,#050a04)"}],videoId:null},
-        {id:"showcase",label:"Showcase",caption:"The final in-game environment built entirely from the kit. In the context of a game jam, the value of the system lies not only in the final result, but in **how quickly it allowed new spaces to be designed, iterated, and assembled**.",imgs:[{label:"Final Level",src:null,bg:"radial-gradient(ellipse at 50% 50%,#060e08,#030704)"}],videoId:null},
+        {id:"kit",label:"Modular Kit",caption:"The complete piece library, designed around a simple constraint: every asset had to justify its existence. Built under game jam conditions, the kit prioritizes **combinatorial flexibility**, allowing a small number of pieces to generate a wide variety of layouts.",imgs:[{label:"Modular Pieces",src:gh("environments/gmtk-kit/kit/01-modular-pieces.png"),bg:"radial-gradient(ellipse at 55% 40%,#081408,#040a04)"}],videoId:null},
+        {id:"assembly",label:"Assembly",caption:"An example room assembled from the modular kit, demonstrating how a **small set of pieces** can create varied spaces.",imgs:[{label:"Room Assembly",src:gh("environments/gmtk-kit/assembly/01-room-assembly.png"),bg:"radial-gradient(ellipse at 45% 60%,#0a1408,#050a04)"}],videoId:null},
+        {id:"showcase",label:"Showcase",caption:"The final in-game environment built entirely from the kit. In the context of a game jam, the value of the system lies not only in the final result, but in **how quickly it allowed new spaces to be designed, iterated, and assembled**.",imgs:[{label:"Final Level",src:gh("environments/gmtk-kit/showcase/01-final-level.png"),bg:"radial-gradient(ellipse at 50% 50%,#060e08,#030704)"}],videoId:null},
       ]},
   ]},
-  {id:"games",label:"Games",icon:"🎮",hex:"#805EAA",orbitRadius:22,orbitSpeed:.0022,startAngle:.8,radius:1.8,desc:"Game development projects.",moons:[
+  {id:"games",label:"Games",icon:"🎮",hex:"#5944A6",orbitRadius:22,orbitSpeed:.0022,startAngle:.8,radius:1.8,desc:"Game development projects.",moons:[
     {id:"hollow-end",label:"Hollow End",icon:"🎮",orbitRadius:3.4,orbitSpeed:.009,startAngle:1,inclination:.24,radius:.40,hex:"#aa88cc",
       categories:HE_CATEGORIES,launchDate:TARGET_DATE,type:"Horror Game",status:"Steam · Oct 2026",devPct:68,
       desc:"Hollow End is a first-person horror exploration game set in an abandoned subway station, where the player must find a way out by exploring, solving puzzles, and making the right decisions. Inspired by escape rooms and liminal spaces, the game replaces combat with atmosphere, observation, and environmental storytelling. Originally developed as my Final Degree Project and awarded High Honours, it became an opportunity to focus on the career path I want to pursue: Technical Art.",
@@ -268,7 +267,7 @@ const PLANETS=[
       features:["First-person psychological horror","Unity HDRP","Environmental storytelling","Exploration, Puzzles & Decision Making","Backrooms & Liminal Spaces","PC / Steam · Oct 2026"],
       imgs:[],videoId:null,cta:"Wishlist on Steam"},
   ]},
-  {id:"vfx",label:"VFX / Shaders",icon:"✨",hex:"#734066",orbitRadius:29,orbitSpeed:.0017,startAngle:2.5,radius:1.08,rings:true,desc:"Real-time VFX and custom shaders.",moons:[
+  {id:"vfx",label:"VFX / Shaders",icon:"✨",hex:"#3C226B",orbitRadius:29,orbitSpeed:.0017,startAngle:2.5,radius:1.08,rings:true,desc:"Real-time VFX and custom shaders.",moons:[
     {id:"magic-barrier",label:"Magic Barrier",icon:"🛡️",orbitRadius:2.9,orbitSpeed:.011,startAngle:.5,inclination:.42,radius:.28,hex:"#9e7292",
       type:"VFX / Shader",status:"",devPct:null,
       desc:"An event-driven energy shield built in Unity HDRP. The core decision: one shader, one pass, both faces of a double-sided transparent mesh handled through IsFrontFace. For transparent meshes that cannot batch, eliminating the extra pass cuts draw call overhead in half. The HDR Fresnel rim and equatorial band bloom in post-processing. Vertex displacement for the breathing pulse runs through VFX Graph alongside a second Mesh Output context for the outer aura. One asset, two visual layers.",
@@ -277,7 +276,7 @@ const PLANETS=[
       imgs:[],cta:"View on ArtStation",ctaHref:"https://www.artstation.com/artwork/L4qQJk",
       categories:[
         {id:"overview",label:"Overview",caption:"The shield spawns on SendEvent, holds for 6 seconds and auto-despawns. No continuous emission, no second material, no extra pass.",imgs:[{label:"Magic Barrier",src:null,bg:"radial-gradient(ellipse at 50% 40%,#18041a,#0c020c)"}],videoId:null},
-        {id:"technical",label:"Technical",caption:"",imgs:[
+        {id:"technical",label:"Breakdown",caption:"",imgs:[
           {label:"Mesh",src:null,bg:"radial-gradient(ellipse at 50% 40%,#14041a,#0a020c)",caption:"The shield uses a **double-sided transparent mesh** whose silhouette defines the readability of the entire effect. Its topology was designed to support both the Fresnel highlights and the vertex displacement, ensuring that the pulse animation remains smooth and visually consistent from every angle."},
           {label:"UV Layout",src:null,bg:"radial-gradient(ellipse at 45% 55%,#160418,#0a0210)",caption:"The UVs were **manually adjusted in Photoshop** to control how textures wrap around the sphere. This provided precise placement of the equatorial energy band and ensured that surface details tiled consistently before any shader work was introduced."},
           {label:"Shader Graph",src:null,bg:"radial-gradient(ellipse at 55% 45%,#12041a,#08020c)",caption:"A **single-pass shader** handles both sides of the mesh using **IsFrontFace**, eliminating the need for duplicate materials or additional rendering passes. The exterior face generates the Fresnel rim and surface details, while the interior receives its own visual treatment. HDR values drive the rim and energy band into Unity's bloom pipeline, creating the shield's characteristic glow."},
@@ -296,7 +295,7 @@ const PLANETS=[
       imgs:[],cta:"View on ArtStation",ctaHref:"https://www.artstation.com/artwork/2BgoNy",
       categories:[
         {id:"overview",label:"Overview",caption:"Main water body at one draw call. Splash and fog at the base kept deliberately cheap to contain overdraw where particles overlap heavily.",imgs:[{label:"Stylized Waterfall",src:null,bg:"radial-gradient(ellipse at 40% 70%,#041018,#020810)"}],videoId:null},
-        {id:"technical",label:"Technical",caption:"",imgs:[
+        {id:"technical",label:"Breakdown",caption:"",imgs:[
           {label:"Mesh",src:null,bg:"radial-gradient(ellipse at 55% 40%,#04101a,#020810)",caption:"The waterfall body is built from a **single low-complexity mesh** designed to let the shader carry most of the visual detail. Its topology follows the direction of the water flow, minimizing UV stretching and preserving smooth motion around curves."},
           {label:"Shader Graph",src:null,bg:"radial-gradient(ellipse at 45% 60%,#040e18,#020708)",caption:"The water surface is generated entirely in **Shader Graph** using two texture layers scrolling at different speeds to simulate flow without relying on physics. Surface normals are reconstructed in real time through **NormalFromHeight**, removing the need for baked normal maps. Key parameters such as colour, tiling, foam intensity, and scroll speed are exposed for live tweaking."},
           {label:"VFX Graph",src:null,bg:"radial-gradient(ellipse at 50% 50%,#041218,#020a0c)",caption:"VFX Graph is used as a **runtime control layer** rather than a particle simulation system. Through a **Mesh Output** context, it drives shader parameters dynamically while keeping the entire waterfall body rendered in a single draw call."},
@@ -309,7 +308,7 @@ const PLANETS=[
         ],videoId:null},
       ]},
   ]},
-  {id:"tools",label:"Tools",icon:"🔧",hex:"#5E6AD6",orbitRadius:36,orbitSpeed:.0012,startAngle:4.5,radius:.72,desc:"Custom Unity editor tools.",moons:[
+  {id:"tools",label:"Tools",icon:"🔧",hex:"#3E1659",orbitRadius:36,orbitSpeed:.0012,startAngle:4.5,radius:.72,desc:"Custom Unity editor tools.",moons:[
     {id:"scatter-tool",label:"Replacement & Scatter Tool",icon:"🔧",orbitRadius:2.1,orbitSpeed:.012,startAngle:2,inclination:-.28,radius:.26,hex:"#9099e2",
       type:"Unity Tool",status:"",devPct:null,
       desc:"A Unity Editor extension that automates scene population workflows. It operates in two modes: Replace, which swaps selected objects with weighted-random prefabs, and Scatter, which distributes instances around existing objects without modifying them.",
@@ -358,31 +357,19 @@ const PLANETS=[
       desc:"Club website for Club Ciclista BTT Valls. Custom WordPress build covering routes, news, events and member information for the mountain bike community of Valls.",
       tags:["WordPress","Web Design","CSS","PHP"],
       features:["Route and event listings","Member area","News and media section","Mobile-first design","Custom theme"],
-      imgs:[],cta:"Visit Website",ctaHref:"https://btt-valls.com",
-      categories:[
-        {id:"overview",label:"Overview",caption:"Club website for Club Ciclista BTT Valls, covering routes, news, events and member information for the local mountain bike community.",imgs:[{label:"btt-valls.com",src:null,bg:"radial-gradient(ellipse at 50% 40%,#041a0c,#020e06)"}],videoId:null},
-        {id:"result",label:"Result",caption:"Live and in use by the club. Covers the full range of content needs from route publishing to event announcements.",imgs:[{label:"Live Site",src:null,bg:"radial-gradient(ellipse at 50% 60%,#021408,#010a04)"}],videoId:null},
-      ]},
+      imgs:[{label:"btt-valls.com",src:null,bg:"radial-gradient(ellipse at 50% 40%,#041a0c,#020e06)",caption:"Club website for Club Ciclista BTT Valls, covering routes, news, events and member information for the local mountain bike community. Live and in use by the club, covering the full range of content needs from route publishing to event announcements."}],cta:"Visit Website",ctaHref:"https://btt-valls.com"},
     {id:"edujuguetes",label:"edujuguetes.com",icon:"🧸",orbitRadius:2.8,orbitSpeed:.010,startAngle:2.6,inclination:-.2,radius:.22,hex:"#58cc8c",
       type:"Website",status:"Live",devPct:null,
       desc:"E-commerce site for an educational toy store. Product catalog, cart integration and order management for a specialty retail shop.",
       tags:["WordPress","WooCommerce","Web Design","CSS"],
       features:["Full WooCommerce product catalog","Cart and checkout integration","Category and filter system","Mobile-first design","Custom theme"],
-      imgs:[],cta:"Visit Website",ctaHref:"https://edujuguetes.com",
-      categories:[
-        {id:"overview",label:"Overview",caption:"E-commerce site for an educational toy store. Product catalog, shopping cart integration and order management built on WooCommerce.",imgs:[{label:"edujuguetes.com",src:null,bg:"radial-gradient(ellipse at 50% 40%,#061808,#030e04)"}],videoId:null},
-        {id:"result",label:"Result",caption:"Live store with full product catalog and checkout flow operational.",imgs:[{label:"Live Site",src:null,bg:"radial-gradient(ellipse at 50% 60%,#041408,#020a04)"}],videoId:null},
-      ]},
+      imgs:[{label:"edujuguetes.com",src:null,bg:"radial-gradient(ellipse at 50% 40%,#061808,#030e04)",caption:"E-commerce site for an educational toy store. Product catalog, shopping cart integration and order management built on WooCommerce. Live store with full product catalog and checkout flow operational."}],cta:"Visit Website",ctaHref:"https://edujuguetes.com"},
     {id:"tirambarcosta",label:"tirambarcostadaurada.com",icon:"🍹",orbitRadius:3.6,orbitSpeed:.008,startAngle:4.2,inclination:.13,radius:.22,hex:"#84e0b4",
       type:"Website",status:"Live",devPct:null,
       desc:"Landing page for a bar-restaurant on the Costa Daurada. Menu showcase, location and contact information for a hospitality client.",
       tags:["WordPress","Web Design","CSS","Hospitality"],
       features:["Menu and food showcase","Location and contact section","Image gallery","Reservation info","Mobile-first design"],
-      imgs:[],cta:"Visit Website",ctaHref:"https://tirambarcostadaurada.com",
-      categories:[
-        {id:"overview",label:"Overview",caption:"Landing page for a bar-restaurant on the Costa Daurada. Menu showcase, gallery, contact information and location for a hospitality client.",imgs:[{label:"tirambarcostadaurada.com",src:null,bg:"radial-gradient(ellipse at 50% 40%,#041610,#020c08)"}],videoId:null},
-        {id:"result",label:"Result",caption:"Live and in use by the client. Serves as the main digital presence for the restaurant.",imgs:[{label:"Live Site",src:null,bg:"radial-gradient(ellipse at 50% 60%,#031208,#010a06)"}],videoId:null},
-      ]},
+      imgs:[{label:"tirambarcostadaurada.com",src:null,bg:"radial-gradient(ellipse at 50% 40%,#041610,#020c08)",caption:"Landing page for a bar-restaurant on the Costa Daurada. Menu showcase, gallery, contact information and location for a hospitality client. Live and in use by the client, serving as the main digital presence for the restaurant."}],cta:"Visit Website",ctaHref:"https://tirambarcostadaurada.com"},
   ]},
 ];
 
@@ -439,14 +426,16 @@ function StatusBar(){
   </div>);
 }
 
-function Gallery({imgs,videoId,c,idx,onIdx}){
+function Gallery({imgs,videoId,c,idx,onIdx,maxH}){
   if(!imgs?.length)return null;
+  const[failed,setFailed]=useState(()=>new Set());
   const cur=imgs[idx]||imgs[0];
   const activeVid=cur.videoId??videoId;
+  const showImg=cur.src&&!failed.has(cur.src);
   const nb=(dir,fn)=>(<button className="pf-nav" onClick={fn} style={{position:"absolute",[dir]:8,top:"50%",transform:"translateY(-50%)",background:"rgba(0,0,0,.6)",border:`1px solid ${c}44`,color:c,width:26,height:26,borderRadius:"50%",cursor:"pointer",fontSize:"1rem",display:"flex",alignItems:"center",justifyContent:"center",transition:"background .2s",zIndex:2}}>{dir==="left"?"‹":"›"}</button>);
   return(<div style={{marginBottom:".75rem"}}>
-    <div style={{position:"relative",borderRadius:"10px",overflow:"hidden",aspectRatio:"16/9",border:`1px solid ${c}28`}}>
-      {cur.src?<img src={cur.src} alt={cur.label||""} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+    <div style={{position:"relative",width:"100%",borderRadius:"10px",overflow:"hidden",aspectRatio:"16/9",maxHeight:maxH,border:`1px solid ${c}28`}}>
+      {showImg?<img src={cur.src} alt={cur.label||""} onError={()=>setFailed(s=>new Set(s).add(cur.src))} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
         :<div style={{width:"100%",height:"100%",background:cur.bg||"rgba(255,255,255,.02)",position:"relative",overflow:"hidden"}}>
           <div style={{position:"absolute",inset:0,backgroundImage:`radial-gradient(circle,${c}07 1px,transparent 1px)`,backgroundSize:"22px 22px"}}/>
           <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse at center,transparent 30%,rgba(0,0,0,.55) 100%)"}}/>
@@ -460,9 +449,9 @@ function Gallery({imgs,videoId,c,idx,onIdx}){
   </div>);
 }
 
-function Modal({c,onClose,children}){
+function Modal({c,onClose,children,width}){
   return(<div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,8,.72)",backdropFilter:"blur(8px)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:"clamp(1rem,3vw,2rem)"}}>
-    <div onClick={e=>e.stopPropagation()} style={{width:"min(1400px,94vw)",maxHeight:"88vh",background:"rgba(7,7,17,.97)",backdropFilter:"blur(28px)",border:`1px solid ${c}30`,borderRadius:"20px",boxShadow:`0 0 80px ${c}18,0 30px 80px rgba(0,0,0,.7)`,overflowY:"auto",scrollbarWidth:"none",fontFamily:"'Space Grotesk',sans-serif",color:"#e8e8f0",animation:"modalIn .35s cubic-bezier(.16,1,.3,1)"}}>{children}</div>
+    <div onClick={e=>e.stopPropagation()} style={{width:width||"min(1400px,94vw)",maxHeight:"88vh",background:"rgba(7,7,17,.97)",backdropFilter:"blur(28px)",border:`1px solid ${c}30`,borderRadius:"20px",boxShadow:`0 0 80px ${c}18,0 30px 80px rgba(0,0,0,.7)`,overflowY:"auto",scrollbarWidth:"none",fontFamily:"'Space Grotesk',sans-serif",color:"#e8e8f0",animation:"modalIn .35s cubic-bezier(.16,1,.3,1)"}}>{children}</div>
   </div>);
 }
 
@@ -538,7 +527,7 @@ function ProjectPanel({project,onClose}){
     const imgs=activeCat?(activeCat.isOverview?(activeCat.imgs||[]):(activeSubcat?.imgs||[])):[];
     const vid=activeSubcat?.videoId??activeCat?.videoId??project.videoId;
     const caption=imgs[imgIdx]?.caption||activeSubcat?.caption;
-    return(<Modal c={pC} onClose={onClose}>
+    return(<Modal c={pC} onClose={onClose} width={activeSubcat?"min(980px,94vw)":"min(1400px,94vw)"}>
       <div style={{padding:"1.75rem 1.75rem 0"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:".75rem"}}><div><div style={{fontSize:".62rem",color:c,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".22em",marginBottom:".25rem"}}>{typeLabel}</div><h2 style={{fontSize:"1.5rem",fontWeight:600,display:"flex",gap:".5rem",alignItems:"center"}}>{project.icon} {project.label}</h2></div><CloseBtn/></div>
         <div style={{display:"flex",gap:".28rem",flexWrap:"wrap",margin:".65rem 0 .85rem"}}>
@@ -567,25 +556,23 @@ function ProjectPanel({project,onClose}){
         <div style={{padding:"0 1.75rem 1.75rem",display:"grid",gridTemplateColumns:"55fr 45fr",gap:"2rem"}}>
           <div>
             {previewImgs.length>0?<Gallery imgs={previewImgs} videoId={vid} c={c} idx={imgIdx} onIdx={setImgIdx}/>:<EmptySlot c={c}/>}
-            {!activeCat.isOverview&&activeCat.subcategories?.length>0&&(<div style={{marginTop:".7rem"}}>
-              <Lb t="EXPLORE" c={c}/>
-              <div style={{display:"flex",flexDirection:"column",gap:".5rem"}}>{activeCat.subcategories.map(sc=>(<button key={sc.id} onClick={()=>{setSubcatId(sc.id);setImgIdx(0);}} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:".7rem .9rem",fontSize:".84rem",fontFamily:"'Space Grotesk',sans-serif",background:`${c}0a`,border:`1px solid ${c}33`,borderRadius:"8px",color:"rgba(232,232,240,.85)",cursor:"pointer",transition:"all .2s",textAlign:"left",textTransform:"uppercase",letterSpacing:".03em"}}>{sc.label}<span style={{color:c,fontSize:".7rem",textTransform:"none"}}>{sc.imgs?.length||0} · →</span></button>))}</div>
-            </div>)}
             {activeCat.links?.map(l=>linkBtn(l,c))}
           </div>
           <div>
-            {activeCat.isOverview&&activeCat.shortDesc&&(<div style={{padding:".65rem .85rem",background:`${c}08`,border:`1px solid ${c}22`,borderRadius:"8px"}}><p style={{fontSize:".8rem",lineHeight:1.7,color:"rgba(232,232,240,.55)",fontStyle:"italic",textAlign:"justify"}}>{renderBold(activeCat.shortDesc)}</p></div>)}
-            {!activeCat.isOverview&&activeCat.text&&(<div><Lb t={activeCat.label.toUpperCase()} c={c}/><p style={{fontSize:".84rem",lineHeight:1.75,color:"rgba(232,232,240,.72)",whiteSpace:"pre-line",textAlign:"justify"}}>{renderBold(activeCat.text)}</p></div>)}
+            {activeCat.isOverview&&activeCat.shortDesc&&(<div style={{padding:".65rem .85rem",background:`${c}08`,border:`1px solid ${c}22`,borderRadius:"8px",marginBottom:"1rem"}}><p style={{fontSize:".8rem",lineHeight:1.7,color:"rgba(232,232,240,.55)",fontStyle:"italic",textAlign:"left"}}>{renderBold(activeCat.shortDesc)}</p></div>)}
+            {!activeCat.isOverview&&activeCat.text&&(<div style={{marginBottom:"1rem"}}><Lb t={activeCat.label.toUpperCase()} c={c}/><p style={{fontSize:".84rem",lineHeight:1.75,color:"rgba(232,232,240,.72)",whiteSpace:"pre-line",textAlign:"left"}}>{renderBold(activeCat.text)}</p></div>)}
+            {!activeCat.isOverview&&activeCat.subcategories?.length>0&&(<div>
+              <Lb t="EXPLORE" c={c}/>
+              <div style={{display:"flex",flexDirection:"column",gap:".5rem"}}>{activeCat.subcategories.map(sc=>(<button key={sc.id} onClick={()=>{setSubcatId(sc.id);setImgIdx(0);}} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:".7rem .9rem",fontSize:".84rem",fontFamily:"'Space Grotesk',sans-serif",background:`${c}0a`,border:`1px solid ${c}33`,borderRadius:"8px",color:"rgba(232,232,240,.85)",cursor:"pointer",transition:"all .2s",textAlign:"left",textTransform:"uppercase",letterSpacing:".03em"}}>{sc.label}<span style={{color:c,fontSize:".7rem",textTransform:"none"}}>{sc.imgs?.length||0} · →</span></button>))}</div>
+            </div>)}
           </div>
         </div>
       ):(
         <div style={{padding:"0 1.75rem 1.75rem"}}>
-          {imgs.length>0?<Gallery imgs={imgs} videoId={vid} c={c} idx={imgIdx} onIdx={setImgIdx}/>:<EmptySlot c={c}/>}
-          {activeCat.subcategories?.length>0&&(<div style={{display:"flex",gap:".28rem",flexWrap:"wrap",margin:".2rem 0 .8rem"}}>{activeCat.subcategories.map(sc=>(<button key={sc.id} className="pf-tab" onClick={()=>{setSubcatId(id=>id===sc.id?null:sc.id);setImgIdx(0);}} style={{padding:".22rem .58rem",fontSize:".64rem",fontFamily:"'JetBrains Mono',monospace",background:subcatId===sc.id?`${c}22`:"transparent",border:`1px solid ${subcatId===sc.id?c+"55":"rgba(255,255,255,.08)"}`,borderRadius:"100px",color:subcatId===sc.id?c:"rgba(232,232,240,.35)",cursor:"pointer",transition:"all .2s",letterSpacing:".06em",whiteSpace:"nowrap",textTransform:"uppercase"}}>{sc.label}</button>))}</div>)}
-          <div style={{maxWidth:"760px"}}>
-            {caption&&(<div key={`${catId}-${subcatId}-${imgIdx}`} style={{animation:"captionFade .22s ease"}}><div style={{fontSize:".6rem",color:`${c}88`,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".14em",marginBottom:".35rem"}}>{(imgs[imgIdx]?.label||activeSubcat?.label)?.toUpperCase()}{imgs.length>0?` · ${imgIdx+1}/${imgs.length}`:""}</div><p style={{fontSize:".86rem",lineHeight:1.75,color:"rgba(232,232,240,.75)",whiteSpace:"pre-line"}}>{renderBold(caption)}</p><HowItWorks text={imgs[imgIdx]?.details} c={c}/></div>)}
-            {activeCat.links?.map(l=>linkBtn(l,c))}
-          </div>
+          {imgs.length>0?<Gallery imgs={imgs} videoId={vid} c={c} idx={imgIdx} onIdx={setImgIdx} maxH="52vh"/>:<EmptySlot c={c}/>}
+          {activeCat.subcategories?.length>0&&(<div style={{display:"flex",gap:".28rem",flexWrap:"wrap",margin:".65rem 0 .7rem"}}>{activeCat.subcategories.map(sc=>(<button key={sc.id} className="pf-tab" onClick={()=>{setSubcatId(id=>id===sc.id?null:sc.id);setImgIdx(0);}} style={{padding:".22rem .58rem",fontSize:".64rem",fontFamily:"'JetBrains Mono',monospace",background:subcatId===sc.id?`${c}22`:"transparent",border:`1px solid ${subcatId===sc.id?c+"55":"rgba(255,255,255,.08)"}`,borderRadius:"100px",color:subcatId===sc.id?c:"rgba(232,232,240,.35)",cursor:"pointer",transition:"all .2s",letterSpacing:".06em",whiteSpace:"nowrap",textTransform:"uppercase"}}>{sc.label}</button>))}</div>)}
+          {caption&&(<div key={`${catId}-${subcatId}-${imgIdx}`} style={{animation:"captionFade .22s ease",marginTop:".3rem"}}><div style={{fontSize:".6rem",color:`${c}88`,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".14em",marginBottom:".3rem"}}>{(imgs[imgIdx]?.label||activeSubcat?.label)?.toUpperCase()}{imgs.length>0?` · ${imgIdx+1}/${imgs.length}`:""}</div><p style={{fontSize:".84rem",lineHeight:1.65,color:"rgba(232,232,240,.75)",whiteSpace:"pre-line",textAlign:"left"}}>{renderBold(caption)}</p><HowItWorks text={imgs[imgIdx]?.details} c={c}/></div>)}
+          {activeCat.links?.map(l=>linkBtn(l,c))}
         </div>
       )}
     </Modal>);
@@ -593,7 +580,7 @@ function ProjectPanel({project,onClose}){
 
   const effCatId=catId??project.categories?.[0]?.id;
   const cat=hasCats?(project.categories.find(c=>c.id===effCatId)||project.categories[0]):null;
-  const imgs=cat?.imgs||[];const vid=cat?.videoId??project.videoId;const caption=imgs[imgIdx]?.caption||cat?.caption;
+  const imgs=cat?.imgs||project.imgs||[];const vid=cat?.videoId??project.videoId;const caption=imgs[imgIdx]?.caption||cat?.caption;
   return(<Modal c={pC} onClose={onClose}>
     <div style={{padding:"1.75rem 1.75rem 0"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:".75rem"}}><div><div style={{fontSize:".62rem",color:pC,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".22em",marginBottom:".25rem"}}>{typeLabel}</div><h2 style={{fontSize:"1.5rem",fontWeight:600,display:"flex",gap:".5rem",alignItems:"center"}}>{project.icon} {project.label}</h2></div><CloseBtn/></div>
