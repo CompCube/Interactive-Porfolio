@@ -270,41 +270,39 @@ const PLANETS=[
   {id:"vfx",label:"VFX / Shaders",icon:"✨",hex:"#3C226B",orbitRadius:29,orbitSpeed:.0017,startAngle:2.5,radius:1.08,rings:true,desc:"Real-time VFX and custom shaders.",moons:[
     {id:"magic-barrier",label:"Magic Barrier",icon:"🛡️",orbitRadius:2.9,orbitSpeed:.011,startAngle:.5,inclination:.42,radius:.28,hex:"#9e7292",
       type:"VFX / Shader",status:"",devPct:null,
-      desc:"An event-driven energy shield built in Unity HDRP. The core decision: one shader, one pass, both faces of a double-sided transparent mesh handled through IsFrontFace. For transparent meshes that cannot batch, eliminating the extra pass cuts draw call overhead in half. The HDR Fresnel rim and equatorial band bloom in post-processing. Vertex displacement for the breathing pulse runs through VFX Graph alongside a second Mesh Output context for the outer aura. One asset, two visual layers.",
-      tags:["Unity","HDRP","VFX Graph","Shader Graph","Blender"],
+      desc:"A real-time energy shield built in Unity URP, combining Shader Graph and VFX Graph into a single reusable effect. The project focuses on rendering efficiency, using a single-pass double-sided shader while layering vertex animation, bloom, and particle effects without unnecessary rendering cost.",
+      tags:["Unity","URP","VFX Graph","Shader Graph","Blender"],
       features:["Single-pass double-face shader via IsFrontFace","HDR Fresnel rim with post-processing bloom","VFX Graph vertex displacement and aura","Event-driven spawn and auto-despawn in 6s","Zero continuous particle emission"],
       imgs:[],cta:"View on ArtStation",ctaHref:"https://www.artstation.com/artwork/L4qQJk",
       categories:[
-        {id:"overview",label:"Overview",caption:"The shield spawns on SendEvent, holds for 6 seconds and auto-despawns. No continuous emission, no second material, no extra pass.",imgs:[{label:"Magic Barrier",src:null,bg:"radial-gradient(ellipse at 50% 40%,#18041a,#0c020c)"}],videoId:null},
+        {id:"overview",label:"Overview",caption:"The shield spawns on SendEvent, holds for 6 seconds and auto-despawns. No continuous emission, no second material, no extra pass.",imgs:[{label:"Magic Barrier",src:null,bg:"radial-gradient(ellipse at 50% 40%,#18041a,#0c020c)"}],videoId:"WvI2CbB6ZAU"},
+        {id:"showcase",label:"Showcase",caption:"",imgs:[
+          {label:"Parameters",src:null,bg:"radial-gradient(ellipse at 50% 60%,#0c0220,#060110)",caption:"Live parameter tweaks showing the exposed controls: rim intensity, band colour, displacement speed and aura opacity."},
+        ],videoId:"VwwDhpI-k-g"},
         {id:"technical",label:"Breakdown",caption:"",imgs:[
           {label:"Mesh",src:null,bg:"radial-gradient(ellipse at 50% 40%,#14041a,#0a020c)",caption:"The shield uses a **double-sided transparent mesh** whose silhouette defines the readability of the entire effect. Its topology was designed to support both the Fresnel highlights and the vertex displacement, ensuring that the pulse animation remains smooth and visually consistent from every angle."},
           {label:"UV Layout",src:null,bg:"radial-gradient(ellipse at 45% 55%,#160418,#0a0210)",caption:"The UVs were **manually adjusted in Photoshop** to control how textures wrap around the sphere. This provided precise placement of the equatorial energy band and ensured that surface details tiled consistently before any shader work was introduced."},
           {label:"Shader Graph",src:null,bg:"radial-gradient(ellipse at 55% 45%,#12041a,#08020c)",caption:"A **single-pass shader** handles both sides of the mesh using **IsFrontFace**, eliminating the need for duplicate materials or additional rendering passes. The exterior face generates the Fresnel rim and surface details, while the interior receives its own visual treatment. HDR values drive the rim and energy band into Unity's bloom pipeline, creating the shield's characteristic glow."},
           {label:"VFX Graph",src:null,bg:"radial-gradient(ellipse at 50% 50%,#160218,#0c010c)",caption:"VFX Graph drives **two independent effects** within the same asset: vertex displacement for the breathing pulse and a second **Mesh Output** context responsible for the outer aura. The entire system is event-driven, spawning on demand and automatically despawning after six seconds, with no continuous particle simulation."},
         ],videoId:null},
-        {id:"showcase",label:"Showcase",caption:"",imgs:[
-          {label:"Showcase",src:null,bg:"radial-gradient(ellipse at 50% 40%,#0a0418,#050210)",caption:"The shield triggered and held in scene. The exterior and interior visual difference is visible when the camera crosses the mesh surface."},
-          {label:"Parameters",src:null,bg:"radial-gradient(ellipse at 50% 60%,#0c0220,#060110)",caption:"Live parameter tweaks showing the exposed controls: rim intensity, band colour, displacement speed and aura opacity."},
-        ],videoId:null},
       ]},
     {id:"waterfall",label:"Stylized Waterfall",icon:"💧",orbitRadius:3.8,orbitSpeed:.008,startAngle:3.2,inclination:-.3,radius:.22,hex:"#906080",
       type:"VFX / Shader",status:"",devPct:null,
-      desc:"A stylized waterfall split into two systems with different performance priorities. The main body is a single mesh rendered through VFX Graph Mesh Output - not for particle simulation, but to push shader parameters at runtime, keeping the whole surface at one draw call. The shader scrolls two layers at different speeds and generates normals in-shader via NormalFromHeight, removing the need for baked normal maps. Splash and fog at the base are a separate Particle System: 1000 quad particles with noise-based alpha clip for a dissolve edge on the droplets.",
+      desc:"A stylized waterfall built in Unity using Shader Graph, VFX Graph, and Particle Systems. The effect is split into two independent systems with different performance priorities: a shader-driven waterfall body and a lightweight splash system, balancing visual quality, runtime flexibility, and mobile-friendly performance.",
       tags:["Unity","VFX Graph","Shader Graph","Blender","Mobile Optimized"],
       features:["One draw call for main body via Mesh Output","Normals generated in-shader via NormalFromHeight","Two-layer UV scrolling without physics simulation","1000 quad particles with noise-based alpha clip","Runtime UI with sliders and colour picker"],
       imgs:[],cta:"View on ArtStation",ctaHref:"https://www.artstation.com/artwork/2BgoNy",
       categories:[
-        {id:"overview",label:"Overview",caption:"Main water body at one draw call. Splash and fog at the base kept deliberately cheap to contain overdraw where particles overlap heavily.",imgs:[{label:"Stylized Waterfall",src:null,bg:"radial-gradient(ellipse at 40% 70%,#041018,#020810)"}],videoId:null},
-        {id:"technical",label:"Breakdown",caption:"",imgs:[
-          {label:"Mesh",src:null,bg:"radial-gradient(ellipse at 55% 40%,#04101a,#020810)",caption:"The waterfall body is built from a **single low-complexity mesh** designed to let the shader carry most of the visual detail. Its topology follows the direction of the water flow, minimizing UV stretching and preserving smooth motion around curves."},
-          {label:"Shader Graph",src:null,bg:"radial-gradient(ellipse at 45% 60%,#040e18,#020708)",caption:"The water surface is generated entirely in **Shader Graph** using two texture layers scrolling at different speeds to simulate flow without relying on physics. Surface normals are reconstructed in real time through **NormalFromHeight**, removing the need for baked normal maps. Key parameters such as colour, tiling, foam intensity, and scroll speed are exposed for live tweaking."},
-          {label:"VFX Graph",src:null,bg:"radial-gradient(ellipse at 50% 50%,#041218,#020a0c)",caption:"VFX Graph is used as a **runtime control layer** rather than a particle simulation system. Through a **Mesh Output** context, it drives shader parameters dynamically while keeping the entire waterfall body rendered in a single draw call."},
-          {label:"Particle System",src:null,bg:"radial-gradient(ellipse at 55% 55%,#040e16,#020810)",caption:"Splash and fog are handled separately with a lightweight Particle System composed of **1000 quad particles**. A noise-based alpha clip creates soft dissolving edges on each droplet, while the shader remains intentionally simple to limit overdraw in areas with heavy particle overlap."},
-          {label:"Optimization Strategy",src:null,bg:"radial-gradient(ellipse at 50% 45%,#04141a,#020a0e)",caption:"The effect is split into **two systems with different performance requirements**: the waterfall body prioritizes visual quality while remaining at a single draw call, whereas the splash and fog effects use inexpensive particles to keep overdraw under control in the most demanding areas."},
-        ],videoId:null},
+        {id:"overview",label:"Overview",caption:"Main water body at one draw call. Splash and fog at the base kept deliberately cheap to contain overdraw where particles overlap heavily.",imgs:[{label:"Stylized Waterfall",src:null,bg:"radial-gradient(ellipse at 40% 70%,#041018,#020810)"}],videoId:"S8ndamM_ybg"},
         {id:"showcase",label:"Showcase",caption:"",imgs:[
           {label:"Showcase",src:null,bg:"radial-gradient(ellipse at 50% 40%,#041418,#02090e)",caption:"Full waterfall in scene with splash system active. Shows how the two systems read together as one coherent effect."},
           {label:"Parameters",src:null,bg:"radial-gradient(ellipse at 50% 60%,#04101a,#020810)",caption:"Live UI with sliders and colour picker. Tiling speed, foam intensity, colour grading and particle density all tweakable in real time."},
+        ],videoId:"3nqZCaLPB2M"},
+        {id:"technical",label:"Breakdown",caption:"",imgs:[
+          {label:"Mesh",src:null,bg:"radial-gradient(ellipse at 55% 40%,#04101a,#020810)",caption:"The waterfall body is built from a **single low-complexity mesh** designed to let the shader carry most of the visual detail. Its topology follows the direction of the water flow, minimizing UV stretching and preserving smooth motion around curves."},
+          {label:"Waterfall Shader",src:null,bg:"radial-gradient(ellipse at 45% 60%,#040e18,#020708)",caption:"The water surface is generated entirely in **Shader Graph** using two texture layers scrolling at different speeds to simulate flow without relying on physics. Surface normals are reconstructed in real time through **NormalFromHeight**, removing the need for baked normal maps. Key parameters such as colour, tiling, foam intensity, and scroll speed are exposed for live tweaking."},
+          {label:"Splash Shader",src:null,bg:"radial-gradient(ellipse at 50% 50%,#041218,#020a0c)",caption:"A dedicated **Unlit Shader** powers the splash and fog particles. A soft radial texture combined with a **noise-based alpha clip** produces natural dissolving edges without the cost of complex transparency. With no lighting model or normal maps, the shader stays lightweight enough to support hundreds of overlapping particles while remaining suitable for mobile hardware."},
+          {label:"Particle System",src:null,bg:"radial-gradient(ellipse at 55% 55%,#040e16,#020810)",caption:"Splash and fog are handled through a lightweight Particle System composed of **1000 quad particles**, built in **VFX Graph** rather than the legacy Shuriken system for better performance on mobile. Each particle uses the splash shader's noise-based alpha clip for a soft dissolving edge, while the whole system stays intentionally simple to limit overdraw in areas with heavy particle overlap."},
         ],videoId:null},
       ]},
   ]},
@@ -435,17 +433,17 @@ function Gallery({imgs,videoId,c,idx,onIdx,maxH}){
   const nb=(dir,fn)=>(<button className="pf-nav" onClick={fn} style={{position:"absolute",[dir]:8,top:"50%",transform:"translateY(-50%)",background:"rgba(0,0,0,.6)",border:`1px solid ${c}44`,color:c,width:26,height:26,borderRadius:"50%",cursor:"pointer",fontSize:"1rem",display:"flex",alignItems:"center",justifyContent:"center",transition:"background .2s",zIndex:2}}>{dir==="left"?"‹":"›"}</button>);
   return(<div style={{marginBottom:".75rem"}}>
     <div style={{position:"relative",width:"100%",borderRadius:"10px",overflow:"hidden",aspectRatio:"16/9",maxHeight:maxH,border:`1px solid ${c}28`}}>
-      {showImg?<img src={cur.src} alt={cur.label||""} onError={()=>setFailed(s=>new Set(s).add(cur.src))} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+      {activeVid?<iframe src={`https://www.youtube.com/embed/${activeVid}`} title={cur.label||"video"} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{width:"100%",height:"100%",border:"none",display:"block"}}/>
+        :showImg?<img src={cur.src} alt={cur.label||""} onError={()=>setFailed(s=>new Set(s).add(cur.src))} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
         :<div style={{width:"100%",height:"100%",background:cur.bg||"rgba(255,255,255,.02)",position:"relative",overflow:"hidden"}}>
           <div style={{position:"absolute",inset:0,backgroundImage:`radial-gradient(circle,${c}07 1px,transparent 1px)`,backgroundSize:"22px 22px"}}/>
           <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse at center,transparent 30%,rgba(0,0,0,.55) 100%)"}}/>
           {[["top","left"],["top","right"],["bottom","left"],["bottom","right"]].map(([v,h])=>(<div key={v+h} style={{position:"absolute",[v]:8,[h]:8,width:14,height:14,borderTop:v==="top"?`1.5px solid ${c}55`:"none",borderBottom:v==="bottom"?`1.5px solid ${c}55`:"none",borderLeft:h==="left"?`1.5px solid ${c}55`:"none",borderRight:h==="right"?`1.5px solid ${c}55`:"none"}}/>))}
           <div style={{position:"absolute",bottom:7,left:10,fontSize:".58rem",color:`${c}88`,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".12em"}}>{(cur.label||"PLACEHOLDER").toUpperCase()}</div>
         </div>}
-      {imgs.length>1&&<>{nb("left",()=>onIdx(i=>(i-1+imgs.length)%imgs.length))}{nb("right",()=>onIdx(i=>(i+1)%imgs.length))}</>}
-      {imgs.length>1&&(<div style={{position:"absolute",bottom:8,right:10,display:"flex",gap:4,zIndex:2}}>{imgs.map((_,i)=><div key={i} onClick={()=>onIdx(i)} style={{width:i===idx?14:5,height:5,borderRadius:"100px",background:i===idx?c:`${c}44`,cursor:"pointer",transition:"all .2s"}}/>)}</div>)}
+      {!activeVid&&imgs.length>1&&<>{nb("left",()=>onIdx(i=>(i-1+imgs.length)%imgs.length))}{nb("right",()=>onIdx(i=>(i+1)%imgs.length))}</>}
+      {!activeVid&&imgs.length>1&&(<div style={{position:"absolute",bottom:8,right:10,display:"flex",gap:4,zIndex:2}}>{imgs.map((_,i)=><div key={i} onClick={()=>onIdx(i)} style={{width:i===idx?14:5,height:5,borderRadius:"100px",background:i===idx?c:`${c}44`,cursor:"pointer",transition:"all .2s"}}/>)}</div>)}
     </div>
-    {activeVid&&(<a href={`https://youtube.com/watch?v=${activeVid}`} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",gap:".5rem",marginTop:".45rem",padding:".4rem .7rem",background:"rgba(220,0,0,.1)",border:"1px solid rgba(220,0,0,.28)",borderRadius:"7px",color:"#ff8888",textDecoration:"none",fontSize:".72rem",fontFamily:"'JetBrains Mono',monospace"}}>▶ Watch on YouTube</a>)}
   </div>);
 }
 
@@ -713,7 +711,7 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
         const mOPts=[];for(let i=0;i<=64;i++){const a=(i/64)*Math.PI*2;mOPts.push(new THREE.Vector3(Math.cos(a)*m.orbitRadius,0,Math.sin(a)*m.orbitRadius));}
         const mol=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(mOPts),new THREE.LineBasicMaterial({color:new THREE.Color(m.hex),transparent:true,opacity:.16}));mol.rotation.x=m.inclination;mol.visible=false;scene.add(mol);moonOrbitLines[m.id]={line:mol};
         const molHit=new THREE.Mesh(new THREE.RingGeometry(Math.max(.05,m.orbitRadius-.16),m.orbitRadius+.16,64),new THREE.MeshBasicMaterial({transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false}));molHit.rotation.x=-Math.PI/2+m.inclination;molHit.userData={type:"moon",id:m.id,planetId:p.id};scene.add(molHit);allTargets.push(molHit);moonOrbitLines[m.id].hit=molHit;
-        const mC=new THREE.Color(p.hex).lerp(new THREE.Color(0xffffff),.4);const mMat=new THREE.MeshStandardMaterial({color:mC.clone().multiplyScalar(.72),emissive:mC,emissiveIntensity:.36,roughness:.6,metalness:.08,bumpMap:moonBumpTex,bumpScale:.018});
+        const mC=new THREE.Color(p.hex).lerp(new THREE.Color(0xffffff),.05);const mMat=new THREE.MeshStandardMaterial({color:mC.clone().multiplyScalar(.72),emissive:mC,emissiveIntensity:.36,roughness:.6,metalness:.08,bumpMap:moonBumpTex,bumpScale:.018});
         const mMesh=new THREE.Mesh(new THREE.SphereGeometry(m.radius,20,20),mMat);mMesh.userData={type:"moon",id:m.id,planetId:p.id};scene.add(mMesh);allTargets.push(mMesh);pMeshes[p.id].mMeshes[m.id]={mesh:mMesh,mat:mMat};});
     });
     const camS={mode:"solar",planetId:null,solarAngle:.8,solarDist:46,solarDistTarget:46,hAngle:.5,vAngle:.55};
