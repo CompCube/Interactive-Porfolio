@@ -195,9 +195,13 @@ const PLANETS=[
       desc:"The structural foundation of *Hollow End* is built from a **reusable modular kit** designed to create **large interconnected subway environments** in Unity HDRP. The same geometry constructs both **The Backroom (L2)** and **The Abandoned Zone (L1 & L3)**, with distinct identities achieved through materials, lighting, and environmental dressing instead of additional meshes.",
       tags:["Blender","Unity HDRP","Modular Kit","Substance 3D Painter","Trim Sheets","Liminal Space","Backrooms"],
       features:["78 modular pieces covering full environmental construction","9 trim sheets with progressive degradation variants","4096px trim sheets at 512 px/m texel density","Two complete environments: Backroom & Abandoned","Material-driven variation using a single UV framework"],
-      imgs:[],cta:"View on ArtStation",
+      imgs:[{label:"Render",src:gh("environments/subway-modular-kit/01-render1.png"),bg:bgEnv}],cta:"View on ArtStation",
       categories:[
         {id:"core-idea",label:"CORE IDEA",hex:"#bb8880",
+         imgs:[
+           {label:"Backrooms",src:gh("environments/subway-modular-kit/core-idea/01-backrooms.jpg"),bg:"radial-gradient(ellipse at 50% 30%,#0a1a10,#040a06)"},
+           {label:"Liminal Space",src:gh("environments/subway-modular-kit/core-idea/02-liminalspace.jpg"),bg:"radial-gradient(ellipse at 50% 70%,#081414,#040808)"},
+         ],
          text:"*Hollow End* was built around a simple production challenge: create multiple narrative environments from a single modular kit without duplicating geometry. Instead of relying on unique assets for each level, the project focuses on reuse, allowing materials, lighting, and environmental dressing to define each space while the underlying structure remains the same.",
          subcategories:[
            {id:"concepts",label:"Concepts",imgs:[
@@ -433,7 +437,7 @@ function Gallery({imgs,videoId,c,idx,onIdx,maxH}){
   const nb=(dir,fn)=>(<button className="pf-nav" onClick={fn} style={{position:"absolute",[dir]:8,top:"50%",transform:"translateY(-50%)",background:"rgba(0,0,0,.6)",border:`1px solid ${c}44`,color:c,width:26,height:26,borderRadius:"50%",cursor:"pointer",fontSize:"1rem",display:"flex",alignItems:"center",justifyContent:"center",transition:"background .2s",zIndex:2}}>{dir==="left"?"‹":"›"}</button>);
   return(<div style={{marginBottom:".75rem"}}>
     <div style={{position:"relative",width:"100%",borderRadius:"10px",overflow:"hidden",aspectRatio:"16/9",maxHeight:maxH,border:`1px solid ${c}28`}}>
-      {activeVid?<iframe src={`https://www.youtube.com/embed/${activeVid}`} title={cur.label||"video"} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{width:"100%",height:"100%",border:"none",display:"block"}}/>
+      {activeVid?<iframe src={`https://www.youtube.com/embed/${activeVid}?autoplay=1&mute=1`} title={cur.label||"video"} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{width:"100%",height:"100%",border:"none",display:"block"}}/>
         :showImg?<img src={cur.src} alt={cur.label||""} onError={()=>setFailed(s=>new Set(s).add(cur.src))} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
         :<div style={{width:"100%",height:"100%",background:cur.bg||"rgba(255,255,255,.02)",position:"relative",overflow:"hidden"}}>
           <div style={{position:"absolute",inset:0,backgroundImage:`radial-gradient(circle,${c}07 1px,transparent 1px)`,backgroundSize:"22px 22px"}}/>
@@ -521,7 +525,7 @@ function ProjectPanel({project,onClose}){
     const activeSubcat=activeCat?.subcategories?.find(s=>s.id===subcatId);
     const c=activeCat?.hex||pC;
     const ovImgs=(project.imgs?.length?project.imgs:null)||project.categories[0]?.subcategories?.[0]?.imgs||project.categories[0]?.imgs||[];
-    const previewImgs=activeCat?(activeCat.isOverview?(activeCat.imgs||[]):(activeCat.subcategories?.[0]?.imgs||[])):[];
+    const previewImgs=activeCat?(activeCat.imgs?.length?activeCat.imgs:(activeCat.subcategories?.[0]?.imgs||[])):[];
     const imgs=activeCat?(activeCat.isOverview?(activeCat.imgs||[]):(activeSubcat?.imgs||[])):[];
     const vid=activeSubcat?.videoId??activeCat?.videoId??project.videoId;
     const caption=imgs[imgIdx]?.caption||activeSubcat?.caption;
@@ -711,7 +715,7 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
         const mOPts=[];for(let i=0;i<=64;i++){const a=(i/64)*Math.PI*2;mOPts.push(new THREE.Vector3(Math.cos(a)*m.orbitRadius,0,Math.sin(a)*m.orbitRadius));}
         const mol=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(mOPts),new THREE.LineBasicMaterial({color:new THREE.Color(m.hex),transparent:true,opacity:.16}));mol.rotation.x=m.inclination;mol.visible=false;scene.add(mol);moonOrbitLines[m.id]={line:mol};
         const molHit=new THREE.Mesh(new THREE.RingGeometry(Math.max(.05,m.orbitRadius-.16),m.orbitRadius+.16,64),new THREE.MeshBasicMaterial({transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false}));molHit.rotation.x=-Math.PI/2+m.inclination;molHit.userData={type:"moon",id:m.id,planetId:p.id};scene.add(molHit);allTargets.push(molHit);moonOrbitLines[m.id].hit=molHit;
-        const mC=new THREE.Color(p.hex).lerp(new THREE.Color(0xffffff),.05);const mMat=new THREE.MeshStandardMaterial({color:mC.clone().multiplyScalar(.72),emissive:mC,emissiveIntensity:.36,roughness:.6,metalness:.08,bumpMap:moonBumpTex,bumpScale:.018});
+        const mC=new THREE.Color(p.hex).lerp(new THREE.Color(0xffffff),.25);const mMat=new THREE.MeshStandardMaterial({color:mC.clone().multiplyScalar(.72),emissive:mC,emissiveIntensity:.36,roughness:.6,metalness:.08,bumpMap:moonBumpTex,bumpScale:.018});
         const mMesh=new THREE.Mesh(new THREE.SphereGeometry(m.radius,20,20),mMat);mMesh.userData={type:"moon",id:m.id,planetId:p.id};scene.add(mMesh);allTargets.push(mMesh);pMeshes[p.id].mMeshes[m.id]={mesh:mMesh,mat:mMat};});
     });
     const camS={mode:"solar",planetId:null,solarAngle:.8,solarDist:46,solarDistTarget:46,hAngle:.5,vAngle:.55};
