@@ -199,18 +199,18 @@ const PLANETS=[
       categories:[
         {id:"core-idea",label:"CORE IDEA",hex:"#bb8880",
          imgs:[
-           {label:"Backrooms",src:gh("environments/subway-modular-kit/core-idea/01-backrooms.jpg"),bg:"radial-gradient(ellipse at 50% 30%,#0a1a10,#040a06)"},
            {label:"Liminal Space",src:gh("environments/subway-modular-kit/core-idea/02-liminalspace.jpg"),bg:"radial-gradient(ellipse at 50% 70%,#081414,#040808)"},
+           {label:"Backrooms",src:gh("environments/subway-modular-kit/core-idea/01-backrooms.jpg"),bg:"radial-gradient(ellipse at 50% 30%,#0a1a10,#040a06)"},
          ],
          text:"*Hollow End* was built around a simple production challenge: create multiple narrative environments from a single modular kit without duplicating geometry. Instead of relying on unique assets for each level, the project focuses on reuse, allowing materials, lighting, and environmental dressing to define each space while the underlying structure remains the same.",
          subcategories:[
            {id:"concepts",label:"Concepts",imgs:[
-             {label:"Backrooms",src:gh("environments/subway-modular-kit/core-idea/concepts/01-backrooms.png"),bg:"radial-gradient(ellipse at 50% 30%,#0a1a10,#040a06)",caption:"The Backrooms is an internet horror concept describing a seemingly **infinite, surreal space** detached from reality. In *Hollow End*, the goal was to create spaces that feel familiar enough to be believable, yet subtly disconnected from reality."},
-             {label:"Liminal Spaces",src:gh("environments/subway-modular-kit/core-idea/concepts/02-liminalspace.png"),bg:"radial-gradient(ellipse at 50% 70%,#081414,#040808)",caption:"Liminal spaces became one of the project's main design pillars. Empty corridors, platforms, and transitional spaces were used to create unease through **atmosphere, lighting** and **silence** instead of relying on traditional horror elements."},
+             {label:"Liminal Spaces",src:gh("environments/subway-modular-kit/core-idea/concepts/01-liminal-spaces.png"),bg:"radial-gradient(ellipse at 50% 70%,#081414,#040808)",caption:"Liminal spaces became one of the project's main design pillars. Empty corridors, platforms, and transitional spaces were used to create unease through **atmosphere, lighting** and **silence** instead of relying on traditional horror elements."},
+             {label:"Backrooms",src:gh("environments/subway-modular-kit/core-idea/concepts/02-backrooms.png"),bg:"radial-gradient(ellipse at 50% 30%,#0a1a10,#040a06)",caption:"The Backrooms is an internet horror concept describing a seemingly **infinite, surreal space** detached from reality. In *Hollow End*, the goal was to create spaces that feel familiar enough to be believable, yet subtly disconnected from reality."},
            ]},
            {id:"moodboard-refs",label:"Moodboard & References",imgs:[
              {label:"U-Bahn (Berlin)",src:gh("environments/subway-modular-kit/core-idea/moodboard-refs/01-berlinsubahn.png"),bg:"radial-gradient(ellipse at 40% 60%,#0a0a18,#040408)",caption:"Berlin's U-Bahn became the **primary architectural reference** for the project. Its modular construction, clean geometry, and restrained visual language naturally translated into a reusable environment system."},
-             {label:"Ghost Stations (Barcelona)",src:gh("environments/subway-modular-kit/core-idea/moodboard-refs/02-ghost-stations-barcelona.png"),bg:"radial-gradient(ellipse at 60% 40%,#100808,#080404)",caption:"Barcelona's abandoned and inaccessible stations inspired the deteriorated areas of the game, introducing unfinished spaces and signs of long-term neglect."},
+             {label:"Ghost Stations (Barcelona)",src:gh("environments/subway-modular-kit/core-idea/moodboard-refs/02-bcn-ghost.png"),bg:"radial-gradient(ellipse at 60% 40%,#100808,#080404)",caption:"Barcelona's abandoned and inaccessible stations inspired the deteriorated areas of the game, introducing unfinished spaces and signs of long-term neglect."},
              {label:"Moodboard",src:gh("environments/subway-modular-kit/core-idea/moodboard-refs/03-moodboard.png"),bg:"radial-gradient(ellipse at 50% 50%,#080a14,#040608)",caption:"The moodboard combines real-world transit architecture with liminal horror references, establishing a clear visual language before production began and guiding every design decision throughout development."},
            ]},
            {id:"game-feeling",label:"Game Feeling",imgs:[
