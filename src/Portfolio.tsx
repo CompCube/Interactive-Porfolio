@@ -217,6 +217,19 @@ const PLANETS=[
              {label:"Kenopsia",src:gh("environments/subway-modular-kit/core-idea/game-feeling/01-kenopsia.png"),bg:"radial-gradient(ellipse at 50% 50%,#060c0a,#030604)",caption:"The atmosphere of *Hollow End* is built around **Kenopsia**: the unsettling feeling of **a place that should be full of life but is now completely empty**. Rather than relying on monsters or jump scares, the environment creates tension through silence, familiarity, and the absence of people."},
            ]},
          ]},
+        {id:"trim-sheets",label:"TRIM SHEETS & MATERIALS",hex:"#88aadd",
+         text:"The material pipeline was defined **before any modeling began**. By designing the trim sheets first, every asset could share the same UV logic from the start, ensuring consistent texel density, reducing material count, and keeping the entire environment scalable through a **unified material framework**.",
+         subcategories:[
+           {id:"first-attempts",label:"First Attempts",imgs:[
+             {label:"Backroom Iterations",src:gh("environments/subway-modular-kit/trim-sheets/first-attemps/01-backrooms.png"),bg:"radial-gradient(ellipse at 45% 55%,#040c1a,#020608)",caption:"Finding the right balance between repetition and readability required several iterations. Early versions either felt too noisy or too uniform, leading to multiple refinements before arriving at a trim sheet that remained **modular without becoming visually repetitive**."},
+             {label:"Abandoned Iterations",src:gh("environments/subway-modular-kit/trim-sheets/first-attemps/02-abandoned.png"),bg:"radial-gradient(ellipse at 55% 45%,#030a14,#020508)",caption:"For the Abandoned Zone, the main challenge wasn't adding damage — it was making **deterioration feel natural** while preserving the modular workflow. Several iterations focused on balancing wear, rust, and water damage without breaking consistency across large connected surfaces."},
+           ]},
+           {id:"final-trimsheets",label:"Final Trim Sheets",imgs:[
+             {label:"Backroom Trim Sheets",src:gh("environments/subway-modular-kit/trim-sheets/final-trimsheets/01-l2-trimsheets.png"),bg:"radial-gradient(ellipse at 55% 45%,#040a18,#020508)",caption:"The final Backroom trim sheets prioritize **clean surfaces, subtle variation, and controlled repetition**, reinforcing the sterile and artificial atmosphere while remaining highly reusable across the environment."},
+             {label:"Abandoned Trim Sheets",src:gh("environments/subway-modular-kit/trim-sheets/final-trimsheets/02-abandoned.png"),bg:"radial-gradient(ellipse at 50% 50%,#180a06,#0c0504)",caption:"The Abandoned trim sheets build upon the **same UV framework**, introducing progressive surface wear, rust, and water damage without requiring any changes to the underlying geometry."},
+           ]},
+           {id:"mat-variations",label:"Material Variations",imgs:[{label:"Progressive Degradation Variants",src:gh("environments/subway-modular-kit/trim-sheets/mat-variations/01-materialvariations.png"),bg:"radial-gradient(ellipse at 50% 50%,#040a18,#020508)",caption:"To break visual repetition while keeping the geometry and material workflow unchanged, **four material variants** were derived from a single base trim sheet to represent different stages of aging and environmental wear."}]},
+         ]},
         {id:"modular-kit",label:"MODULAR KIT SYSTEM",hex:"#7abba8",
          imgs:[{label:"Full Modular Kit",src:gh("environments/subway-modular-kit/modular-kit/01-fullmodularkit.png"),bg:"radial-gradient(ellipse at 50% 50%,#0a1a14,#040a08)"}],
          text:"The Modular Kit is the **structural backbone** of *Hollow End*, consisting of **78 reusable pieces** used to construct every playable environment. Organized into two main sets (New and Abandoned) and built around a strict **4-meter grid**, the system ensures predictable snapping, consistent UV layouts, and a uniform texel density across the entire project.\n\nRather than creating unique assets for each area, the kit prioritizes **modularity and reuse**. The same geometry supports multiple environments, with materials, lighting, and environmental dressing providing each space with its own visual identity.",
@@ -236,27 +249,6 @@ const PLANETS=[
              {label:"Pieces",src:gh("environments/subway-modular-kit/modular-kit/abandoned-l1/04-pieces.png"),bg:"radial-gradient(ellipse at 50% 60%,#180808,#0a0404)",caption:"The Abandoned Zone is built from the **exact same modular pieces**, recontextualized through material degradation, lighting, and environmental dressing. This demonstrates the core strength of the system: creating a completely different atmosphere without increasing the structural asset count."},
            ]},
          ]},
-        {id:"trim-sheets",label:"TRIM SHEETS & MATERIALS",hex:"#88aadd",
-         text:"The material pipeline was defined **before any modeling began**. By designing the trim sheets first, every asset could share the same UV logic from the start, ensuring consistent texel density, reducing material count, and keeping the entire environment scalable through a **unified material framework**.",
-         subcategories:[
-           {id:"ts-overview",label:"Overview",imgs:[{label:"Material Workflow",src:gh("environments/subway-modular-kit/trim-sheets/ts-overview/01-material-workflow.png"),bg:bgBlue,caption:"Instead of creating materials after the assets were modeled, the trim sheet library became the **foundation of the entire environment pipeline**. This approach kept UV layouts and texture resolution consistent across the kit while reducing the material count from **78 individual materials** to just **9 trim sheets**."}]},
-           {id:"tech-aspects",label:"Technical Aspects",imgs:[{label:"Technical Specifications",src:gh("environments/subway-modular-kit/trim-sheets/tech-aspects/01-technical-specifications.png"),bg:"radial-gradient(ellipse at 45% 55%,#040c1a,#020608)",caption:"All trim sheets were authored at **4096×4096** and designed around the project's **4-meter modular standard**, maintaining a consistent **512 px/m texel density** throughout the environment. Each material follows Unity HDRP's standard **Base Map, Normal Map, and Mask Map** workflow, allowing the entire modular kit to share a compact material library without sacrificing visual quality."}]},
-           {id:"first-attempts",label:"First Attempts",imgs:[
-             {label:"Backroom Iterations",src:gh("environments/subway-modular-kit/trim-sheets/first-attemps/01-backrooms.png"),bg:"radial-gradient(ellipse at 45% 55%,#040c1a,#020608)",caption:"Finding the right balance between repetition and readability required several iterations. Early versions either felt too noisy or too uniform, leading to multiple refinements before arriving at a trim sheet that remained **modular without becoming visually repetitive**."},
-             {label:"Abandoned Iterations",src:gh("environments/subway-modular-kit/trim-sheets/first-attemps/02-abandoned.png"),bg:"radial-gradient(ellipse at 55% 45%,#030a14,#020508)",caption:"For the Abandoned Zone, the main challenge wasn't adding damage — it was making **deterioration feel natural** while preserving the modular workflow. Several iterations focused on balancing wear, rust, and water damage without breaking consistency across large connected surfaces."},
-           ]},
-           {id:"final-trimsheets",label:"Final Trim Sheets",imgs:[
-             {label:"Backroom Trim Sheets",src:gh("environments/subway-modular-kit/trim-sheets/final-trimsheets/01-l2-trimsheets.png"),bg:"radial-gradient(ellipse at 55% 45%,#040a18,#020508)",caption:"The final Backroom trim sheets prioritize **clean surfaces, subtle variation, and controlled repetition**, reinforcing the sterile and artificial atmosphere while remaining highly reusable across the environment."},
-             {label:"Abandoned Trim Sheets",src:gh("environments/subway-modular-kit/trim-sheets/final-trimsheets/02-abandoned.png"),bg:"radial-gradient(ellipse at 50% 50%,#180a06,#0c0504)",caption:"The Abandoned trim sheets build upon the **same UV framework**, introducing progressive surface wear, rust, and water damage without requiring any changes to the underlying geometry."},
-           ]},
-           {id:"mat-variations",label:"Material Variations",imgs:[{label:"Progressive Degradation Variants",src:gh("environments/subway-modular-kit/trim-sheets/mat-variations/01-materialvariations.png"),bg:"radial-gradient(ellipse at 50% 50%,#040a18,#020508)",caption:"To break visual repetition while keeping the geometry and material workflow unchanged, **four material variants** were derived from a single base trim sheet to represent different stages of aging and environmental wear."}]},
-         ]},
-        {id:"dual-env",label:"Dual Environment",hex:"#66bbcc",
-         text:"A single modular kit. Two completely different environments. **The Backroom** and **The Abandoned Zone** share the exact same structural geometry, with their identities defined entirely through materials, lighting, and environmental dressing.",
-         subcategories:[
-           {id:"backroom",label:"Backroom",imgs:[{label:"Backroom",src:gh("environments/subway-modular-kit/dual-env/backroom/01-backroom.png"),bg:"radial-gradient(ellipse at 50% 50%,#0a1a0a,#040a04)",caption:"The Backroom exposes the modular system at its purest. **Bright lighting, clean materials, and repetitive architecture** create a space that feels functional, familiar, and subtly disconnected from reality."}]},
-           {id:"abandoned",label:"Abandoned",imgs:[{label:"Abandoned",src:gh("environments/subway-modular-kit/dual-env/abandoned/01-abandoned.png"),bg:"radial-gradient(ellipse at 50% 50%,#1a0a08,#0a0504)",caption:"The **exact same geometry** is transformed through material degradation and lighting. The passage of time is what changes the space."}]},
-         ]},
         {id:"results",label:"Results",hex:"#99bbaa",
          imgs:[
            {label:"L2 Render",src:gh("environments/subway-modular-kit/results/01_l2render_1.png"),bg:bgEnv},
@@ -264,10 +256,7 @@ const PLANETS=[
            {label:"L2 Render",src:gh("environments/subway-modular-kit/results/03-l2render.png"),bg:"radial-gradient(ellipse at 55% 45%,#081a12,#040c08)"},
          ],
          text:"The final modular pipeline enabled **two visually distinct environments** to be built from a **single shared geometry set** while keeping production scalable, material count low, and the scene efficient to manage in Unity HDRP.",
-         subcategories:[
-           {id:"final-shots",label:"Final Shots",imgs:[{label:"Final Shots",src:gh("environments/subway-modular-kit/results/final-shots/01-final-shots.png"),bg:bgEnv,caption:"The completed environments with lighting, post-processing, and all details in place. At this stage, the **modular system fades into the background**, leaving atmosphere and storytelling to define the experience."}]},
-           {id:"metrics",label:"Metrics",imgs:[{label:"Metrics",src:gh("environments/subway-modular-kit/results/metrics/01-metrics.png"),bg:bgTeal,caption:"• **78 modular pieces**\n• **9 trim sheets** with progressive degradation variants\n• **4096×4096** trim sheet resolution\n• **512 px/m** consistent texel density\n• **2 complete environments** built from a single shared geometry set\n• Low material count through a **trim sheet workflow**"}]},
-         ]},
+        },
       ]},
     {id:"gmtk-kit",label:"GMTK Loop Kit",icon:"🔁",orbitRadius:2.9,orbitSpeed:.008,startAngle:3.8,inclination:-.36,radius:.20,hex:"#bb8880",
       type:"Environment Art",status:"GMTK 2026",devPct:null,
