@@ -218,6 +218,7 @@ const PLANETS=[
            ]},
          ]},
         {id:"trim-sheets",label:"TRIM SHEETS & MATERIALS",hex:"#88aadd",
+         imgs:[{label:"Trim Sheets",src:gh("environments/subway-modular-kit/trim-sheets/01-trimsheets.png"),bg:"radial-gradient(ellipse at 50% 50%,#0a1220,#04081a)"}],
          text:"The material pipeline was defined **before any modeling began**. By designing the trim sheets first, every asset could share the same UV logic from the start, ensuring consistent texel density, reducing material count, and keeping the entire environment scalable through a **unified material framework**.",
          subcategories:[
            {id:"first-attempts",label:"First Attempts",imgs:[
@@ -226,9 +227,8 @@ const PLANETS=[
            ]},
            {id:"final-trimsheets",label:"Final Trim Sheets",imgs:[
              {label:"Backroom Trim Sheets",src:gh("environments/subway-modular-kit/trim-sheets/final-trimsheets/01-l2-trimsheets.png"),bg:"radial-gradient(ellipse at 55% 45%,#040a18,#020508)",caption:"The final Backroom trim sheets prioritize **clean surfaces, subtle variation, and controlled repetition**, reinforcing the sterile and artificial atmosphere while remaining highly reusable across the environment."},
-             {label:"Abandoned Trim Sheets",src:gh("environments/subway-modular-kit/trim-sheets/final-trimsheets/02-abandoned.png"),bg:"radial-gradient(ellipse at 50% 50%,#180a06,#0c0504)",caption:"The Abandoned trim sheets build upon the **same UV framework**, introducing progressive surface wear, rust, and water damage without requiring any changes to the underlying geometry."},
+             {label:"Abandoned Trim Sheets",src:gh("environments/subway-modular-kit/trim-sheets/final-trimsheets/02-abandoned.png"),bg:"radial-gradient(ellipse at 50% 50%,#180a06,#0c0504)",caption:"The Abandoned trim sheets build upon the **same UV framework**, introducing progressive surface wear, rust, and water damage without requiring any changes to the underlying geometry.\n\nTo break visual repetition while keeping the geometry and material workflow unchanged, **four material variants** were derived from a single base trim sheet to represent different stages of aging and environmental wear."},
            ]},
-           {id:"mat-variations",label:"Material Variations",imgs:[{label:"Progressive Degradation Variants",src:gh("environments/subway-modular-kit/trim-sheets/mat-variations/01-materialvariations.png"),bg:"radial-gradient(ellipse at 50% 50%,#040a18,#020508)",caption:"To break visual repetition while keeping the geometry and material workflow unchanged, **four material variants** were derived from a single base trim sheet to represent different stages of aging and environmental wear."}]},
          ]},
         {id:"modular-kit",label:"MODULAR KIT SYSTEM",hex:"#7abba8",
          imgs:[{label:"Full Modular Kit",src:gh("environments/subway-modular-kit/modular-kit/01-fullmodularkit.png"),bg:"radial-gradient(ellipse at 50% 50%,#0a1a14,#040a08)"}],
@@ -250,11 +250,14 @@ const PLANETS=[
            ]},
          ]},
         {id:"results",label:"Results",hex:"#99bbaa",
-         imgs:[
-           {label:"L2 Render",src:gh("environments/subway-modular-kit/results/01_l2render_1.png"),bg:bgEnv},
-           {label:"L2 Render",src:gh("environments/subway-modular-kit/results/02-l2render-2.png"),bg:"radial-gradient(ellipse at 45% 55%,#0a1a14,#040a08)"},
-           {label:"L2 Render",src:gh("environments/subway-modular-kit/results/03-l2render.png"),bg:"radial-gradient(ellipse at 55% 45%,#081a12,#040c08)"},
-         ],
+         dualGallery:{
+           left:{label:"Backroom",imgs:[
+             {label:"L2 Render",src:gh("environments/subway-modular-kit/results/01_l2render_1.png"),bg:bgEnv},
+             {label:"L2 Render",src:gh("environments/subway-modular-kit/results/02-l2render-2.png"),bg:"radial-gradient(ellipse at 45% 55%,#0a1a14,#040a08)"},
+             {label:"L2 Render",src:gh("environments/subway-modular-kit/results/03-l2render.png"),bg:"radial-gradient(ellipse at 55% 45%,#081a12,#040c08)"},
+           ]},
+           right:{label:"Abandoned",imgs:[]},
+         },
          text:"The final modular pipeline enabled **two visually distinct environments** to be built from a **single shared geometry set** while keeping production scalable, material count low, and the scene efficient to manage in Unity HDRP.",
         },
       ]},
@@ -508,6 +511,7 @@ function ProjectPanel({project,onClose}){
   const[catId,setCatId]=useState(null);
   const[subcatId,setSubcatId]=useState(null);
   const[imgIdx,setImgIdx]=useState(0);
+  const[imgIdx2,setImgIdx2]=useState(0);
   useEffect(()=>{setImgIdx(0);setSubcatId(null);},[catId]);
   useEffect(()=>{setImgIdx(0);},[subcatId]);
   const pC=project.hex;
@@ -560,6 +564,23 @@ function ProjectPanel({project,onClose}){
             </div>
           </div>
           <WishlistBtn c={pC}/>
+        </div>
+      ):activeCat.dualGallery?(
+        <div style={{padding:"0 1.75rem 1.75rem"}}>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1.5rem",marginBottom:"1.2rem"}}>
+            <div>
+              <Lb t={activeCat.dualGallery.left.label.toUpperCase()} c={c}/>
+              {activeCat.dualGallery.left.imgs?.length>0?<Gallery imgs={activeCat.dualGallery.left.imgs} c={c} idx={imgIdx} onIdx={setImgIdx}/>:<EmptySlot c={c}/>}
+            </div>
+            <div>
+              <Lb t={activeCat.dualGallery.right.label.toUpperCase()} c={c}/>
+              {activeCat.dualGallery.right.imgs?.length>0?<Gallery imgs={activeCat.dualGallery.right.imgs} c={c} idx={imgIdx2} onIdx={setImgIdx2}/>:<EmptySlot c={c}/>}
+            </div>
+          </div>
+          <div>
+            <Lb t={activeCat.label.toUpperCase()} c={c}/>
+            <p style={{fontSize:".84rem",lineHeight:1.75,color:"rgba(232,232,240,.72)",whiteSpace:"pre-line",textAlign:"left"}}>{renderBold(activeCat.text)}</p>
+          </div>
         </div>
       ):!activeSubcat?(
         <div style={{padding:"0 1.75rem 1.75rem",display:"grid",gridTemplateColumns:"55fr 45fr",gap:"2rem"}}>
