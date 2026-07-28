@@ -534,7 +534,7 @@ function ProjectPanel({project,onClose}){
     const activeSubcat=activeCat?.subcategories?.find(s=>s.id===subcatId);
     const c=activeCat?.hex||pC;
     const ovImgs=(project.imgs?.length?project.imgs:null)||project.categories[0]?.subcategories?.[0]?.imgs||project.categories[0]?.imgs||[];
-    const imgs=activeCat?(activeCat.isOverview?(activeCat.imgs||[]):(activeSubcat?.imgs||[])):[];
+    const imgs=activeCat?(activeSubcat?(activeSubcat.imgs||[]):(activeCat.imgs||[])):[];
     const vid=activeSubcat?.videoId??activeCat?.videoId??project.videoId;
     const caption=imgs[imgIdx]?.caption||activeSubcat?.caption;
     return(<Modal c={pC} onClose={onClose} width="min(1400px,94vw)">
