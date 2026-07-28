@@ -455,8 +455,8 @@ function Gallery({imgs,videoId,c,idx,onIdx,maxH}){
           {[["top","left"],["top","right"],["bottom","left"],["bottom","right"]].map(([v,h])=>(<div key={v+h} style={{position:"absolute",[v]:8,[h]:8,width:14,height:14,borderTop:v==="top"?`1.5px solid ${c}55`:"none",borderBottom:v==="bottom"?`1.5px solid ${c}55`:"none",borderLeft:h==="left"?`1.5px solid ${c}55`:"none",borderRight:h==="right"?`1.5px solid ${c}55`:"none"}}/>))}
           <div style={{position:"absolute",bottom:7,left:10,fontSize:".58rem",color:`${c}88`,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".12em"}}>{(cur.label||"PLACEHOLDER").toUpperCase()}</div>
         </div>}
-      {!activeVid&&imgs.length>1&&<>{nb("left",()=>onIdx(i=>(i-1+imgs.length)%imgs.length))}{nb("right",()=>onIdx(i=>(i+1)%imgs.length))}</>}
-      {!activeVid&&imgs.length>1&&(<div style={{position:"absolute",bottom:8,right:10,display:"flex",gap:4,zIndex:2}}>{imgs.map((_,i)=><div key={i} onClick={()=>onIdx(i)} style={{width:i===idx?14:5,height:5,borderRadius:"100px",background:i===idx?c:`${c}44`,cursor:"pointer",transition:"all .2s"}}/>)}</div>)}
+      {imgs.length>1&&<>{nb("left",()=>onIdx(i=>(i-1+imgs.length)%imgs.length))}{nb("right",()=>onIdx(i=>(i+1)%imgs.length))}</>}
+      {imgs.length>1&&(<div style={{position:"absolute",bottom:8,right:10,display:"flex",gap:4,zIndex:2}}>{imgs.map((_,i)=><div key={i} onClick={()=>onIdx(i)} style={{width:i===idx?14:5,height:5,borderRadius:"100px",background:i===idx?c:`${c}44`,cursor:"pointer",transition:"all .2s"}}/>)}</div>)}
     </div>
   </div>);
 }
