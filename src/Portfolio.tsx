@@ -337,7 +337,6 @@ const PLANETS=[
          subcategories:[
            {id:"prefab-system",label:"Prefab System",videoId:"E6_3iGuphXo",imgs:[{label:"Weighted Selection",src:null,bg:"radial-gradient(ellipse at 45% 55%,#080c18,#040610)",caption:"The tool uses a weighted prefab system where each entry defines a spawn probability through a configurable weight value. Prefabs are selected at runtime using a cumulative weight algorithm, ensuring statistically correct distribution across large batches. Invalid or zero-weight entries are ignored, and execution is blocked if no valid prefabs are available."}]},
            {id:"targeting",label:"Targeting System",videoId:"CZhshdW902s",imgs:[{label:"Targeting",src:null,bg:"radial-gradient(ellipse at 55% 45%,#0c1020,#060810)",caption:"Objects can be selected as targets directly from the current selection, or automatically gathered by tag or name filtering. All targets are cached and processed in a stable, deterministic order to ensure consistent results across runs when using seeded randomness. In Scatter mode, targeting is limited to the current selection to preserve explicit control over spawn sources."}]},
-           {id:"modes",label:"Modes",imgs:[{label:"Replace vs Scatter",src:null,bg:"radial-gradient(ellipse at 50% 50%,#0a0e1a,#050810)",caption:"Replace mode destroys each target object and replaces it with a randomly selected prefab. Scatter mode preserves the original objects and instead spawns multiple instances around them within a defined radius. Both modes reuse the same core pipeline for transform application, alignment, and randomization, ensuring consistent behavior across workflows."}]},
            {id:"scatter-system",label:"Scatter System",videoId:"P5dfYw8AfGY",imgs:[{label:"Scatter Generation",src:null,bg:"radial-gradient(ellipse at 45% 55%,#080c18,#040610)",caption:"Scatter generation distributes instances using a circular random sampling approach around each source object. A configurable overlap system prevents excessive clustering by enforcing minimum distance checks between spawned instances. Each position is validated against previously placed objects to maintain spatial coherence across the full scatter operation."}]},
          ]},
         {id:"transform-placement",label:"Transform & Placement",hex:"#4a5ac0",
@@ -350,10 +349,9 @@ const PLANETS=[
         {id:"workflow",label:"Workflow",hex:"#8090e8",
          text:"The tool is designed for safe, iterative authoring. Seeded determinism guarantees reproducible results, the preview system shows ghost instances before committing, presets store full configurations as ScriptableObjects, and all operations integrate with Unity's Undo system.",
          subcategories:[
-           {id:"seeded-determinism",label:"Seeded Determinism",imgs:[{label:"Seeded Determinism",src:null,bg:"radial-gradient(ellipse at 50% 40%,#0a0c1a,#050810)",caption:"All random operations can be driven by a fixed seed, ensuring fully reproducible results across executions. The tool isolates its random state during execution and restores it afterward, preventing interference with other systems in the Unity session. This allows deterministic scene generation without affecting global randomness."}]},
+           {id:"seeded-determinism",label:"Seeded Determinism",videoId:"_iy8SNaRQCk",imgs:[{label:"Seeded Determinism",src:null,bg:"radial-gradient(ellipse at 50% 40%,#0a0c1a,#050810)",caption:"All random operations can be driven by a fixed seed, ensuring fully reproducible results across executions. The tool isolates its random state during execution and restores it afterward, preventing interference with other systems in the Unity session. This allows deterministic scene generation without affecting global randomness."}]},
            {id:"preview",label:"Preview System",videoId:"wuc3opLIMfw",imgs:[{label:"Preview System",src:null,bg:"radial-gradient(ellipse at 45% 55%,#080c18,#040610)",caption:"The preview system generates ghost instances of the final result without modifying the scene. Preview objects use temporary materials and are fully isolated from the undo stack. Changes in selection, seed, or configuration automatically trigger regeneration, providing a live representation of the final output."}]},
            {id:"presets-parenting",label:"Presets & Parenting",videoId:"4T8QWvAsooE",imgs:[{label:"Presets & Parenting",src:null,bg:"radial-gradient(ellipse at 55% 45%,#0a0e1a,#050810)",caption:"The generated scenes can be organized and reused by grouping all spawned objects under a single parent and allowing full tool configurations to be saved as presets. All generated instances are automatically parented under a dedicated group object, while the full tool state is stored in ScriptableObject-based presets that can be saved and reloaded across scenes."}]},
-           {id:"undo",label:"Undo & Safety",imgs:[{label:"Undo Safety",src:null,bg:"radial-gradient(ellipse at 50% 50%,#080c18,#040610)",caption:"All operations are fully integrated with Unity's Undo system, grouping complex multi-object operations into a single step. This ensures safe iteration during scene authoring, allowing users to revert large replacements or scatter operations without manual cleanup."}]},
            {id:"error-control",label:"Error Control",imgs:[{label:"Workflow & User Error Control",src:gh("tools/scatter-tool/workflow/error-control/01-workflow-user-error.png"),bg:"radial-gradient(ellipse at 50% 50%,#0a0c1a,#050810)",caption:"To ensure safe and predictable behavior, all inputs are validated before execution to prevent invalid operations, blocking the process if any value could lead to an undefined state. This ensures objects are never spawned in unstable or incorrect configurations.\n\nThe tool also provides full undo support by grouping all generated changes into a single Ctrl+Z action. Long operations are visually tracked with a progress indicator, and contextual warnings help identify risky setups before committing."}]},
          ]},
         {id:"ui-architecture",label:"UI Architecture",hex:"#6070d8",
@@ -512,7 +510,7 @@ function ProjectPanel({project,onClose}){
   const[subcatId,setSubcatId]=useState(null);
   const[imgIdx,setImgIdx]=useState(0);
   const[imgIdx2,setImgIdx2]=useState(0);
-  useEffect(()=>{setImgIdx(0);setSubcatId(null);},[catId]);
+  useEffect(()=>{setImgIdx(0);const cat=project.categories?.find(c=>c.id===catId);setSubcatId(cat?.subcategories?.[0]?.id||null);},[catId]);
   useEffect(()=>{setImgIdx(0);},[subcatId]);
   const pC=project.hex;
   const T=({t})=><span style={{padding:".18rem .6rem",background:`${pC}18`,border:`1px solid ${pC}44`,borderRadius:"100px",fontSize:".68rem",color:pC,fontFamily:"'JetBrains Mono',monospace"}}>{t}</span>;
@@ -536,11 +534,10 @@ function ProjectPanel({project,onClose}){
     const activeSubcat=activeCat?.subcategories?.find(s=>s.id===subcatId);
     const c=activeCat?.hex||pC;
     const ovImgs=(project.imgs?.length?project.imgs:null)||project.categories[0]?.subcategories?.[0]?.imgs||project.categories[0]?.imgs||[];
-    const previewImgs=activeCat?(activeCat.imgs?.length?activeCat.imgs:(activeCat.subcategories?.[0]?.imgs||[])):[];
     const imgs=activeCat?(activeCat.isOverview?(activeCat.imgs||[]):(activeSubcat?.imgs||[])):[];
     const vid=activeSubcat?.videoId??activeCat?.videoId??project.videoId;
     const caption=imgs[imgIdx]?.caption||activeSubcat?.caption;
-    return(<Modal c={pC} onClose={onClose} width={activeSubcat?"min(980px,94vw)":"min(1400px,94vw)"}>
+    return(<Modal c={pC} onClose={onClose} width="min(1400px,94vw)">
       <div style={{padding:"1.75rem 1.75rem 0"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:".75rem"}}><div><div style={{fontSize:".62rem",color:c,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".22em",marginBottom:".25rem"}}>{typeLabel}</div><h2 style={{fontSize:"1.5rem",fontWeight:600,display:"flex",gap:".5rem",alignItems:"center"}}>{project.icon} {project.label}</h2></div><CloseBtn/></div>
         <div style={{display:"flex",gap:".28rem",flexWrap:"wrap",margin:".65rem 0 .85rem"}}>
@@ -582,10 +579,11 @@ function ProjectPanel({project,onClose}){
             <p style={{fontSize:".84rem",lineHeight:1.75,color:"rgba(232,232,240,.72)",whiteSpace:"pre-line",textAlign:"left"}}>{renderBold(activeCat.text)}</p>
           </div>
         </div>
-      ):!activeSubcat?(
+      ):(
         <div style={{padding:"0 1.75rem 1.75rem",display:"grid",gridTemplateColumns:"55fr 45fr",gap:"2rem"}}>
           <div>
-            {previewImgs.length>0?<Gallery imgs={previewImgs} videoId={vid} c={c} idx={imgIdx} onIdx={setImgIdx}/>:<EmptySlot c={c}/>}
+            {imgs.length>0?<Gallery imgs={imgs} videoId={vid} c={c} idx={imgIdx} onIdx={setImgIdx}/>:<EmptySlot c={c}/>}
+            {caption&&(<div key={`${catId}-${subcatId}-${imgIdx}`} style={{marginTop:".2rem",animation:"captionFade .22s ease"}}><div style={{fontSize:".6rem",color:`${c}88`,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".14em",marginBottom:".3rem"}}>{(imgs[imgIdx]?.label||activeSubcat?.label)?.toUpperCase()}{imgs.length>0?` · ${imgIdx+1}/${imgs.length}`:""}</div><p style={{fontSize:".82rem",lineHeight:1.65,color:"rgba(232,232,240,.72)",whiteSpace:"pre-line",textAlign:"left"}}>{renderBold(caption)}</p><HowItWorks text={imgs[imgIdx]?.details} c={c}/></div>)}
             {activeCat.links?.map(l=>linkBtn(l,c))}
           </div>
           <div>
@@ -593,16 +591,9 @@ function ProjectPanel({project,onClose}){
             {!activeCat.isOverview&&activeCat.text&&(<div style={{marginBottom:"1rem"}}><Lb t={activeCat.label.toUpperCase()} c={c}/><p style={{fontSize:".84rem",lineHeight:1.75,color:"rgba(232,232,240,.72)",whiteSpace:"pre-line",textAlign:"left"}}>{renderBold(activeCat.text)}</p></div>)}
             {!activeCat.isOverview&&activeCat.subcategories?.length>0&&(<div>
               <Lb t="EXPLORE" c={c}/>
-              <div style={{display:"flex",flexDirection:"column",gap:".5rem"}}>{activeCat.subcategories.map(sc=>(<button key={sc.id} onClick={()=>{setSubcatId(sc.id);setImgIdx(0);}} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:".7rem .9rem",fontSize:".84rem",fontFamily:"'Space Grotesk',sans-serif",background:`${c}0a`,border:`1px solid ${c}33`,borderRadius:"8px",color:"rgba(232,232,240,.85)",cursor:"pointer",transition:"all .2s",textAlign:"left",textTransform:"uppercase",letterSpacing:".03em"}}>{sc.label}<span style={{color:c,fontSize:".7rem",textTransform:"none"}}>{sc.imgs?.length||0} · →</span></button>))}</div>
+              <div style={{display:"flex",flexDirection:"column",gap:".5rem"}}>{activeCat.subcategories.map(sc=>(<button key={sc.id} onClick={()=>{setSubcatId(sc.id);setImgIdx(0);}} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:".7rem .9rem",fontSize:".84rem",fontFamily:"'Space Grotesk',sans-serif",background:subcatId===sc.id?`${c}20`:`${c}0a`,border:`1px solid ${subcatId===sc.id?c+"77":c+"33"}`,borderRadius:"8px",color:subcatId===sc.id?"rgba(255,255,255,.95)":"rgba(232,232,240,.85)",cursor:"pointer",transition:"all .2s",textAlign:"left",textTransform:"uppercase",letterSpacing:".03em"}}>{sc.label}<span style={{color:c,fontSize:".7rem",textTransform:"none"}}>{sc.imgs?.length||0} · →</span></button>))}</div>
             </div>)}
           </div>
-        </div>
-      ):(
-        <div style={{padding:"0 1.75rem 1.75rem"}}>
-          {imgs.length>0?<Gallery imgs={imgs} videoId={vid} c={c} idx={imgIdx} onIdx={setImgIdx} maxH="52vh"/>:<EmptySlot c={c}/>}
-          {activeCat.subcategories?.length>0&&(<div style={{display:"flex",gap:".28rem",flexWrap:"wrap",margin:".65rem 0 .7rem"}}>{activeCat.subcategories.map(sc=>(<button key={sc.id} className="pf-tab" onClick={()=>{setSubcatId(id=>id===sc.id?null:sc.id);setImgIdx(0);}} style={{padding:".22rem .58rem",fontSize:".64rem",fontFamily:"'JetBrains Mono',monospace",background:subcatId===sc.id?`${c}22`:"transparent",border:`1px solid ${subcatId===sc.id?c+"55":"rgba(255,255,255,.08)"}`,borderRadius:"100px",color:subcatId===sc.id?c:"rgba(232,232,240,.35)",cursor:"pointer",transition:"all .2s",letterSpacing:".06em",whiteSpace:"nowrap",textTransform:"uppercase"}}>{sc.label}</button>))}</div>)}
-          {caption&&(<div key={`${catId}-${subcatId}-${imgIdx}`} style={{animation:"captionFade .22s ease",marginTop:".3rem"}}><div style={{fontSize:".6rem",color:`${c}88`,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".14em",marginBottom:".3rem"}}>{(imgs[imgIdx]?.label||activeSubcat?.label)?.toUpperCase()}{imgs.length>0?` · ${imgIdx+1}/${imgs.length}`:""}</div><p style={{fontSize:".84rem",lineHeight:1.65,color:"rgba(232,232,240,.75)",whiteSpace:"pre-line",textAlign:"left"}}>{renderBold(caption)}</p><HowItWorks text={imgs[imgIdx]?.details} c={c}/></div>)}
-          {activeCat.links?.map(l=>linkBtn(l,c))}
         </div>
       )}
     </Modal>);
