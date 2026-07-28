@@ -327,8 +327,8 @@ const PLANETS=[
       tags:["Unity","C#","Editor Tools","Procedural","ScriptableObject"],
       features:["Two modes: weighted Replace and procedural Scatter","Weighted prefab system with cumulative probability","Tag and name filtering for target selection","Surface alignment via downward raycasting","Configurable transform and scale randomization","Seeded determinism with isolated random state","Non-destructive preview with ghost instances","ScriptableObject-based preset system","Full Unity Undo integration"],
       imgs:[
-        {label:"Hook Video",src:null,bg:"radial-gradient(ellipse at 50% 40%,#0a0e1a,#050810)",videoId:null,caption:"Quick look at the tool in action."},
-        {label:"Full Demo",src:null,bg:"radial-gradient(ellipse at 50% 40%,#080c18,#040610)",videoId:null,caption:"Full walkthrough of all tool features and workflow."},
+        {label:"Hook Video",src:null,bg:"radial-gradient(ellipse at 50% 40%,#0a0e1a,#050810)",videoId:"sqHVsmYYLsU",caption:"Quick look at the tool in action."},
+        {label:"Full Demo",src:null,bg:"radial-gradient(ellipse at 50% 40%,#080c18,#040610)",videoId:"TYoK6CLA0mY",caption:"Full walkthrough of all tool features and workflow."},
       ],cta:"View on GitHub",
       categories:[
         {id:"core-systems",label:"Core Systems",hex:"#7080e0",
