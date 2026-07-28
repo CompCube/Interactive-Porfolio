@@ -355,7 +355,7 @@ const PLANETS=[
            {id:"error-control",label:"Error Control",imgs:[{label:"Workflow & User Error Control",src:gh("tools/scatter-tool/workflow/error-control/01-workflow-user-error.png"),bg:"radial-gradient(ellipse at 50% 50%,#0a0c1a,#050810)",caption:"To ensure safe and predictable behavior, all inputs are validated before execution to prevent invalid operations, blocking the process if any value could lead to an undefined state. This ensures objects are never spawned in unstable or incorrect configurations.\n\nThe tool also provides full undo support by grouping all generated changes into a single Ctrl+Z action. Long operations are visually tracked with a progress indicator, and contextual warnings help identify risky setups before committing."}]},
          ]},
         {id:"ui-architecture",label:"UI Architecture",hex:"#6070d8",
-         imgs:[{label:"UI Architecture",src:gh("tools/scatter-tool/ui-architecture/01-architecture.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a0e1a,#050810)"}],
+         imgs:[{label:"UI Architecture",src:gh("tools/scatter-tool/ui-architecture/01-ui-architechture.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a0e1a,#050810)"}],
          text:"The tool is implemented as a single Unity EditorWindow with modular UI sections. Each feature is exposed through collapsible panels, separating target configuration, prefab management, transform controls, and execution logic. The interface prioritizes clarity and fast iteration over deep nesting or complex menus.",
         },
       ]},
