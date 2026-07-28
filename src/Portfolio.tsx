@@ -557,6 +557,10 @@ function ProjectPanel({project,onClose}){
             <div>
               <div style={{marginBottom:"1.1rem"}}><Lb t="ABOUT THIS PROJECT"/><p style={{fontSize:".82rem",lineHeight:1.72,color:"rgba(232,232,240,.65)",textAlign:"justify"}}>{renderBold(project.desc)}</p></div>
               <RightMeta c={pC}/>
+              {ovImgs.length>1&&(<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:".5rem",marginTop:"1.1rem"}}>
+                <button onClick={()=>setImgIdx(0)} style={{padding:".55rem",fontSize:".72rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".04em",background:imgIdx===0?`${pC}22`:`${pC}0a`,border:`1px solid ${imgIdx===0?pC+"66":pC+"28"}`,borderRadius:"8px",color:imgIdx===0?pC:"rgba(232,232,240,.55)",cursor:"pointer",transition:"all .2s"}}>▸ Short Video</button>
+                <button onClick={()=>setImgIdx(1)} style={{padding:".55rem",fontSize:".72rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".04em",background:imgIdx===1?`${pC}22`:`${pC}0a`,border:`1px solid ${imgIdx===1?pC+"66":pC+"28"}`,borderRadius:"8px",color:imgIdx===1?pC:"rgba(232,232,240,.55)",cursor:"pointer",transition:"all .2s"}}>▸ Full Showcase</button>
+              </div>)}
               {project.launchDate&&<div style={{marginTop:"1.1rem"}}><Countdown targetDate={project.launchDate} c={pC}/></div>}
             </div>
           </div>
