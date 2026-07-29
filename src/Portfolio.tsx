@@ -99,22 +99,40 @@ const HE_CATEGORIES=[
        {label:"Color Palette & Identity — Backroom",src:gh("games/hollow-end/game-art/references-identity/03-backroom-color-palette.png"),bg:"radial-gradient(ellipse at 50% 50%,#0a1810,#04100a)",caption:"The Backroom is defined by a cold, desaturated green palette. Although green is often associated with life, it has also been widely used in film and games to evoke mystery, corruption, and a sense that something is fundamentally wrong. Here, it reinforces both the unnatural nature of the space and the uncertainty surrounding it."},
        {label:"Color Palette & Identity — Abandoned Zone",src:gh("games/hollow-end/game-art/references-identity/04-abandoned-zone-palette.png"),bg:"radial-gradient(ellipse at 55% 45%,#0a1018,#04080e)",caption:"The Abandoned zone is built around blue and white tones. White improves readability in dark, confined spaces, while blue emphasizes coldness and isolation. Together, they create an environment that feels both believable and unsettling."},
      ]},
-     {id:"environment-art",label:"Environment",imgs:[
-       {label:"Working Methodology",src:null,bg:bgEnv,caption:"A custom production pipeline was defined to build a photorealistic environment with limited resources while maximizing modular reuse: **references → concept sketches → color palette → trim sheets → modular kit → texturing → export**. Material planning and modular design were developed together from the start to reduce repetition and avoid costly rework later in production."},
-       {label:"Trim Sheets — Backroom (First Attempt)",src:gh("games/hollow-end/game-art/environment-art/01-first-backrooms.png"),bg:"radial-gradient(ellipse at 50% 50%,#0e1a08,#061004)",caption:"Five 4096px trim sheets were created for the Backroom's walls, floors, and ceilings. Multiple iterations were explored to balance repetition, readability, and material variation while maintaining a coherent visual identity."},
-       {label:"Trim Sheets — Backroom (Final)",src:gh("games/hollow-end/game-art/environment-art/01-l2-trimsheets.png"),bg:"radial-gradient(ellipse at 50% 50%,#0e1a08,#061004)",caption:"Five 4096px trim sheets were created for the Backroom's walls, floors, and ceilings. Multiple iterations were explored to balance repetition, readability, and material variation while maintaining a coherent visual identity."},
-       {label:"Trim Sheets — Abandoned Zone (First Attempt)",src:gh("games/hollow-end/game-art/environment-art/02-first-abandoned.png"),bg:"radial-gradient(ellipse at 45% 55%,#1a1608,#0e0c04)",caption:"Starting from the same base textures, four progressively degraded material variants were created to represent different stages of wear and decay. Mixing these variations throughout the environment increases visual diversity while preserving a consistent architectural language."},
-       {label:"Trim Sheets — Abandoned Zone (Final)",src:gh("games/hollow-end/game-art/environment-art/02-abandoned-trimsheets.png"),bg:"radial-gradient(ellipse at 45% 55%,#1a1608,#0e0c04)",caption:"Starting from the same base textures, four progressively degraded material variants were created to represent different stages of wear and decay. Mixing these variations throughout the environment increases visual diversity while preserving a consistent architectural language."},
-       {label:"Modular Kit — Reuse & Adaptation",src:gh("games/hollow-end/game-art/environment-art/04-l2-kit.png"),bg:"radial-gradient(ellipse at 55% 45%,#141a08,#0a1004)",caption:"The Abandoned zone reuses almost the entire modular kit from the Backroom, reinforcing the idea that both spaces belong to the same station. New pieces were added only when required by gameplay or visual identity, always remaining compatible with the original system."},
-       {label:"Modular Kit — Reuse & Adaptation",src:gh("games/hollow-end/game-art/environment-art/05-l2-kit.png"),bg:"radial-gradient(ellipse at 55% 45%,#141a08,#0a1004)",caption:"The Abandoned zone reuses almost the entire modular kit from the Backroom, reinforcing the idea that both spaces belong to the same station. New pieces were added only when required by gameplay or visual identity, always remaining compatible with the original system."},
-       {label:"Modular Kit — Reuse & Adaptation",src:gh("games/hollow-end/game-art/environment-art/06-l2-kit.png"),bg:"radial-gradient(ellipse at 55% 45%,#141a08,#0a1004)",caption:"The Abandoned zone reuses almost the entire modular kit from the Backroom, reinforcing the idea that both spaces belong to the same station. New pieces were added only when required by gameplay or visual identity, always remaining compatible with the original system."},
-       {label:"Modular Kit — Reuse & Adaptation",src:gh("games/hollow-end/game-art/environment-art/07-l1-kit.png"),bg:"radial-gradient(ellipse at 55% 45%,#141a08,#0a1004)",caption:"The Abandoned zone reuses almost the entire modular kit from the Backroom, reinforcing the idea that both spaces belong to the same station. New pieces were added only when required by gameplay or visual identity, always remaining compatible with the original system."},
-       {label:"Modular Kit — Reuse & Adaptation",src:gh("games/hollow-end/game-art/environment-art/08-l2-pieces.png"),bg:"radial-gradient(ellipse at 55% 45%,#141a08,#0a1004)",caption:"The Abandoned zone reuses almost the entire modular kit from the Backroom, reinforcing the idea that both spaces belong to the same station. New pieces were added only when required by gameplay or visual identity, always remaining compatible with the original system."},
-       {label:"Modular Kit — Reuse & Adaptation",src:gh("games/hollow-end/game-art/environment-art/09-l2-pieces.png"),bg:"radial-gradient(ellipse at 55% 45%,#141a08,#0a1004)",caption:"The Abandoned zone reuses almost the entire modular kit from the Backroom, reinforcing the idea that both spaces belong to the same station. New pieces were added only when required by gameplay or visual identity, always remaining compatible with the original system."},
-       {label:"Modular Kit — Reuse & Adaptation",src:gh("games/hollow-end/game-art/environment-art/10-l1-pieces.png"),bg:"radial-gradient(ellipse at 55% 45%,#141a08,#0a1004)",caption:"The Abandoned zone reuses almost the entire modular kit from the Backroom, reinforcing the idea that both spaces belong to the same station. New pieces were added only when required by gameplay or visual identity, always remaining compatible with the original system."},
-       {label:"Modular Kit — Reuse & Adaptation",src:gh("games/hollow-end/game-art/environment-art/11-l1-pieces.png"),bg:"radial-gradient(ellipse at 55% 45%,#141a08,#0a1004)",caption:"The Abandoned zone reuses almost the entire modular kit from the Backroom, reinforcing the idea that both spaces belong to the same station. New pieces were added only when required by gameplay or visual identity, always remaining compatible with the original system."},
-       {label:"Modular Kit — Reuse & Adaptation",src:gh("games/hollow-end/game-art/environment-art/12-l2-pieces.png"),bg:"radial-gradient(ellipse at 55% 45%,#141a08,#0a1004)",caption:"The Abandoned zone reuses almost the entire modular kit from the Backroom, reinforcing the idea that both spaces belong to the same station. New pieces were added only when required by gameplay or visual identity, always remaining compatible with the original system."},
-       {label:"Modular Kit — Reuse & Adaptation",src:gh("games/hollow-end/game-art/environment-art/13-l1-pieces.png"),bg:"radial-gradient(ellipse at 55% 45%,#141a08,#0a1004)",caption:"The Abandoned zone reuses almost the entire modular kit from the Backroom, reinforcing the idea that both spaces belong to the same station. New pieces were added only when required by gameplay or visual identity, always remaining compatible with the original system."},
+     {id:"environment-art",label:"Environment",groups:[
+       {label:"Trim Sheets",imgs:[
+         {label:"Working Methodology",src:null,bg:bgEnv,caption:"A custom production pipeline was defined to build a photorealistic environment with limited resources while maximizing modular reuse: **references → concept sketches → color palette → trim sheets → modular kit → texturing → export**. Material planning and modular design were developed together from the start to reduce repetition and avoid costly rework later in production."},
+         {label:"Trim Sheets — Backroom (First Attempt)",src:gh("games/hollow-end/game-art/environment-art/01-first-backrooms.png"),bg:"radial-gradient(ellipse at 50% 50%,#0e1a08,#061004)",caption:"Five 4096px trim sheets were created for the Backroom's walls, floors, and ceilings. Multiple iterations were explored to balance repetition, readability, and material variation while maintaining a coherent visual identity."},
+         {label:"Trim Sheets — Backroom (Final)",src:gh("games/hollow-end/game-art/environment-art/01-l2-trimsheets.png"),bg:"radial-gradient(ellipse at 50% 50%,#0e1a08,#061004)",caption:"Five 4096px trim sheets were created for the Backroom's walls, floors, and ceilings. Multiple iterations were explored to balance repetition, readability, and material variation while maintaining a coherent visual identity."},
+         {label:"Trim Sheets — Abandoned Zone (First Attempt)",src:gh("games/hollow-end/game-art/environment-art/02-first-abandoned.png"),bg:"radial-gradient(ellipse at 45% 55%,#1a1608,#0e0c04)",caption:"Starting from the same base textures, four progressively degraded material variants were created to represent different stages of wear and decay. Mixing these variations throughout the environment increases visual diversity while preserving a consistent architectural language."},
+         {label:"Trim Sheets — Abandoned Zone (Final)",src:gh("games/hollow-end/game-art/environment-art/02-abandoned-trimsheets.png"),bg:"radial-gradient(ellipse at 45% 55%,#1a1608,#0e0c04)",caption:"Starting from the same base textures, four progressively degraded material variants were created to represent different stages of wear and decay. Mixing these variations throughout the environment increases visual diversity while preserving a consistent architectural language."},
+       ]},
+       {label:"Modular Kit",imgs:[
+         {label:"Modular Kit — Reuse & Adaptation",src:gh("games/hollow-end/game-art/environment-art/04-l2-kit.png"),bg:"radial-gradient(ellipse at 55% 45%,#141a08,#0a1004)",caption:"The Abandoned zone reuses almost the entire modular kit from the Backroom, reinforcing the idea that both spaces belong to the same station. New pieces were added only when required by gameplay or visual identity, always remaining compatible with the original system."},
+         {label:"Modular Kit — Reuse & Adaptation",src:gh("games/hollow-end/game-art/environment-art/05-l2-kit.png"),bg:"radial-gradient(ellipse at 55% 45%,#141a08,#0a1004)",caption:"The Abandoned zone reuses almost the entire modular kit from the Backroom, reinforcing the idea that both spaces belong to the same station. New pieces were added only when required by gameplay or visual identity, always remaining compatible with the original system."},
+         {label:"Modular Kit — Reuse & Adaptation",src:gh("games/hollow-end/game-art/environment-art/06-l2-kit.png"),bg:"radial-gradient(ellipse at 55% 45%,#141a08,#0a1004)",caption:"The Abandoned zone reuses almost the entire modular kit from the Backroom, reinforcing the idea that both spaces belong to the same station. New pieces were added only when required by gameplay or visual identity, always remaining compatible with the original system."},
+         {label:"Modular Kit — Reuse & Adaptation",src:gh("games/hollow-end/game-art/environment-art/07-l1-kit.png"),bg:"radial-gradient(ellipse at 55% 45%,#141a08,#0a1004)",caption:"The Abandoned zone reuses almost the entire modular kit from the Backroom, reinforcing the idea that both spaces belong to the same station. New pieces were added only when required by gameplay or visual identity, always remaining compatible with the original system."},
+         {label:"Modular Kit — Reuse & Adaptation",src:gh("games/hollow-end/game-art/environment-art/08-l2-pieces.png"),bg:"radial-gradient(ellipse at 55% 45%,#141a08,#0a1004)",caption:"The Abandoned zone reuses almost the entire modular kit from the Backroom, reinforcing the idea that both spaces belong to the same station. New pieces were added only when required by gameplay or visual identity, always remaining compatible with the original system."},
+         {label:"Modular Kit — Reuse & Adaptation",src:gh("games/hollow-end/game-art/environment-art/09-l2-pieces.png"),bg:"radial-gradient(ellipse at 55% 45%,#141a08,#0a1004)",caption:"The Abandoned zone reuses almost the entire modular kit from the Backroom, reinforcing the idea that both spaces belong to the same station. New pieces were added only when required by gameplay or visual identity, always remaining compatible with the original system."},
+         {label:"Modular Kit — Reuse & Adaptation",src:gh("games/hollow-end/game-art/environment-art/10-l1-pieces.png"),bg:"radial-gradient(ellipse at 55% 45%,#141a08,#0a1004)",caption:"The Abandoned zone reuses almost the entire modular kit from the Backroom, reinforcing the idea that both spaces belong to the same station. New pieces were added only when required by gameplay or visual identity, always remaining compatible with the original system."},
+         {label:"Modular Kit — Reuse & Adaptation",src:gh("games/hollow-end/game-art/environment-art/11-l1-pieces.png"),bg:"radial-gradient(ellipse at 55% 45%,#141a08,#0a1004)",caption:"The Abandoned zone reuses almost the entire modular kit from the Backroom, reinforcing the idea that both spaces belong to the same station. New pieces were added only when required by gameplay or visual identity, always remaining compatible with the original system."},
+         {label:"Modular Kit — Reuse & Adaptation",src:gh("games/hollow-end/game-art/environment-art/12-l2-pieces.png"),bg:"radial-gradient(ellipse at 55% 45%,#141a08,#0a1004)",caption:"The Abandoned zone reuses almost the entire modular kit from the Backroom, reinforcing the idea that both spaces belong to the same station. New pieces were added only when required by gameplay or visual identity, always remaining compatible with the original system."},
+         {label:"Modular Kit — Reuse & Adaptation",src:gh("games/hollow-end/game-art/environment-art/13-l1-pieces.png"),bg:"radial-gradient(ellipse at 55% 45%,#141a08,#0a1004)",caption:"The Abandoned zone reuses almost the entire modular kit from the Backroom, reinforcing the idea that both spaces belong to the same station. New pieces were added only when required by gameplay or visual identity, always remaining compatible with the original system."},
+       ]},
+       {label:"Results",imgs:[
+         {label:"Results",src:null,caption:"Final integration of the modular kit across both zones. The Backroom (L2) and the Abandoned Zone (L1) share the exact same underlying geometry, each achieving a distinct visual identity through material variation, lighting, and environmental dressing.",compare:{
+           left:{label:"Backroom",imgs:[
+             {label:"L2 Render",src:gh("games/hollow-end/game-art/environment-art/results/01_l2render_1.png"),bg:"radial-gradient(ellipse at 50% 50%,#0a1a0a,#040a04)"},
+             {label:"L2 Render",src:gh("games/hollow-end/game-art/environment-art/results/02-l2render-2.png"),bg:"radial-gradient(ellipse at 45% 55%,#0a1a0a,#040a04)"},
+             {label:"L2 Render",src:gh("games/hollow-end/game-art/environment-art/results/03-l2render.png"),bg:"radial-gradient(ellipse at 55% 45%,#0a1a0a,#040a04)"},
+           ]},
+           right:{label:"Abandoned",imgs:[
+             {label:"L1 Render",src:gh("games/hollow-end/game-art/environment-art/results/04-l1-render2.png"),bg:"radial-gradient(ellipse at 50% 50%,#1a0c08,#0a0504)"},
+             {label:"L1 Render",src:gh("games/hollow-end/game-art/environment-art/results/05-l1-render1.png"),bg:"radial-gradient(ellipse at 45% 55%,#1a0c08,#0a0504)"},
+             {label:"L1 Render",src:gh("games/hollow-end/game-art/environment-art/results/06-l1-render3.png"),bg:"radial-gradient(ellipse at 55% 45%,#1a0c08,#0a0504)"},
+           ]},
+         }},
+       ]},
      ]},
      {id:"props",label:"Props",imgs:[
        {label:"Modeling Workflow",src:gh("games/hollow-end/game-art/props/01-modelling-workflow.png"),bg:"radial-gradient(ellipse at 50% 50%,#1a0c04,#0a0602)",caption:"Every prop follows the same production pipeline: **low-poly blockout → high-poly detailing → UV unwrapping → texturing → export to Unity**. High-poly meshes were created using subdivision, bevel modifiers, and optional sculpting, while vertex painting was used selectively to drive material masks in Substance Painter. The example shown compares an asset with 8,131 polygons to its 1.5 million polygon high-poly counterpart."},
@@ -182,7 +200,14 @@ const HE_CATEGORIES=[
    text:"Hollow End was submitted as a final degree project at Universitat de Girona in 2025, targeting a Steam and itch.io release in October 2026.",
    links:[{label:"Wishlist on Steam",href:"#",icon:"🎮"},{label:"View on Itch.io",href:"#",icon:"🎯"}],
    subcategories:[
-     {id:"final-shots",label:"Final Shots",imgs:[{label:"Final Shots",src:null,bg:"radial-gradient(ellipse at 50% 50%,#050510,#020208)",caption:"Coming soon - in-engine captures at full fidelity with lighting, post-processing and props in place."}]},
+     {id:"final-shots",label:"Final Shots",imgs:[
+       {label:"Final Shot",src:gh("games/hollow-end/game-art/environment-art/results/01_l2render_1.png"),bg:"radial-gradient(ellipse at 50% 50%,#050510,#020208)",caption:"In-engine captures at full fidelity with lighting, post-processing and props in place."},
+       {label:"Final Shot",src:gh("games/hollow-end/game-art/environment-art/results/02-l2render-2.png"),bg:"radial-gradient(ellipse at 50% 50%,#050510,#020208)",caption:"In-engine captures at full fidelity with lighting, post-processing and props in place."},
+       {label:"Final Shot",src:gh("games/hollow-end/game-art/environment-art/results/03-l2render.png"),bg:"radial-gradient(ellipse at 50% 50%,#050510,#020208)",caption:"In-engine captures at full fidelity with lighting, post-processing and props in place."},
+       {label:"Final Shot",src:gh("games/hollow-end/game-art/environment-art/results/04-l1-render2.png"),bg:"radial-gradient(ellipse at 50% 50%,#050510,#020208)",caption:"In-engine captures at full fidelity with lighting, post-processing and props in place."},
+       {label:"Final Shot",src:gh("games/hollow-end/game-art/environment-art/results/05-l1-render1.png"),bg:"radial-gradient(ellipse at 50% 50%,#050510,#020208)",caption:"In-engine captures at full fidelity with lighting, post-processing and props in place."},
+       {label:"Final Shot",src:gh("games/hollow-end/game-art/environment-art/results/06-l1-render3.png"),bg:"radial-gradient(ellipse at 50% 50%,#050510,#020208)",caption:"In-engine captures at full fidelity with lighting, post-processing and props in place."},
+     ]},
      {id:"trailer",label:"Trailer / Video",imgs:[{label:"Trailer",src:null,bg:"radial-gradient(ellipse at 50% 50%,#080510,#040208)",caption:"Coming soon."}]},
      {id:"tfg",label:"TFG & Recognition",imgs:[{label:"TFG Recognition",src:null,bg:"radial-gradient(ellipse at 50% 50%,#0a0510,#050208)",caption:"Hollow End was submitted as a Final Degree Project at Universitat de Girona in 2025 and awarded Matrícula d'Honor (High Honours). Jury feedback coming soon."}]},
    ]},
@@ -277,7 +302,11 @@ const PLANETS=[
              {label:"L2 Render",src:gh("environments/subway-modular-kit/results/02-l2render-2.png"),bg:"radial-gradient(ellipse at 45% 55%,#0a1a14,#040a08)"},
              {label:"L2 Render",src:gh("environments/subway-modular-kit/results/03-l2render.png"),bg:"radial-gradient(ellipse at 55% 45%,#081a12,#040c08)"},
            ]},
-           right:{label:"Abandoned",imgs:[]},
+           right:{label:"Abandoned",imgs:[
+             {label:"L1 Render",src:gh("environments/subway-modular-kit/results/04-l1-render2.png"),bg:"radial-gradient(ellipse at 50% 50%,#1a0c08,#0a0504)"},
+             {label:"L1 Render",src:gh("environments/subway-modular-kit/results/05-l1-render1.png"),bg:"radial-gradient(ellipse at 45% 55%,#180a08,#0a0504)"},
+             {label:"L1 Render",src:gh("environments/subway-modular-kit/results/06-l1-render3.png"),bg:"radial-gradient(ellipse at 55% 45%,#1a0c08,#0c0604)"},
+           ]},
          },
          text:"The final modular pipeline enabled **two visually distinct environments** to be built from a **single shared geometry set** while keeping production scalable, material count low, and the scene efficient to manage in Unity HDRP.",
         },
@@ -534,8 +563,12 @@ function ProjectPanel({project,onClose}){
   const[subcatId,setSubcatId]=useState(null);
   const[imgIdx,setImgIdx]=useState(0);
   const[imgIdx2,setImgIdx2]=useState(0);
+  const[groupIdx,setGroupIdx]=useState(0);
+  const[cmpL,setCmpL]=useState(0);
+  const[cmpR,setCmpR]=useState(0);
   useEffect(()=>{setImgIdx(0);const cat=project.categories?.find(c=>c.id===catId);setSubcatId(cat?.subcategories?.[0]?.id||null);},[catId]);
-  useEffect(()=>{setImgIdx(0);},[subcatId]);
+  useEffect(()=>{setImgIdx(0);setGroupIdx(0);},[subcatId]);
+  useEffect(()=>{setCmpL(0);setCmpR(0);},[imgIdx,subcatId,groupIdx]);
   const pC=project.hex;
   const T=({t})=><span style={{padding:".18rem .6rem",background:`${pC}18`,border:`1px solid ${pC}44`,borderRadius:"100px",fontSize:".68rem",color:pC,fontFamily:"'JetBrains Mono',monospace"}}>{t}</span>;
   const Lb=({t,c=pC})=><div style={{fontSize:".6rem",color:c,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".22em",marginBottom:".45rem"}}>{t}</div>;
@@ -558,7 +591,7 @@ function ProjectPanel({project,onClose}){
     const activeSubcat=activeCat?.subcategories?.find(s=>s.id===subcatId);
     const c=activeCat?.hex||pC;
     const ovImgs=(project.imgs?.length?project.imgs:null)||project.categories[0]?.subcategories?.[0]?.imgs||project.categories[0]?.imgs||[];
-    const imgs=activeCat?(activeSubcat?(activeSubcat.imgs||[]):(activeCat.imgs||[])):[];
+    const imgs=activeCat?(activeSubcat?(activeSubcat.groups?(activeSubcat.groups[groupIdx]?.imgs||[]):(activeSubcat.imgs||[])):(activeCat.imgs||[])):[];
     const vid=activeSubcat?.videoId??activeCat?.videoId??project.videoId;
     const caption=imgs[imgIdx]?.caption||activeSubcat?.caption;
     return(<Modal c={pC} onClose={onClose} width="min(1400px,94vw)">
@@ -610,12 +643,17 @@ function ProjectPanel({project,onClose}){
       ):(
         <div style={{padding:"0 1.75rem 1.75rem",display:"grid",gridTemplateColumns:"55fr 45fr",gap:"2rem"}}>
           <div>
+            {activeSubcat?.groups&&(<div style={{display:"flex",gap:".28rem",flexWrap:"wrap",marginBottom:".7rem"}}>{activeSubcat.groups.map((g,i)=>(<button key={g.label} onClick={()=>{setGroupIdx(i);setImgIdx(0);}} style={{padding:".22rem .58rem",fontSize:".64rem",fontFamily:"'JetBrains Mono',monospace",background:groupIdx===i?`${c}22`:"transparent",border:`1px solid ${groupIdx===i?c+"55":"rgba(255,255,255,.08)"}`,borderRadius:"100px",color:groupIdx===i?c:"rgba(232,232,240,.35)",cursor:"pointer",transition:"all .2s",letterSpacing:".06em",whiteSpace:"nowrap",textTransform:"uppercase"}}>{g.label}</button>))}</div>)}
             {imgs[imgIdx]?.compare?(
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:".75rem"}}>
-                {["left","right"].map(side=>(<div key={side}>
-                  <Lb t={imgs[imgIdx].compare[side].label.toUpperCase()} c={c}/>
-                  {(imgs[imgIdx].compare[side].imgs||[]).map((im,i)=>(<div key={i} style={{aspectRatio:"4/3",borderRadius:"10px",overflow:"hidden",border:`1px solid ${c}28`,marginBottom:i<imgs[imgIdx].compare[side].imgs.length-1?".5rem":0,background:im.bg||"rgba(255,255,255,.02)"}}>{im.src?<img src={im.src} alt={im.label||""} style={{width:"100%",height:"100%",objectFit:"cover"}}/>:<div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontSize:".62rem",color:`${c}44`,fontFamily:"'JetBrains Mono',monospace"}}>Coming soon</span></div>}</div>))}
-                </div>))}
+                <div>
+                  <Lb t={imgs[imgIdx].compare.left.label.toUpperCase()} c={c}/>
+                  {imgs[imgIdx].compare.left.imgs?.length>0?<Gallery imgs={imgs[imgIdx].compare.left.imgs} c={c} idx={cmpL} onIdx={setCmpL}/>:<EmptySlot c={c}/>}
+                </div>
+                <div>
+                  <Lb t={imgs[imgIdx].compare.right.label.toUpperCase()} c={c}/>
+                  {imgs[imgIdx].compare.right.imgs?.length>0?<Gallery imgs={imgs[imgIdx].compare.right.imgs} c={c} idx={cmpR} onIdx={setCmpR}/>:<EmptySlot c={c}/>}
+                </div>
                 {imgs.length>1&&(<div style={{gridColumn:"1 / -1",display:"flex",justifyContent:"space-between",gap:".6rem",marginTop:".3rem"}}>
                   <button onClick={()=>setImgIdx(i=>(i-1+imgs.length)%imgs.length)} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:".4rem",padding:".55rem .9rem",background:`${c}18`,border:`1px solid ${c}55`,borderRadius:"8px",color:c,fontSize:".78rem",fontWeight:600,fontFamily:"'JetBrains Mono',monospace",cursor:"pointer",transition:"background .2s"}}>‹ PREV SLIDE</button>
                   <button onClick={()=>setImgIdx(i=>(i+1)%imgs.length)} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:".4rem",padding:".55rem .9rem",background:`${c}18`,border:`1px solid ${c}55`,borderRadius:"8px",color:c,fontSize:".78rem",fontWeight:600,fontFamily:"'JetBrains Mono',monospace",cursor:"pointer",transition:"background .2s"}}>NEXT SLIDE ›</button>
