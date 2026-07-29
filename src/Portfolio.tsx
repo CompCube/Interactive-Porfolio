@@ -131,13 +131,8 @@ const HE_CATEGORIES=[
        {label:"Results",imgs:[
          {label:"Results",src:null,caption:"Final integration of the modular kit across both zones. The Backroom (L2) and the Abandoned Zone (L1) share the exact same underlying geometry, each achieving a distinct visual identity through material variation, lighting, and environmental dressing.",compare:{
            left:{label:"Backroom",imgs:[
-<<<<<<< HEAD
              {label:"L2 Render",src:gh("games/hollow-end/game-art/environment-art/results/02-l2render-2.png"),bg:"radial-gradient(ellipse at 45% 55%,#0a1a0a,#040a04)"},
              {label:"L2 Render",src:gh("games/hollow-end/game-art/environment-art/results/01_l2render_1.png"),bg:"radial-gradient(ellipse at 50% 50%,#0a1a0a,#040a04)"},
-=======
-             {label:"L2 Render",src:gh("games/hollow-end/game-art/environment-art/results/01_l2render_1.png"),bg:"radial-gradient(ellipse at 50% 50%,#0a1a0a,#040a04)"},
-             {label:"L2 Render",src:gh("games/hollow-end/game-art/environment-art/results/02-l2render-2.png"),bg:"radial-gradient(ellipse at 45% 55%,#0a1a0a,#040a04)"},
->>>>>>> 70ecf29126769b18f624ebe77a4979506ffa5403
              {label:"L2 Render",src:gh("games/hollow-end/game-art/environment-art/results/03-l2render.png"),bg:"radial-gradient(ellipse at 55% 45%,#0a1a0a,#040a04)"},
            ]},
            right:{label:"Abandoned",imgs:[
@@ -673,13 +668,8 @@ function ProjectPanel({project,onClose}){
                   </div>);
                 })}
                 {imgs.length>1&&(<div style={{gridColumn:"1 / -1",display:"flex",justifyContent:"space-between",gap:".6rem",marginTop:".3rem"}}>
-<<<<<<< HEAD
                   <button onClick={()=>setImgIdx(i=>(i-1+imgs.length)%imgs.length)} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:".4rem",padding:".55rem .9rem",background:`${c}18`,border:`1px solid ${c}55`,borderRadius:"8px",color:c,fontSize:".78rem",fontWeight:600,fontFamily:"'JetBrains Mono',monospace",cursor:"pointer",transition:"background .2s"}}>{t("prevSlide").toUpperCase()}</button>
                   <button onClick={()=>setImgIdx(i=>(i+1)%imgs.length)} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:".4rem",padding:".55rem .9rem",background:`${c}18`,border:`1px solid ${c}55`,borderRadius:"8px",color:c,fontSize:".78rem",fontWeight:600,fontFamily:"'JetBrains Mono',monospace",cursor:"pointer",transition:"background .2s"}}>{t("nextSlide").toUpperCase()}</button>
-=======
-                  <button onClick={()=>setImgIdx(i=>(i-1+imgs.length)%imgs.length)} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:".4rem",padding:".55rem .9rem",background:`${c}18`,border:`1px solid ${c}55`,borderRadius:"8px",color:c,fontSize:".78rem",fontWeight:600,fontFamily:"'JetBrains Mono',monospace",cursor:"pointer",transition:"background .2s"}}>‹ PREV SLIDE</button>
-                  <button onClick={()=>setImgIdx(i=>(i+1)%imgs.length)} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:".4rem",padding:".55rem .9rem",background:`${c}18`,border:`1px solid ${c}55`,borderRadius:"8px",color:c,fontSize:".78rem",fontWeight:600,fontFamily:"'JetBrains Mono',monospace",cursor:"pointer",transition:"background .2s"}}>NEXT SLIDE ›</button>
->>>>>>> 70ecf29126769b18f624ebe77a4979506ffa5403
                 </div>)}
               </div>
             ):(imgs.length>0?<Gallery imgs={imgs} videoId={vid} c={c} idx={imgIdx} onIdx={setImgIdx}/>:<EmptySlot c={c}/>)}
