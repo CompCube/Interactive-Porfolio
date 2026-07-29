@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, createContext, useContext } from "react";
 import * as THREE from "three";
 
 const PVERT=`varying vec3 vP;varying vec3 vN;void main(){vP=normalize(position);vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
@@ -21,6 +21,15 @@ const FRAG=`uniform float u_t;varying vec3 vN;varying vec3 vP;vec3 h33(vec3 p){p
 const gd=id=>`https://drive.google.com/thumbnail?id=${id}&sz=w1200`;
 const GH_USER="CompCube",GH_REPO="Interactive-Porfolio",GH_BRANCH="main";
 const gh=path=>`https://raw.githubusercontent.com/${GH_USER}/${GH_REPO}/${GH_BRANCH}/portfolio-media/${path}`;
+
+const LANGS=["ca","es","en"];
+const STRINGS={
+  ca:{overview:"Resum",aboutProject:"Sobre el projecte",features:"Característiques",explore:"Explorar",devProgress:"Progrés de desenvolupament",howItWorks:"Com funciona",prevSlide:"‹ Anterior",nextSlide:"Següent ›",shortVideo:"Vídeo curt",fullShowcase:"Vídeo complet",hintZoomT:"ZOOM",hintZoomD:"Roda del ratolí per acostar-te o allunyar-te.",hintMoveT:"MOURE'S",hintMoveD:"Clica i arrossega per girar la vista.",hintPlanetT:"PLANETES",hintPlanetD:"Cada planeta és una categoria de projectes.",hintMoonT:"LLUNES",hintMoonD:"Cada lluna és un projecte individual."},
+  es:{overview:"Resumen",aboutProject:"Sobre el proyecto",features:"Características",explore:"Explorar",devProgress:"Progreso de desarrollo",howItWorks:"Cómo funciona",prevSlide:"‹ Anterior",nextSlide:"Siguiente ›",shortVideo:"Vídeo corto",fullShowcase:"Vídeo completo",hintZoomT:"ZOOM",hintZoomD:"Rueda del ratón para acercarte o alejarte.",hintMoveT:"MOVERSE",hintMoveD:"Haz clic y arrastra para girar la vista.",hintPlanetT:"PLANETAS",hintPlanetD:"Cada planeta es una categoría de proyectos.",hintMoonT:"LUNAS",hintMoonD:"Cada luna es un proyecto individual."},
+  en:{overview:"Overview",aboutProject:"About This Project",features:"Features",explore:"Explore",devProgress:"Dev Progress",howItWorks:"How It Works",prevSlide:"‹ Prev Slide",nextSlide:"Next Slide ›",shortVideo:"Short Video",fullShowcase:"Full Showcase",hintZoomT:"ZOOM",hintZoomD:"Scroll wheel to zoom in and out.",hintMoveT:"MOVE",hintMoveD:"Click and drag to rotate the view.",hintPlanetT:"PLANETS",hintPlanetD:"Each planet is a project category.",hintMoonT:"MOONS",hintMoonD:"Each moon is an individual project."},
+};
+const LangContext=createContext("en");
+const useT=()=>{const lang=useContext(LangContext);return k=>STRINGS[lang]?.[k]??STRINGS.en[k]??k;};
 const TARGET_DATE="2026-10-31T00:00:00";
 const bgEnv="radial-gradient(ellipse at 50% 50%,#041408,#020a04)";
 const bgTeal="radial-gradient(ellipse at 50% 50%,#041410,#020a08)";
@@ -122,8 +131,13 @@ const HE_CATEGORIES=[
        {label:"Results",imgs:[
          {label:"Results",src:null,caption:"Final integration of the modular kit across both zones. The Backroom (L2) and the Abandoned Zone (L1) share the exact same underlying geometry, each achieving a distinct visual identity through material variation, lighting, and environmental dressing.",compare:{
            left:{label:"Backroom",imgs:[
+<<<<<<< HEAD
+             {label:"L2 Render",src:gh("games/hollow-end/game-art/environment-art/results/02-l2render-2.png"),bg:"radial-gradient(ellipse at 45% 55%,#0a1a0a,#040a04)"},
+             {label:"L2 Render",src:gh("games/hollow-end/game-art/environment-art/results/01_l2render_1.png"),bg:"radial-gradient(ellipse at 50% 50%,#0a1a0a,#040a04)"},
+=======
              {label:"L2 Render",src:gh("games/hollow-end/game-art/environment-art/results/01_l2render_1.png"),bg:"radial-gradient(ellipse at 50% 50%,#0a1a0a,#040a04)"},
              {label:"L2 Render",src:gh("games/hollow-end/game-art/environment-art/results/02-l2render-2.png"),bg:"radial-gradient(ellipse at 45% 55%,#0a1a0a,#040a04)"},
+>>>>>>> 70ecf29126769b18f624ebe77a4979506ffa5403
              {label:"L2 Render",src:gh("games/hollow-end/game-art/environment-art/results/03-l2render.png"),bg:"radial-gradient(ellipse at 55% 45%,#0a1a0a,#040a04)"},
            ]},
            right:{label:"Abandoned",imgs:[
@@ -440,6 +454,8 @@ const CSS=`
 *{box-sizing:border-box;margin:0;padding:0}
 @keyframes progFill{from{width:0}to{}}
 @keyframes modalIn{from{opacity:0;transform:scale(.93) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes hintPanelIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes hintPanelOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(24px)}}
 @keyframes warpIn{0%{opacity:0;transform:scale(.4)}35%{opacity:1}100%{opacity:0;transform:scale(3)}}
 @keyframes tipIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
 @keyframes cdPulse{0%,100%{opacity:1}50%{opacity:.5}}
@@ -453,9 +469,9 @@ const CSS=`
 `;
 
 const renderBold=t=>t?t.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).map((p,i)=>{if(p.startsWith('**')&&p.endsWith('**'))return(<strong key={i} style={{color:"rgba(232,232,240,.98)",fontWeight:600}}>{p.slice(2,-2)}</strong>);if(p.startsWith('*')&&p.endsWith('*'))return(<em key={i} style={{fontStyle:"italic",color:"rgba(232,232,240,.82)"}}>{p.slice(1,-1)}</em>);return p;}):null;
-const HowItWorks=({text,c})=>{const[open,setOpen]=useState(false);if(!text)return null;return(<div style={{marginTop:".55rem"}}>
+const HowItWorks=({text,c})=>{const t=useT();const[open,setOpen]=useState(false);if(!text)return null;return(<div style={{marginTop:".55rem"}}>
   <button onClick={()=>setOpen(o=>!o)} style={{display:"flex",alignItems:"center",gap:".35rem",padding:".28rem .6rem",fontSize:".62rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".08em",color:c,background:`${c}14`,border:`1px solid ${c}44`,borderRadius:"6px",cursor:"pointer",transition:"all .2s"}}>
-    <span style={{display:"inline-block",transition:"transform .2s",transform:open?"rotate(90deg)":"none"}}>▸</span> HOW IT WORKS
+    <span style={{display:"inline-block",transition:"transform .2s",transform:open?"rotate(90deg)":"none"}}>▸</span> {t("howItWorks").toUpperCase()}
   </button>
   {open&&<p style={{fontSize:".79rem",lineHeight:1.66,color:"rgba(232,232,240,.68)",whiteSpace:"pre-line",marginTop:".5rem",padding:".7rem .8rem",background:`${c}0a`,border:`1px solid ${c}22`,borderRadius:"8px",animation:"captionFade .18s ease"}}>{renderBold(text)}</p>}
 </div>);};
@@ -557,6 +573,7 @@ function StarPanel({onClose}){
 }
 
 function ProjectPanel({project,onClose}){
+  const t=useT();
   const hasCats=!!(project.categories?.length);
   const hasSubcats=hasCats&&project.categories.some(c=>c.subcategories?.length>0);
   const[catId,setCatId]=useState(null);
@@ -575,7 +592,7 @@ function ProjectPanel({project,onClose}){
   const CloseBtn=()=><button onClick={onClose} style={{background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.14)",color:"#e8e8f0",width:32,height:32,borderRadius:"50%",cursor:"pointer",fontSize:"1.1rem",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>x</button>;
   const EmptySlot=({c})=><div style={{aspectRatio:"16/9",background:"rgba(255,255,255,.02)",border:`1px dashed ${c}22`,borderRadius:"10px",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:".75rem"}}><span style={{fontSize:".72rem",color:`${c}44`,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".1em"}}>Coming soon</span></div>;
   const RightMeta=({c=pC})=>{
-    return(<div style={{marginBottom:"1.1rem"}}><Lb t="FEATURES" c={c}/>{project.features.map((f,i)=><div key={i} style={{display:"flex",gap:".45rem",fontSize:".82rem",color:"rgba(232,232,240,.72)",marginBottom:".3rem"}}><span style={{color:pC,flexShrink:0,fontSize:".65rem",marginTop:".1rem"}}>▸</span>{f}</div>)}</div>);
+    return(<div style={{marginBottom:"1.1rem"}}><Lb t={t("features").toUpperCase()} c={c}/>{project.features.map((f,i)=><div key={i} style={{display:"flex",gap:".45rem",fontSize:".82rem",color:"rgba(232,232,240,.72)",marginBottom:".3rem"}}><span style={{color:pC,flexShrink:0,fontSize:".65rem",marginTop:".1rem"}}>▸</span>{f}</div>)}</div>);
   };
   const TagsRow=()=><div style={{display:"flex",flexWrap:"wrap",gap:".38rem"}}>{project.tags.map(t=><T key={t} t={t}/>)}</div>;
   const WishlistBtn=({c=pC})=>{
@@ -598,7 +615,7 @@ function ProjectPanel({project,onClose}){
       <div style={{padding:"1.75rem 1.75rem 0"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:".75rem"}}><div><div style={{fontSize:".62rem",color:c,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".22em",marginBottom:".25rem"}}>{typeLabel}</div><h2 style={{fontSize:"1.5rem",fontWeight:600,display:"flex",gap:".5rem",alignItems:"center"}}>{project.icon} {project.label}</h2></div><CloseBtn/></div>
         <div style={{display:"flex",gap:".28rem",flexWrap:"wrap",margin:".65rem 0 .85rem"}}>
-          <button onClick={()=>setCatId(null)} style={{padding:".22rem .58rem",fontSize:".66rem",fontFamily:"'JetBrains Mono',monospace",background:catId===null?`${pC}22`:"transparent",border:`1px solid ${catId===null?pC+"66":"rgba(255,255,255,.07)"}`,borderRadius:"100px",color:catId===null?pC:"rgba(232,232,240,.35)",cursor:"pointer",transition:"all .2s",whiteSpace:"nowrap",letterSpacing:".06em",textTransform:"uppercase"}}>Overview</button>
+          <button onClick={()=>setCatId(null)} style={{padding:".22rem .58rem",fontSize:".66rem",fontFamily:"'JetBrains Mono',monospace",background:catId===null?`${pC}22`:"transparent",border:`1px solid ${catId===null?pC+"66":"rgba(255,255,255,.07)"}`,borderRadius:"100px",color:catId===null?pC:"rgba(232,232,240,.35)",cursor:"pointer",transition:"all .2s",whiteSpace:"nowrap",letterSpacing:".06em",textTransform:"uppercase"}}>{t("overview")}</button>
           {project.categories.map(cat=>(<button key={cat.id} onClick={()=>setCatId(cat.id)} style={{padding:".22rem .58rem",fontSize:".66rem",fontFamily:"'JetBrains Mono',monospace",background:catId===cat.id?`${cat.hex||pC}22`:"transparent",border:`1px solid ${catId===cat.id?(cat.hex||pC)+"66":"rgba(255,255,255,.07)"}`,borderRadius:"100px",color:catId===cat.id?(cat.hex||pC):"rgba(232,232,240,.35)",cursor:"pointer",transition:"all .2s",whiteSpace:"nowrap",letterSpacing:".06em",textTransform:"uppercase"}}>{cat.icon||""} {cat.label}</button>))}
         </div>
         <div style={{height:1,background:`linear-gradient(90deg,${c}55,transparent)`,marginBottom:"1.25rem"}}/>
@@ -608,15 +625,15 @@ function ProjectPanel({project,onClose}){
           <div style={{display:"grid",gridTemplateColumns:"55fr 45fr",gap:"2rem",marginBottom:"1.3rem"}}>
             <div>
               {ovImgs.length>0?<Gallery imgs={ovImgs} videoId={project.videoId} c={pC} idx={imgIdx} onIdx={setImgIdx}/>:<EmptySlot c={pC}/>}
-              {project.devPct!=null&&(<div style={{marginTop:".85rem"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:"4px"}}><span style={{fontSize:".6rem",color:pC,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".18em"}}>DEV PROGRESS</span><span style={{fontSize:".6rem",color:pC,fontFamily:"'JetBrains Mono',monospace"}}>{project.devPct}%</span></div><div style={{height:3,background:"rgba(255,255,255,.06)",borderRadius:2}}><div style={{height:"100%",width:`${project.devPct}%`,background:`linear-gradient(90deg,${pC}66,${pC})`,borderRadius:2,animation:"progFill 1s ease"}}/></div></div>)}
+              {project.devPct!=null&&(<div style={{marginTop:".85rem"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:"4px"}}><span style={{fontSize:".6rem",color:pC,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".18em"}}>{t("devProgress").toUpperCase()}</span><span style={{fontSize:".6rem",color:pC,fontFamily:"'JetBrains Mono',monospace"}}>{project.devPct}%</span></div><div style={{height:3,background:"rgba(255,255,255,.06)",borderRadius:2}}><div style={{height:"100%",width:`${project.devPct}%`,background:`linear-gradient(90deg,${pC}66,${pC})`,borderRadius:2,animation:"progFill 1s ease"}}/></div></div>)}
               <div style={{marginTop:"1rem"}}><TagsRow/></div>
             </div>
             <div>
-              <div style={{marginBottom:"1.1rem"}}><Lb t="ABOUT THIS PROJECT"/><p style={{fontSize:".82rem",lineHeight:1.72,color:"rgba(232,232,240,.65)",textAlign:"justify"}}>{renderBold(project.desc)}</p></div>
+              <div style={{marginBottom:"1.1rem"}}><Lb t={t("aboutProject").toUpperCase()}/><p style={{fontSize:".82rem",lineHeight:1.72,color:"rgba(232,232,240,.65)",textAlign:"justify"}}>{renderBold(project.desc)}</p></div>
               <RightMeta c={pC}/>
               {ovImgs.length>1&&(<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:".5rem",marginTop:"1.1rem"}}>
-                <button onClick={()=>setImgIdx(0)} style={{padding:".55rem",fontSize:".72rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".04em",background:imgIdx===0?`${pC}22`:`${pC}0a`,border:`1px solid ${imgIdx===0?pC+"66":pC+"28"}`,borderRadius:"8px",color:imgIdx===0?pC:"rgba(232,232,240,.55)",cursor:"pointer",transition:"all .2s"}}>▸ Short Video</button>
-                <button onClick={()=>setImgIdx(1)} style={{padding:".55rem",fontSize:".72rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".04em",background:imgIdx===1?`${pC}22`:`${pC}0a`,border:`1px solid ${imgIdx===1?pC+"66":pC+"28"}`,borderRadius:"8px",color:imgIdx===1?pC:"rgba(232,232,240,.55)",cursor:"pointer",transition:"all .2s"}}>▸ Full Showcase</button>
+                <button onClick={()=>setImgIdx(0)} style={{padding:".55rem",fontSize:".72rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".04em",background:imgIdx===0?`${pC}22`:`${pC}0a`,border:`1px solid ${imgIdx===0?pC+"66":pC+"28"}`,borderRadius:"8px",color:imgIdx===0?pC:"rgba(232,232,240,.55)",cursor:"pointer",transition:"all .2s"}}>▸ {t("shortVideo")}</button>
+                <button onClick={()=>setImgIdx(1)} style={{padding:".55rem",fontSize:".72rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".04em",background:imgIdx===1?`${pC}22`:`${pC}0a`,border:`1px solid ${imgIdx===1?pC+"66":pC+"28"}`,borderRadius:"8px",color:imgIdx===1?pC:"rgba(232,232,240,.55)",cursor:"pointer",transition:"all .2s"}}>▸ {t("fullShowcase")}</button>
               </div>)}
               {project.launchDate&&<div style={{marginTop:"1.1rem"}}><Countdown targetDate={project.launchDate} c={pC}/></div>}
             </div>
@@ -656,8 +673,13 @@ function ProjectPanel({project,onClose}){
                   </div>);
                 })}
                 {imgs.length>1&&(<div style={{gridColumn:"1 / -1",display:"flex",justifyContent:"space-between",gap:".6rem",marginTop:".3rem"}}>
+<<<<<<< HEAD
+                  <button onClick={()=>setImgIdx(i=>(i-1+imgs.length)%imgs.length)} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:".4rem",padding:".55rem .9rem",background:`${c}18`,border:`1px solid ${c}55`,borderRadius:"8px",color:c,fontSize:".78rem",fontWeight:600,fontFamily:"'JetBrains Mono',monospace",cursor:"pointer",transition:"background .2s"}}>{t("prevSlide").toUpperCase()}</button>
+                  <button onClick={()=>setImgIdx(i=>(i+1)%imgs.length)} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:".4rem",padding:".55rem .9rem",background:`${c}18`,border:`1px solid ${c}55`,borderRadius:"8px",color:c,fontSize:".78rem",fontWeight:600,fontFamily:"'JetBrains Mono',monospace",cursor:"pointer",transition:"background .2s"}}>{t("nextSlide").toUpperCase()}</button>
+=======
                   <button onClick={()=>setImgIdx(i=>(i-1+imgs.length)%imgs.length)} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:".4rem",padding:".55rem .9rem",background:`${c}18`,border:`1px solid ${c}55`,borderRadius:"8px",color:c,fontSize:".78rem",fontWeight:600,fontFamily:"'JetBrains Mono',monospace",cursor:"pointer",transition:"background .2s"}}>‹ PREV SLIDE</button>
                   <button onClick={()=>setImgIdx(i=>(i+1)%imgs.length)} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:".4rem",padding:".55rem .9rem",background:`${c}18`,border:`1px solid ${c}55`,borderRadius:"8px",color:c,fontSize:".78rem",fontWeight:600,fontFamily:"'JetBrains Mono',monospace",cursor:"pointer",transition:"background .2s"}}>NEXT SLIDE ›</button>
+>>>>>>> 70ecf29126769b18f624ebe77a4979506ffa5403
                 </div>)}
               </div>
             ):(imgs.length>0?<Gallery imgs={imgs} videoId={vid} c={c} idx={imgIdx} onIdx={setImgIdx}/>:<EmptySlot c={c}/>)}
@@ -668,7 +690,7 @@ function ProjectPanel({project,onClose}){
             {activeCat.isOverview&&activeCat.shortDesc&&(<div style={{padding:".65rem .85rem",background:`${c}08`,border:`1px solid ${c}22`,borderRadius:"8px",marginBottom:"1rem"}}><p style={{fontSize:".8rem",lineHeight:1.7,color:"rgba(232,232,240,.55)",fontStyle:"italic",textAlign:"left"}}>{renderBold(activeCat.shortDesc)}</p></div>)}
             {!activeCat.isOverview&&activeCat.text&&(<div style={{marginBottom:"1rem"}}><Lb t={activeCat.label.toUpperCase()} c={c}/><p style={{fontSize:".84rem",lineHeight:1.75,color:"rgba(232,232,240,.72)",whiteSpace:"pre-line",textAlign:"left"}}>{renderBold(activeCat.text)}</p></div>)}
             {!activeCat.isOverview&&activeCat.subcategories?.length>0&&(<div>
-              <Lb t="EXPLORE" c={c}/>
+              <Lb t={t("explore").toUpperCase()} c={c}/>
               <div style={{display:"flex",flexDirection:"column",gap:".5rem"}}>{activeCat.subcategories.map(sc=>(<button key={sc.id} onClick={()=>{setSubcatId(sc.id);setImgIdx(0);}} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:".7rem .9rem",fontSize:".84rem",fontFamily:"'Space Grotesk',sans-serif",background:subcatId===sc.id?`${c}20`:`${c}0a`,border:`1px solid ${subcatId===sc.id?c+"77":c+"33"}`,borderRadius:"8px",color:subcatId===sc.id?"rgba(255,255,255,.95)":"rgba(232,232,240,.85)",cursor:"pointer",transition:"all .2s",textAlign:"left",textTransform:"uppercase",letterSpacing:".03em"}}>{sc.label}<span style={{color:c,fontSize:".7rem",textTransform:"none"}}>{sc.imgs?.length||0} · →</span></button>))}</div>
             </div>)}
           </div>
@@ -691,7 +713,7 @@ function ProjectPanel({project,onClose}){
         {hasCats&&(<><div style={{height:1,background:`linear-gradient(90deg,${pC}33,transparent)`,margin:".4rem 0"}}/><div style={{display:"flex",gap:".28rem",flexWrap:"wrap",margin:".35rem 0 .4rem"}}>{project.categories.map(cat=>(<button key={cat.id} className="pf-tab" onClick={()=>{setCatId(cat.id);setImgIdx(0);}} style={{padding:".22rem .58rem",fontSize:".64rem",fontFamily:"'JetBrains Mono',monospace",background:effCatId===cat.id?`${pC}22`:"transparent",border:`1px solid ${effCatId===cat.id?pC+"55":"rgba(255,255,255,.08)"}`,borderRadius:"100px",color:effCatId===cat.id?pC:"rgba(232,232,240,.35)",cursor:"pointer",transition:"all .2s",letterSpacing:".06em",whiteSpace:"nowrap",textTransform:"uppercase"}}>{cat.label}</button>))}</div><div style={{height:1,background:`linear-gradient(90deg,${pC}22,transparent)`,marginBottom:".55rem"}}/></>)}
         {caption&&(<div key={effCatId} style={{animation:"captionFade .22s ease"}}><div style={{fontSize:".58rem",color:`${pC}88`,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".14em",marginBottom:".3rem"}}>{(imgs[imgIdx]?.label||cat?.label)?.toUpperCase()}{imgs.length>0?` · ${imgIdx+1}/${imgs.length}`:""}</div><p style={{fontSize:".81rem",lineHeight:1.72,color:"rgba(232,232,240,.72)",whiteSpace:"pre-line"}}>{renderBold(caption)}</p><HowItWorks text={imgs[imgIdx]?.details} c={pC}/></div>)}
       </div>
-      <div><div style={{marginBottom:"1.1rem"}}><Lb t="ABOUT THIS PROJECT"/><p style={{fontSize:".82rem",lineHeight:1.72,color:"rgba(232,232,240,.65)",textAlign:"justify"}}>{renderBold(project.desc)}</p></div><RightMeta/><div style={{marginBottom:"1.3rem"}}><TagsRow/></div><WishlistBtn/></div>
+      <div><div style={{marginBottom:"1.1rem"}}><Lb t={t("aboutProject").toUpperCase()}/><p style={{fontSize:".82rem",lineHeight:1.72,color:"rgba(232,232,240,.65)",textAlign:"justify"}}>{renderBold(project.desc)}</p></div><RightMeta/><div style={{marginBottom:"1.3rem"}}><TagsRow/></div><WishlistBtn/></div>
     </div>
   </Modal>);
 }
@@ -722,6 +744,30 @@ function Mobile(){
   </div>);
 }
 
+function NavHint({onDone}){
+  const t=useT();
+  const[closing,setClosing]=useState(false);
+  const close=()=>{if(closing)return;setClosing(true);setTimeout(onDone,500);};
+  useEffect(()=>{
+    const t1=setTimeout(close,6000);
+    return()=>clearTimeout(t1);
+  },[]);
+  const items=[
+    {icon:"🖱️",title:t("hintZoomT"),text:t("hintZoomD")},
+    {icon:"✋",title:t("hintMoveT"),text:t("hintMoveD")},
+    {icon:"🪐",title:t("hintPlanetT"),text:t("hintPlanetD")},
+    {icon:"🌙",title:t("hintMoonT"),text:t("hintMoonD")},
+  ];
+  return(<div onClick={close} style={{position:"fixed",inset:0,zIndex:250,display:"flex",alignItems:"flex-end",justifyContent:"center",padding:"0 1rem 3rem",pointerEvents:"none"}}>
+    <div onClick={close} style={{pointerEvents:"auto",cursor:"pointer",background:"rgba(7,7,17,.94)",backdropFilter:"blur(20px)",border:`1px solid ${STAR.hex}44`,borderRadius:"16px",boxShadow:`0 20px 60px rgba(0,0,0,.6),0 0 40px ${STAR.hex}18`,padding:"1.2rem 1.5rem",maxWidth:"640px",display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"1.1rem",fontFamily:"'Space Grotesk',sans-serif",animation:closing?"hintPanelOut .5s ease forwards":"hintPanelIn 1s ease-out"}}>
+      {items.map(it=>(<div key={it.title} style={{textAlign:"center"}}>
+        <div style={{fontSize:"1.35rem",marginBottom:".3rem"}}>{it.icon}</div>
+        <div style={{fontSize:".62rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".1em",color:STAR.hex,marginBottom:".3rem"}}>{it.title}</div>
+        <div style={{fontSize:".7rem",lineHeight:1.5,color:"rgba(232,232,240,.68)"}}>{it.text}</div>
+      </div>))}
+    </div>
+  </div>);
+}
 function IntroScreen({onEnter}){
   return(<>
     <style>{`@keyframes introUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}@keyframes introIn{from{opacity:0}to{opacity:1}}@keyframes introBlink{0%,100%{opacity:.14}50%{opacity:.44}}`}</style>
@@ -911,6 +957,8 @@ export default function Portfolio(){
   const[audioOn,setAudioOn]=useState(false);
   const[muted,setMuted]=useState(false);
   const[intro,setIntro]=useState(true);
+  const[showNavHint,setShowNavHint]=useState(false);
+  const[lang,setLang]=useState("en");
   const audioRef=useRef(null);
   const initAudio=useCallback(()=>{if(audioRef.current)return;try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const master=ctx.createGain();master.gain.value=.025;master.connect(ctx.destination);[55,82.5,110].forEach((f,i)=>{const o=ctx.createOscillator();o.type="sine";o.frequency.value=f;const g=ctx.createGain();g.gain.value=1-i*.28;o.connect(g);g.connect(master);o.start();});const lfo=ctx.createOscillator();lfo.frequency.value=.06;const lg=ctx.createGain();lg.gain.value=.008;lfo.connect(lg);lg.connect(master.gain);lfo.start();audioRef.current={ctx,master};setAudioOn(true);}catch(e){}},[]);
   useEffect(()=>{
@@ -926,16 +974,18 @@ export default function Portfolio(){
   const onEnterPlanet=useCallback(id=>{setActivePlanetId(id);setPanelData(null);setWarp(true);setTimeout(()=>setWarp(false),550);playEnterSound();},[playEnterSound]);
   const onExitPlanet=useCallback(()=>{setActivePlanetId(null);setPanelData(null);},[]);
   const onHoverMoon=useCallback((data,x,y)=>setHovMoon({data,x,y}),[]);
-  if(intro)return <IntroScreen onEnter={()=>{setIntro(false);initAudio();}}/>;
+  if(intro)return <IntroScreen onEnter={()=>{setIntro(false);setShowNavHint(true);initAudio();}}/>;
   if(isMobile)return <Mobile/>;
-  return(<div style={{width:"100%",height:"100vh",background:"#000008",overflow:"hidden",position:"relative"}}>
+  return(<LangContext.Provider value={lang}><div style={{width:"100%",height:"100vh",background:"#000008",overflow:"hidden",position:"relative"}}>
     <SolarScene onStarClick={onStarClick} onMoonClick={onMoonClick} onEnterPlanet={onEnterPlanet} onExitPlanet={onExitPlanet} onHoverMoon={onHoverMoon}/>
+    {showNavHint&&<NavHint onDone={()=>setShowNavHint(false)}/>}
     {activePlanetId&&<HUD planetId={activePlanetId}/>}
     {panelData?.type==="star"&&<StarPanel onClose={()=>setPanelData(null)}/>}
     {panelData?.type==="project"&&<ProjectPanel project={panelData.project} onClose={()=>setPanelData(null)}/>}
     {hovMoon.data&&!panelData&&<MoonTooltip moon={hovMoon.data} x={hovMoon.x} y={hovMoon.y}/>}
     {warp&&<div style={{position:"fixed",inset:0,zIndex:300,pointerEvents:"none",background:"radial-gradient(ellipse at center,rgba(180,220,255,.14) 0%,rgba(100,160,255,.06) 45%,transparent 70%)",animation:"warpIn .55s ease-out forwards"}}/>}
     <StatusBar/>
+    <button onClick={()=>setLang(l=>LANGS[(LANGS.indexOf(l)+1)%LANGS.length])} style={{position:"fixed",bottom:"1.5rem",right:audioOn?"5.2rem":"1.5rem",background:"rgba(7,7,17,.85)",border:`1px solid ${STAR.hex}66`,borderRadius:"8px",padding:".38rem .65rem",color:STAR.hex,cursor:"pointer",fontSize:".65rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".1em",zIndex:100,transition:"all .2s"}}>{lang.toUpperCase()}</button>
     {audioOn&&<button onClick={toggleMute} style={{position:"fixed",bottom:"1.5rem",right:"1.5rem",background:"rgba(7,7,17,.85)",border:`1px solid ${STAR.hex}${muted?"33":"66"}`,borderRadius:"8px",padding:".38rem .65rem",color:muted?"rgba(232,232,240,.3)":STAR.hex,cursor:"pointer",fontSize:".65rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".1em",zIndex:100,transition:"all .2s"}}>{muted?"🔇":"🔊"}</button>}
-  </div>);
+  </div></LangContext.Provider>);
 }
