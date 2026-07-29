@@ -136,7 +136,7 @@ const HE_CATEGORIES=[
      ]},
      {id:"props",label:"Props",imgs:[
        {label:"Modeling Workflow",src:gh("games/hollow-end/game-art/props/01-modelling-workflow.png"),bg:"radial-gradient(ellipse at 50% 50%,#1a0c04,#0a0602)",caption:"Every prop follows the same production pipeline: **low-poly blockout → high-poly detailing → UV unwrapping → texturing → export to Unity**. High-poly meshes were created using subdivision, bevel modifiers, and optional sculpting, while vertex painting was used selectively to drive material masks in Substance Painter. The example shown compares an asset with 8,131 polygons to its 1.5 million polygon high-poly counterpart."},
-       {label:"Two-Version System",src:null,bg:"radial-gradient(ellipse at 45% 55%,#1a1004,#0e0802)",caption:"Every prop exists in two different states: New, used in the Backroom, and Abandoned, used in the realistic zone. While both versions share the same geometry, each required its own texturing pass, material setup, and visual language to match the atmosphere of its environment.",compare:{
+       {label:"Two-Version System",src:null,bg:"radial-gradient(ellipse at 45% 55%,#1a1004,#0e0802)",caption:"Every prop exists in two different states: New, used in the Backroom, and Abandoned, used in the realistic zone. While both versions share the same geometry, each required its own texturing pass, material setup, and visual language to match the atmosphere of its environment.",compare:{stacked:true,
          left:{label:"New",imgs:[
            {label:"Prop (New)",src:gh("games/hollow-end/game-art/props/02-props-new.png"),bg:"radial-gradient(ellipse at 50% 50%,#1a1004,#0e0802)"},
            {label:"Sign (New)",src:gh("games/hollow-end/game-art/props/02-sign-new.png"),bg:"radial-gradient(ellipse at 50% 50%,#1a1004,#0e0802)"},
@@ -646,14 +646,15 @@ function ProjectPanel({project,onClose}){
             {activeSubcat?.groups&&(<div style={{display:"flex",gap:".28rem",flexWrap:"wrap",marginBottom:".7rem"}}>{activeSubcat.groups.map((g,i)=>(<button key={g.label} onClick={()=>{setGroupIdx(i);setImgIdx(0);}} style={{padding:".22rem .58rem",fontSize:".64rem",fontFamily:"'JetBrains Mono',monospace",background:groupIdx===i?`${c}22`:"transparent",border:`1px solid ${groupIdx===i?c+"55":"rgba(255,255,255,.08)"}`,borderRadius:"100px",color:groupIdx===i?c:"rgba(232,232,240,.35)",cursor:"pointer",transition:"all .2s",letterSpacing:".06em",whiteSpace:"nowrap",textTransform:"uppercase"}}>{g.label}</button>))}</div>)}
             {imgs[imgIdx]?.compare?(
               <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"1rem",marginBottom:".75rem"}}>
-                <div>
-                  <Lb t={imgs[imgIdx].compare.left.label.toUpperCase()} c={c}/>
-                  {imgs[imgIdx].compare.left.imgs?.length>0?<Gallery imgs={imgs[imgIdx].compare.left.imgs} c={c} idx={cmpL} onIdx={setCmpL}/>:<EmptySlot c={c}/>}
-                </div>
-                <div>
-                  <Lb t={imgs[imgIdx].compare.right.label.toUpperCase()} c={c}/>
-                  {imgs[imgIdx].compare.right.imgs?.length>0?<Gallery imgs={imgs[imgIdx].compare.right.imgs} c={c} idx={cmpR} onIdx={setCmpR}/>:<EmptySlot c={c}/>}
-                </div>
+                {["left","right"].map(side=>{
+                  const cd=imgs[imgIdx].compare[side];
+                  return(<div key={side}>
+                    <Lb t={cd.label.toUpperCase()} c={c}/>
+                    {imgs[imgIdx].compare.stacked?
+                      (cd.imgs||[]).map((im,i)=>(<div key={i} style={{aspectRatio:"4/3",borderRadius:"10px",overflow:"hidden",border:`1px solid ${c}28`,marginBottom:i<cd.imgs.length-1?".5rem":0,background:im.bg||"rgba(255,255,255,.02)"}}>{im.src?<img src={im.src} alt={im.label||""} style={{width:"100%",height:"100%",objectFit:"cover"}}/>:<div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontSize:".62rem",color:`${c}44`,fontFamily:"'JetBrains Mono',monospace"}}>Coming soon</span></div>}</div>))
+                      :(cd.imgs?.length>0?<Gallery imgs={cd.imgs} c={c} idx={side==="left"?cmpL:cmpR} onIdx={side==="left"?setCmpL:setCmpR}/>:<EmptySlot c={c}/>)}
+                  </div>);
+                })}
                 {imgs.length>1&&(<div style={{gridColumn:"1 / -1",display:"flex",justifyContent:"space-between",gap:".6rem",marginTop:".3rem"}}>
                   <button onClick={()=>setImgIdx(i=>(i-1+imgs.length)%imgs.length)} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:".4rem",padding:".55rem .9rem",background:`${c}18`,border:`1px solid ${c}55`,borderRadius:"8px",color:c,fontSize:".78rem",fontWeight:600,fontFamily:"'JetBrains Mono',monospace",cursor:"pointer",transition:"background .2s"}}>‹ PREV SLIDE</button>
                   <button onClick={()=>setImgIdx(i=>(i+1)%imgs.length)} style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",gap:".4rem",padding:".55rem .9rem",background:`${c}18`,border:`1px solid ${c}55`,borderRadius:"8px",color:c,fontSize:".78rem",fontWeight:600,fontFamily:"'JetBrains Mono',monospace",cursor:"pointer",transition:"background .2s"}}>NEXT SLIDE ›</button>
