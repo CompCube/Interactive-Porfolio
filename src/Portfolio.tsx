@@ -212,7 +212,7 @@ const HE_CATEGORIES=[
    ]},
   {id:"results",label:"Results",icon:"🚀",hex:"#ffaa88",
    text:"Hollow End was submitted as a final degree project at Universitat de Girona in 2025, targeting a Steam and itch.io release in October 2026.",
-   links:[{label:"Wishlist on Steam",href:"#",icon:"🎮"},{label:"View on Itch.io",href:"#",icon:"🎯"}],
+   links:[{label:"Wishlist on Steam",href:"#",icon:"🎮"},{label:"View on Itch.io",href:"#",icon:"🎯"},{label:"View on ArtStation",href:"https://www.artstation.com/artwork/oJNdqq",icon:"🎨"}],
    subcategories:[
      {id:"final-shots",label:"Final Shots",imgs:[
        {label:"Final Shot",src:gh("games/hollow-end/game-art/environment-art/results/01_l2render_1.png"),bg:"radial-gradient(ellipse at 50% 50%,#050510,#020208)",caption:"In-engine captures at full fidelity with lighting, post-processing and props in place."},
@@ -242,7 +242,7 @@ const PLANETS=[
       desc:"A collection of **80+ optimized game-ready props** created for **Hollow End** using a **low-poly to high-poly production workflow**, **texture atlases**, and a scalable asset pipeline tailored for large **Unity HDRP** environments. Each prop was designed with both **clean and abandoned variants**, allowing the same asset library to be reused across multiple locations while supporting environmental storytelling and reducing production overhead.",
       tags:["Unity","HDRP","Blender","3D Art","PBR","Substance 3D Painter"],
       features:["Low-poly to high-poly workflow","80+ game-ready assets","14 shared texture atlases","Strict polygon budget per category","Unity HDRP compatible","Based on 300+ real reference photos"],
-      imgs:[],cta:"View on ArtStation",
+      imgs:[],cta:"View on ArtStation",ctaHref:"https://www.artstation.com/artwork/BklNBz",
       categories:[
         {id:"props",label:"Props",caption:"A collection of environment props created to populate the different areas of *Hollow End's* subway station. Assets were designed with clear complexity targets to balance visual quality and scalability:\n\n• **Small props (300–500 tris)**\n• **Medium props (500–2,000 tris)**\n• **Hero assets (2,000–5,000 tris).**",imgs:[{label:"Various Old",src:gd("1jmy-Y6FaGikQz5nak32qwymNsLZift0n")},{label:"Various New",src:"https://res.cloudinary.com/dr4hp18nh/image/upload/v1780611743/new_xaxlai.png"},{label:"Posters Old",src:gd("1jgnglczIGFRJUE2SseHzoNnGRHSc-LYz")},{label:"Posters New",src:gd("1F2jy4CfjXtoGbNf-z1lkiZwNyH3EBV74")}],videoId:null},
         {id:"reference",label:"References",caption:"During a trip to Berlin, I collected **300+ reference photos** across multiple U-Bahn stations, focusing on architecture, lighting, materials, signage, wear, and transitional spaces. These references became the visual foundation for shaping the atmosphere and environmental language of *Hollow End*.",imgs:[{label:"Reference Images",src:gd("1OC3EYBdZsgheHM-zj0gK8KTPSXaXx6c7")},{label:"Berlin U-Bahn",src:gd("1bT1GiVG-jnW3nf5MVgU5wJ0u-lsWxogI")}],videoId:null},
@@ -256,7 +256,7 @@ const PLANETS=[
       desc:"The structural foundation of *Hollow End* is built from a **reusable modular kit** designed to create **large interconnected subway environments** in Unity HDRP. The same geometry constructs both **The Backroom (L2)** and **The Abandoned Zone (L1 & L3)**, with distinct identities achieved through materials, lighting, and environmental dressing instead of additional meshes.",
       tags:["Blender","Unity HDRP","Modular Kit","Substance 3D Painter","Trim Sheets","Liminal Space","Backrooms"],
       features:["78 modular pieces covering full environmental construction","9 trim sheets with progressive degradation variants","4096px trim sheets at 512 px/m texel density","Two complete environments: Backroom & Abandoned","Material-driven variation using a single UV framework"],
-      imgs:[{label:"Render",src:gh("environments/subway-modular-kit/01-render1.png"),bg:bgEnv}],cta:"View on ArtStation",
+      imgs:[{label:"Render",src:gh("environments/subway-modular-kit/01-render1.png"),bg:bgEnv}],cta:"View on ArtStation",ctaHref:"https://www.artstation.com/artwork/YGv1AV",
       categories:[
         {id:"core-idea",label:"CORE IDEA",hex:"#bb8880",
          imgs:[
@@ -294,8 +294,8 @@ const PLANETS=[
         {id:"modular-kit",label:"MODULAR KIT SYSTEM",hex:"#7abba8",
          imgs:[{label:"Full Modular Kit",src:gh("environments/subway-modular-kit/modular-kit/01-fullmodularkit.png"),bg:"radial-gradient(ellipse at 50% 50%,#0a1a14,#040a08)"}],
          text:"The Modular Kit is the **structural backbone** of *Hollow End*, consisting of **78 reusable pieces** used to construct every playable environment. Organized into two main sets (New and Abandoned) and built around a strict **4-meter grid**, the system ensures predictable snapping, consistent UV layouts, and a uniform texel density across the entire project.\n\nRather than creating unique assets for each area, the kit prioritizes **modularity and reuse**. The same geometry supports multiple environments, with materials, lighting, and environmental dressing providing each space with its own visual identity.",
-         subcategories:[
-           {id:"backroom-l2",label:"Backroom (L2)",imgs:[
+         dualGallery:{
+           left:{label:"Backroom (L2)",imgs:[
              {label:"Walls",src:gh("environments/subway-modular-kit/modular-kit/backroom-l2/01-walls.png"),bg:"radial-gradient(ellipse at 50% 50%,#0a1a0a,#040a04)",caption:"The Backroom showcases the modular system in its purest form. Clean materials, uniform lighting, and repetitive architectural elements intentionally expose the underlying structure, reinforcing the **artificial and unsettling atmosphere** of the space."},
              {label:"Floors",src:gh("environments/subway-modular-kit/modular-kit/backroom-l2/02-floors.png"),bg:"radial-gradient(ellipse at 45% 55%,#081a08,#040a04)",caption:"The Backroom showcases the modular system in its purest form. Clean materials, uniform lighting, and repetitive architectural elements intentionally expose the underlying structure, reinforcing the **artificial and unsettling atmosphere** of the space."},
              {label:"Full Modular Kit",src:gh("environments/subway-modular-kit/modular-kit/backroom-l2/03-fullmodularkit.png"),bg:"radial-gradient(ellipse at 55% 45%,#0a1c0a,#040c04)",caption:"The Backroom showcases the modular system in its purest form. Clean materials, uniform lighting, and repetitive architectural elements intentionally expose the underlying structure, reinforcing the **artificial and unsettling atmosphere** of the space."},
@@ -303,13 +303,13 @@ const PLANETS=[
              {label:"Pieces",src:gh("environments/subway-modular-kit/modular-kit/backroom-l2/05-pieces-2.png"),bg:"radial-gradient(ellipse at 45% 45%,#0a1a08,#040c04)",caption:"The Backroom showcases the modular system in its purest form. Clean materials, uniform lighting, and repetitive architectural elements intentionally expose the underlying structure, reinforcing the **artificial and unsettling atmosphere** of the space."},
              {label:"Pieces",src:gh("environments/subway-modular-kit/modular-kit/backroom-l2/06-pieces-3.png"),bg:"radial-gradient(ellipse at 55% 55%,#081a0a,#040a04)",caption:"The Backroom showcases the modular system in its purest form. Clean materials, uniform lighting, and repetitive architectural elements intentionally expose the underlying structure, reinforcing the **artificial and unsettling atmosphere** of the space."},
            ]},
-           {id:"abandoned-l1",label:"Abandoned (L1)",imgs:[
+           right:{label:"Abandoned (L1)",imgs:[
              {label:"Full Modular Kit",src:gh("environments/subway-modular-kit/modular-kit/abandoned-l1/01-fullmodularkit.png"),bg:"radial-gradient(ellipse at 50% 50%,#1a0a08,#0a0504)",caption:"The Abandoned Zone is built from the **exact same modular pieces**, recontextualized through material degradation, lighting, and environmental dressing. This demonstrates the core strength of the system: creating a completely different atmosphere without increasing the structural asset count."},
              {label:"Pieces",src:gh("environments/subway-modular-kit/modular-kit/abandoned-l1/02-pieces.png"),bg:"radial-gradient(ellipse at 45% 55%,#180a08,#0a0504)",caption:"The Abandoned Zone is built from the **exact same modular pieces**, recontextualized through material degradation, lighting, and environmental dressing. This demonstrates the core strength of the system: creating a completely different atmosphere without increasing the structural asset count."},
              {label:"Pieces",src:gh("environments/subway-modular-kit/modular-kit/abandoned-l1/03-pieces.png"),bg:"radial-gradient(ellipse at 55% 45%,#1a0c08,#0c0604)",caption:"The Abandoned Zone is built from the **exact same modular pieces**, recontextualized through material degradation, lighting, and environmental dressing. This demonstrates the core strength of the system: creating a completely different atmosphere without increasing the structural asset count."},
              {label:"Pieces",src:gh("environments/subway-modular-kit/modular-kit/abandoned-l1/04-pieces.png"),bg:"radial-gradient(ellipse at 50% 60%,#180808,#0a0404)",caption:"The Abandoned Zone is built from the **exact same modular pieces**, recontextualized through material degradation, lighting, and environmental dressing. This demonstrates the core strength of the system: creating a completely different atmosphere without increasing the structural asset count."},
            ]},
-         ]},
+         }},
         {id:"results",label:"Results",hex:"#99bbaa",
          dualGallery:{
            left:{label:"Backroom",imgs:[
@@ -318,8 +318,8 @@ const PLANETS=[
              {label:"L2 Render",src:gh("environments/subway-modular-kit/results/03-l2render.png"),bg:"radial-gradient(ellipse at 55% 45%,#081a12,#040c08)"},
            ]},
            right:{label:"Abandoned",imgs:[
-             {label:"L1 Render",src:gh("environments/subway-modular-kit/results/04-l1-render2.png"),bg:"radial-gradient(ellipse at 50% 50%,#1a0c08,#0a0504)"},
              {label:"L1 Render",src:gh("environments/subway-modular-kit/results/05-l1-render1.png"),bg:"radial-gradient(ellipse at 45% 55%,#180a08,#0a0504)"},
+             {label:"L1 Render",src:gh("environments/subway-modular-kit/results/04-l1-render2.png"),bg:"radial-gradient(ellipse at 50% 50%,#1a0c08,#0a0504)"},
              {label:"L1 Render",src:gh("environments/subway-modular-kit/results/06-l1-render3.png"),bg:"radial-gradient(ellipse at 55% 45%,#1a0c08,#0c0604)"},
            ]},
          },
@@ -336,7 +336,7 @@ const PLANETS=[
         {label:"Modular Kit",src:gh("environments/gmtk-kit/02-objects.png"),bg:"radial-gradient(ellipse at 45% 55%,#0a1206,#050a04)",caption:"The complete piece library, designed around a simple constraint: every asset had to justify its existence. Built under game jam conditions, the kit prioritizes **combinatorial flexibility**, allowing a small number of pieces to generate a wide variety of layouts."},
         {label:"Assembly",src:gh("environments/gmtk-kit/03-fullmodularkit.png"),bg:"radial-gradient(ellipse at 45% 60%,#0a1408,#050a04)",caption:"An example room assembled from the modular kit, demonstrating how a **small set of pieces** can create varied spaces."},
         {label:"Assembly",src:gh("environments/gmtk-kit/04-result.png"),bg:"radial-gradient(ellipse at 55% 45%,#081206,#040a04)",caption:"An example room assembled from the modular kit, demonstrating how a **small set of pieces** can create varied spaces."},
-      ],cta:"View on ArtStation",ctaHref:"https://www.artstation.com/artwork/bgvy9E"},
+      ],thumbnail:gh("environments/gmtk-kit/01-a-thumbnail.png"),cta:"View on ArtStation",ctaHref:"https://www.artstation.com/artwork/bgvy9E"},
   ]},
   {id:"games",label:"Games",icon:"🎮",hex:"#5944A6",orbitRadius:22,orbitSpeed:.0022,startAngle:.8,radius:1.8,desc:"Game development projects.",moons:[
     {id:"hollow-end",label:"Hollow End",icon:"🎮",orbitRadius:3.4,orbitSpeed:.009,startAngle:1,inclination:.24,radius:.40,hex:"#aa88cc",
@@ -370,7 +370,7 @@ const PLANETS=[
       desc:"A stylized waterfall built in Unity using Shader Graph, VFX Graph, and Particle Systems. The effect is split into two independent systems with different performance priorities: a shader-driven waterfall body and a lightweight splash system, balancing visual quality, runtime flexibility, and mobile-friendly performance.",
       tags:["Unity","VFX Graph","Shader Graph","Blender","Mobile Optimized"],
       features:["One draw call for main body via Mesh Output","Normals generated in-shader via NormalFromHeight","Two-layer UV scrolling without physics simulation","1000 quad particles with noise-based alpha clip","Runtime UI with sliders and colour picker"],
-      imgs:[],thumbnail:gh("vfx/waterfall/01-thumbnail.png"),cta:"View on ArtStation",ctaHref:"https://www.artstation.com/artwork/2BgoNy",
+      imgs:[],thumbnail:gh("vfx/waterfall/01-thumbnail.png"),cta:"View on ArtStation",ctaHref:"https://www.artstation.com/artwork/kNkPgn",
       categories:[
         {id:"overview",label:"Overview",caption:"Main water body at one draw call. Splash and fog at the base kept deliberately cheap to contain overdraw where particles overlap heavily.",imgs:[{label:"Stylized Waterfall",src:gh("vfx/waterfall/overview/01-stylized-waterfall.png"),bg:"radial-gradient(ellipse at 40% 70%,#041018,#020810)"}],videoId:"S8ndamM_ybg"},
         {id:"showcase",label:"Showcase",caption:"",imgs:[
@@ -395,7 +395,7 @@ const PLANETS=[
         {label:"Thumbnail",src:gh("tools/scatter-tool/01-thumbnail.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a0e1a,#050810)"},
         {label:"Hook Video",src:null,bg:"radial-gradient(ellipse at 50% 40%,#0a0e1a,#050810)",videoId:"sqHVsmYYLsU",caption:"Quick look at the tool in action."},
         {label:"Full Demo",src:null,bg:"radial-gradient(ellipse at 50% 40%,#080c18,#040610)",videoId:"TYoK6CLA0mY",caption:"Full walkthrough of all tool features and workflow."},
-      ],thumbnail:gh("tools/scatter-tool/01-thumbnail.png"),cta:"View on GitHub",
+      ],thumbnail:gh("tools/scatter-tool/01-thumbnail.png"),cta:"View on ArtStation",ctaHref:"https://www.artstation.com/artwork/yA0egQ",
       categories:[
         {id:"core-systems",label:"Core Systems",hex:"#7080e0",
          imgs:[{label:"Tool Overview",src:null,bg:"radial-gradient(ellipse at 50% 40%,#0a0e1a,#050810)",videoId:"Dl6SS5CLTXE",caption:"The Object Replacement Tool is a Unity Editor extension designed to automate scene population workflows. It operates in two modes: Replace, which swaps selected objects with weighted-random prefabs, and Scatter, which distributes instances around existing objects without modifying them. Both modes share a unified system for transforms, randomization, surface alignment, undo support, and previewing."}],
