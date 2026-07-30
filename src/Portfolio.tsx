@@ -532,17 +532,34 @@ function StatusBar(){
   </div>);
 }
 
-function Lightbox({src,onClose}){
+function Lightbox({imgs,idx,onIdx,onClose}){
+  const cur=imgs[idx]||imgs[0];
   const[zoom,setZoom]=useState(1);
   const[pos,setPos]=useState({x:0,y:0});
   const dragRef=useRef(null);
   const pinchRef=useRef({dist:0,zoom:1});
+  const wrapRef=useRef(null);
+  useEffect(()=>{setZoom(1);setPos({x:0,y:0});},[idx]);
+  const nav=dir=>{
+    if(imgs.length<2)return;
+    let i=idx;
+    for(let k=0;k<imgs.length;k++){i=(i+dir+imgs.length)%imgs.length;if(imgs[i]?.src){onIdx(i);return;}}
+  };
   useEffect(()=>{
-    const onKey=e=>{if(e.key==="Escape")onClose();};
+    const onKey=e=>{
+      if(e.key==="Escape")onClose();
+      else if(e.key==="ArrowRight")nav(1);
+      else if(e.key==="ArrowLeft")nav(-1);
+    };
     window.addEventListener("keydown",onKey);
     return()=>window.removeEventListener("keydown",onKey);
-  },[onClose]);
-  const onWheel=e=>{e.preventDefault();e.stopPropagation();setZoom(z=>{const nz=Math.max(1,Math.min(5,z-e.deltaY*.0016));if(nz<=1)setPos({x:0,y:0});return nz;});};
+  });
+  useEffect(()=>{
+    const el=wrapRef.current;if(!el)return;
+    const onWheel=e=>{e.preventDefault();setZoom(z=>{const nz=Math.max(1,Math.min(5,z-e.deltaY*.0016));if(nz<=1)setPos({x:0,y:0});return nz;});};
+    el.addEventListener("wheel",onWheel,{passive:false});
+    return()=>el.removeEventListener("wheel",onWheel);
+  },[]);
   const startDrag=(x,y)=>{if(zoom>1)dragRef.current={x:x-pos.x,y:y-pos.y};};
   const moveDrag=(x,y)=>{if(dragRef.current)setPos({x:x-dragRef.current.x,y:y-dragRef.current.y});};
   const endDrag=()=>{dragRef.current=null;};
@@ -556,13 +573,17 @@ function Lightbox({src,onClose}){
     else if(e.touches.length===1&&dragRef.current){e.preventDefault();moveDrag(e.touches[0].clientX,e.touches[0].clientY);}
   };
   return(
-    <div onClick={e=>{if(e.target===e.currentTarget&&zoom<=1)onClose();}} onWheel={onWheel}
+    <div ref={wrapRef} onClick={e=>{if(e.target===e.currentTarget&&zoom<=1)onClose();}}
       onMouseDown={e=>startDrag(e.clientX,e.clientY)} onMouseMove={e=>moveDrag(e.clientX,e.clientY)} onMouseUp={endDrag} onMouseLeave={endDrag}
       onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={endDrag}
       style={{position:"fixed",inset:0,background:"rgba(4,4,10,.96)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",cursor:zoom>1?"grab":"zoom-out",touchAction:"none"}}>
-      <img src={src} alt="" draggable={false} style={{maxWidth:"96vw",maxHeight:"96vh",objectFit:"contain",transform:`scale(${zoom}) translate(${pos.x/zoom}px,${pos.y/zoom}px)`,transition:dragRef.current?"none":"transform .12s ease-out",userSelect:"none",cursor:"inherit"}}/>
+      <img src={cur.src} alt={cur.label||""} draggable={false} style={{maxWidth:"92vw",maxHeight:"92vh",width:"auto",height:"auto",objectFit:"contain",transform:`scale(${zoom}) translate(${pos.x/zoom}px,${pos.y/zoom}px)`,transition:dragRef.current?"none":"transform .12s ease-out",userSelect:"none",cursor:"inherit"}}/>
+      {imgs.length>1&&<>
+        <button onClick={e=>{e.stopPropagation();nav(-1);}} style={{position:"fixed",left:"1.2rem",top:"50%",transform:"translateY(-50%)",background:"rgba(255,255,255,.08)",border:"1px solid rgba(255,255,255,.25)",color:"#fff",width:44,height:44,borderRadius:"50%",fontSize:"1.4rem",cursor:"pointer",zIndex:1001,display:"flex",alignItems:"center",justifyContent:"center"}}>‹</button>
+        <button onClick={e=>{e.stopPropagation();nav(1);}} style={{position:"fixed",right:"1.2rem",top:"50%",transform:"translateY(-50%)",background:"rgba(255,255,255,.08)",border:"1px solid rgba(255,255,255,.25)",color:"#fff",width:44,height:44,borderRadius:"50%",fontSize:"1.4rem",cursor:"pointer",zIndex:1001,display:"flex",alignItems:"center",justifyContent:"center"}}>›</button>
+      </>}
       <button onClick={onClose} style={{position:"fixed",top:"1.2rem",right:"1.2rem",background:"rgba(255,255,255,.08)",border:"1px solid rgba(255,255,255,.25)",color:"#fff",width:38,height:38,borderRadius:"50%",fontSize:"1.15rem",cursor:"pointer",zIndex:1001}}>✕</button>
-      <div style={{position:"fixed",bottom:"1.2rem",left:"50%",transform:"translateX(-50%)",fontSize:".62rem",fontFamily:"'JetBrains Mono',monospace",color:"rgba(255,255,255,.4)",letterSpacing:".08em",whiteSpace:"nowrap"}}>SCROLL OR PINCH TO ZOOM · DRAG TO PAN · ESC TO CLOSE</div>
+      <div style={{position:"fixed",bottom:"1.2rem",left:"50%",transform:"translateX(-50%)",fontSize:".62rem",fontFamily:"'JetBrains Mono',monospace",color:"rgba(255,255,255,.4)",letterSpacing:".08em",whiteSpace:"nowrap"}}>{imgs.length>1?`${idx+1}/${imgs.length} · `:""}SCROLL OR PINCH TO ZOOM · DRAG TO PAN · ESC TO CLOSE</div>
     </div>
   );
 }
@@ -606,7 +627,7 @@ function Gallery({imgs,videoId,c,idx,onIdx,maxH}){
       {imgs.length>1&&<>{nb("left",()=>onIdx(i=>(i-1+imgs.length)%imgs.length))}{nb("right",()=>onIdx(i=>(i+1)%imgs.length))}</>}
       {imgs.length>1&&(<div style={{position:"absolute",bottom:8,right:10,display:"flex",gap:4,zIndex:2}}>{imgs.map((_,i)=><div key={i} onClick={()=>onIdx(i)} style={{width:i===idx?14:5,height:5,borderRadius:"100px",background:i===idx?c:`${c}44`,cursor:"pointer",transition:"all .2s"}}/>)}</div>)}
     </div>
-    {lbOpen&&showImg&&<Lightbox src={cur.src} onClose={()=>setLbOpen(false)}/>}
+    {lbOpen&&showImg&&<Lightbox imgs={imgs} idx={idx} onIdx={onIdx} onClose={()=>setLbOpen(false)}/>}
   </div>);
 }
 
