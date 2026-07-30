@@ -43,6 +43,7 @@ const bg2="radial-gradient(ellipse at 60% 50%,#001020,#00060e)";
 
 const HE_CATEGORIES=[
   {id:"introduction",label:"Introduction",icon:"📋",hex:"#66ccdd",
+   lead:"Hollow End turns the environment itself into the main gameplay mechanic. No combat, only exploration and decisions.",
    text:"Hollow End is built around a simple creative challenge: can the environment itself become the main gameplay mechanic? Set inside an abandoned subway station, the game replaces combat with exploration, environmental puzzles, and decision-making, encouraging players to observe their surroundings rather than simply move through them.\n\nDrawing inspiration from real underground transit architecture, Hollow End transforms familiar spaces into unsettling ones through repetition, scale, lighting, and atmosphere. Structure is the foundation. Atmosphere is the goal.",
    subcategories:[
      {id:"core-idea",label:"Core Idea",imgs:[
@@ -59,6 +60,7 @@ const HE_CATEGORIES=[
      ]},
    ]},
   {id:"narrative",label:"Narrative",icon:"📖",hex:"#cc88ff",
+   lead:"The story is told entirely through the environment, with no cutscenes or dialogue. Two branching paths shape what players uncover.",
    text:"Hollow End tells its story entirely through the environment. There are no cutscenes, no dialogue, and almost no direct exposition. Instead, players uncover the station's history by exploring its spaces, observing what happened there, and piecing together the clues left behind.\n\nThe game is divided into two distinct narrative paths, each tied to a different side of the station. The Backroom follows a more surreal and unsettling logic, detached from conventional reality and shaped by repetition, isolation, and the unknown. In contrast, the Abandoned zone tells a more grounded story centered around the criminal group that took refuge within the station's decaying infrastructure.\n\nDepending on the path they choose, players gradually discover different fragments of the station's history and assemble their own understanding of what happened beneath the city.",
    subcategories:[
      {id:"story-setting",label:"Story & Setting",imgs:[
@@ -76,6 +78,7 @@ const HE_CATEGORIES=[
      ]},
    ]},
   {id:"gameplay",label:"Gameplay & Level Design",icon:"🕹️",hex:"#aadd88",
+   lead:"There's no combat. Only exploration, observation and decision-making drive the tension.",
    text:"Hollow End is a first-person horror game built around exploration, observation, and decision-making. There is no combat: the player can only move, interact with objects, and manage the station's systems. Tension and anxiety come from the environment itself and the threats hidden within the darkness.",
    subcategories:[
      {id:"core-loop",label:"Core Loop",imgs:[
@@ -100,6 +103,7 @@ const HE_CATEGORIES=[
      ]},
    ]},
   {id:"game-art",label:"Game Art",icon:"🎨",hex:"#ff99cc",
+   lead:"Two contrasting aesthetics, the sterile Backroom and the decaying Abandoned zone, share the same underlying geometry.",
    text:"All visual assets were created for Unity HDRP, combining two contrasting aesthetics built on the same underlying geometry: the sterile, over-lit unreality of the Backroom and the accumulated decay of the Abandoned zone.",
    subcategories:[
      {id:"references-identity",label:"References & Identity",imgs:[
@@ -180,6 +184,7 @@ const HE_CATEGORIES=[
      ]},
    ]},
   {id:"technical",label:"Technical Implementation",icon:"💻",hex:"#ffdd88",
+   lead:"A collection of interconnected custom systems, from portals and interactables to lighting, enemy AI and blackout management, all built to make the environment itself the main gameplay system.",
    text:"Beyond its visual design, Hollow End is built on a collection of interconnected gameplay systems developed specifically for the project. From spatial portals and shared interaction logic to dynamic lighting, enemy AI, and blackout management, every mechanic is designed to support the same goal: turning the environment itself into the main gameplay system. This section explores the technical implementation behind those systems.",
    subcategories:[
      {id:"hdrp-pipeline",label:"HDRP Pipeline",imgs:[
@@ -458,18 +463,43 @@ const CSS=`
 @keyframes introUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
 @keyframes introIn{from{opacity:0}to{opacity:1}}
 @keyframes introBlink{0%,100%{opacity:.14}50%{opacity:.44}}
+@keyframes qnIn{from{opacity:0;transform:translateX(-16px)}to{opacity:1;transform:translateX(0)}}
 .pf-btn:hover{filter:brightness(1.25)!important}
 .pf-nav:hover{background:rgba(0,0,0,.85)!important}
 .pf-tab:hover{border-color:rgba(255,255,255,.28)!important}
+.qn-item:hover{background:rgba(255,255,255,.055)!important;border-color:rgba(255,255,255,.22)!important}
+.qn-toggle:hover{filter:brightness(1.2)}
+.qn-scroll{scrollbar-width:thin;scrollbar-color:rgba(237,195,43,.35) transparent}
+.qn-scroll::-webkit-scrollbar{width:6px}
+.qn-scroll::-webkit-scrollbar-track{background:transparent}
+.qn-scroll::-webkit-scrollbar-thumb{background:rgba(237,195,43,.28);border-radius:100px}
+.qn-scroll::-webkit-scrollbar-thumb:hover{background:rgba(237,195,43,.5)}
 `;
 
 const renderBold=t=>t?t.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).map((p,i)=>{if(p.startsWith('**')&&p.endsWith('**'))return(<strong key={i} style={{color:"rgba(232,232,240,.98)",fontWeight:600}}>{p.slice(2,-2)}</strong>);if(p.startsWith('*')&&p.endsWith('*'))return(<em key={i} style={{fontStyle:"italic",color:"rgba(232,232,240,.82)"}}>{p.slice(1,-1)}</em>);return p;}):null;
+function Lb({t,c}){return <div style={{fontSize:".6rem",color:c,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".22em",marginBottom:".45rem"}}>{t}</div>;}
 const HowItWorks=({text,c})=>{const t=useT();const[open,setOpen]=useState(false);if(!text)return null;return(<div style={{marginTop:".55rem"}}>
   <button onClick={()=>setOpen(o=>!o)} style={{display:"flex",alignItems:"center",gap:".35rem",padding:".28rem .6rem",fontSize:".62rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".08em",color:c,background:`${c}14`,border:`1px solid ${c}44`,borderRadius:"6px",cursor:"pointer",transition:"all .2s"}}>
     <span style={{display:"inline-block",transition:"transform .2s",transform:open?"rotate(90deg)":"none"}}>▸</span> {t("howItWorks").toUpperCase()}
   </button>
   {open&&<p style={{fontSize:".79rem",lineHeight:1.66,color:"rgba(232,232,240,.68)",whiteSpace:"pre-line",marginTop:".5rem",padding:".7rem .8rem",background:`${c}0a`,border:`1px solid ${c}22`,borderRadius:"8px",animation:"captionFade .18s ease"}}>{renderBold(text)}</p>}
 </div>);};
+
+function CategoryIntro({cat,c}){
+  const[open,setOpen]=useState(false);
+  return(<div style={{marginBottom:"1rem"}}>
+    <Lb t={cat.label.toUpperCase()} c={c}/>
+    {cat.lead&&<p style={{fontSize:".92rem",fontWeight:600,lineHeight:1.55,color:"rgba(255,255,255,.92)",marginBottom:".6rem"}}>{renderBold(cat.lead)}</p>}
+    {cat.lead?(<>
+      <button onClick={()=>setOpen(o=>!o)} style={{display:"flex",alignItems:"center",gap:".35rem",padding:".28rem .6rem",fontSize:".62rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".08em",color:c,background:`${c}14`,border:`1px solid ${c}44`,borderRadius:"6px",cursor:"pointer",transition:"all .2s"}}>
+        <span style={{display:"inline-block",transition:"transform .2s",transform:open?"rotate(90deg)":"none"}}>▸</span> {open?"READ LESS":"READ MORE"}
+      </button>
+      {open&&<p style={{fontSize:".84rem",lineHeight:1.75,color:"rgba(232,232,240,.72)",whiteSpace:"pre-line",textAlign:"left",marginTop:".65rem",animation:"captionFade .18s ease"}}>{renderBold(cat.text)}</p>}
+    </>):(
+      <p style={{fontSize:".84rem",lineHeight:1.75,color:"rgba(232,232,240,.72)",whiteSpace:"pre-line",textAlign:"left"}}>{renderBold(cat.text)}</p>
+    )}
+  </div>);
+}
 
 function Countdown({targetDate,c}){
   const[rem,setRem]=useState({d:0,h:0,m:0,s:0});
@@ -482,7 +512,9 @@ function Countdown({targetDate,c}){
 
 function MoonTooltip({moon,x,y}){
   if(!moon)return null;
-  return(<div style={{position:"fixed",left:x+18,top:y-58,background:"rgba(7,7,17,.94)",backdropFilter:"blur(16px)",border:`1px solid ${moon.hex}44`,borderRadius:"10px",padding:".55rem .8rem",pointerEvents:"none",zIndex:150,fontFamily:"'Space Grotesk',sans-serif",minWidth:160,animation:"tipIn .15s ease"}}>
+  const thumb=moon.imgs?.[0]?.src||moon.categories?.[0]?.imgs?.[0]?.src||moon.categories?.[0]?.subcategories?.[0]?.imgs?.[0]?.src||null;
+  return(<div style={{position:"fixed",left:x+18,top:thumb?y-172:y-58,background:"rgba(7,7,17,.94)",backdropFilter:"blur(16px)",border:`1px solid ${moon.hex}44`,borderRadius:"10px",padding:".55rem .8rem",pointerEvents:"none",zIndex:150,fontFamily:"'Space Grotesk',sans-serif",minWidth:180,maxWidth:210,animation:"tipIn .15s ease"}}>
+    {thumb&&<div style={{width:"100%",height:96,borderRadius:"7px",overflow:"hidden",marginBottom:".5rem",background:"rgba(255,255,255,.03)"}}><img src={thumb} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/></div>}
     <div style={{fontSize:".78rem",fontWeight:600,color:"#e8e8f0",marginBottom:".18rem"}}>{moon.icon} {moon.label}</div>
     <div style={{fontSize:".62rem",color:moon.hex,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".06em"}}>{moon.type}{moon.status?` · ${moon.status}`:""}</div>
   </div>);
@@ -500,12 +532,26 @@ function StatusBar(){
 function Gallery({imgs,videoId,c,idx,onIdx,maxH}){
   if(!imgs?.length)return null;
   const[failed,setFailed]=useState(()=>new Set());
+  const wrapRef=useRef(null);
+  const lockRef=useRef(false);
+  useEffect(()=>{
+    const el=wrapRef.current;if(!el||imgs.length<2)return;
+    const onWheel=e=>{
+      e.preventDefault();e.stopPropagation();
+      if(lockRef.current)return;
+      lockRef.current=true;setTimeout(()=>{lockRef.current=false;},380);
+      if(e.deltaY>0)onIdx(i=>(i+1)%imgs.length);else if(e.deltaY<0)onIdx(i=>(i-1+imgs.length)%imgs.length);
+    };
+    el.addEventListener("wheel",onWheel,{passive:false});
+    return()=>el.removeEventListener("wheel",onWheel);
+  },[imgs.length,onIdx]);
   const cur=imgs[idx]||imgs[0];
   const activeVid=cur.videoId??videoId;
   const showImg=cur.src&&!failed.has(cur.src);
+  const mh=maxH||"44vh";
   const nb=(dir,fn)=>(<button className="pf-nav" onClick={fn} style={{position:"absolute",[dir]:8,top:"50%",transform:"translateY(-50%)",background:"rgba(0,0,0,.6)",border:`1px solid ${c}44`,color:c,width:26,height:26,borderRadius:"50%",cursor:"pointer",fontSize:"1rem",display:"flex",alignItems:"center",justifyContent:"center",transition:"background .2s",zIndex:2}}>{dir==="left"?"‹":"›"}</button>);
   return(<div style={{marginBottom:".75rem"}}>
-    <div style={{position:"relative",width:"100%",borderRadius:"10px",overflow:"hidden",aspectRatio:"16/9",maxHeight:maxH,border:`1px solid ${c}28`}}>
+    <div ref={wrapRef} style={{position:"relative",width:"100%",borderRadius:"10px",overflow:"hidden",aspectRatio:"16/9",maxHeight:mh,border:`1px solid ${c}28`}}>
       {activeVid?<iframe src={`https://www.youtube.com/embed/${activeVid}?autoplay=1&mute=1`} title={cur.label||"video"} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{width:"100%",height:"100%",border:"none",display:"block"}}/>
         :showImg?<img src={cur.src} alt={cur.label||""} onError={()=>setFailed(s=>new Set(s).add(cur.src))} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
         :cur.textPlaceholder?<div style={{width:"100%",height:"100%",background:"rgba(255,255,255,.02)",border:`1px dashed ${c}22`,display:"flex",alignItems:"center",justifyContent:"center",padding:"1.5rem",boxSizing:"border-box",overflowY:"auto"}}>
@@ -583,7 +629,6 @@ function ProjectPanel({project,onClose}){
   useEffect(()=>{setCmpL(0);setCmpR(0);},[imgIdx,subcatId,groupIdx]);
   const pC=project.hex;
   const T=({t})=><span style={{padding:".18rem .6rem",background:`${pC}18`,border:`1px solid ${pC}44`,borderRadius:"100px",fontSize:".68rem",color:pC,fontFamily:"'JetBrains Mono',monospace"}}>{t}</span>;
-  const Lb=({t,c=pC})=><div style={{fontSize:".6rem",color:c,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".22em",marginBottom:".45rem"}}>{t}</div>;
   const CloseBtn=()=><button onClick={onClose} style={{background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.14)",color:"#e8e8f0",width:32,height:32,borderRadius:"50%",cursor:"pointer",fontSize:"1.1rem",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>x</button>;
   const EmptySlot=({c})=><div style={{aspectRatio:"16/9",background:"rgba(255,255,255,.02)",border:`1px dashed ${c}22`,borderRadius:"10px",display:"flex",alignItems:"center",justifyContent:"center",marginBottom:".75rem"}}><span style={{fontSize:".72rem",color:`${c}44`,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".1em"}}>Coming soon</span></div>;
   const RightMeta=({c=pC})=>{
@@ -624,7 +669,7 @@ function ProjectPanel({project,onClose}){
               <div style={{marginTop:"1rem"}}><TagsRow/></div>
             </div>
             <div>
-              <div style={{marginBottom:"1.1rem"}}><Lb t={t("aboutProject").toUpperCase()}/><p style={{fontSize:".82rem",lineHeight:1.72,color:"rgba(232,232,240,.65)",textAlign:"justify"}}>{renderBold(project.desc)}</p></div>
+              <div style={{marginBottom:"1.1rem"}}><Lb t={t("aboutProject").toUpperCase()} c={pC}/><p style={{fontSize:".82rem",lineHeight:1.72,color:"rgba(232,232,240,.65)",textAlign:"justify"}}>{renderBold(project.desc)}</p></div>
               <RightMeta c={pC}/>
               {ovImgs.length>1&&(<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:".5rem",marginTop:"1.1rem"}}>
                 <button onClick={()=>setImgIdx(0)} style={{padding:".55rem",fontSize:".72rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".04em",background:imgIdx===0?`${pC}22`:`${pC}0a`,border:`1px solid ${imgIdx===0?pC+"66":pC+"28"}`,borderRadius:"8px",color:imgIdx===0?pC:"rgba(232,232,240,.55)",cursor:"pointer",transition:"all .2s"}}>▸ {t("shortVideo")}</button>
@@ -678,7 +723,7 @@ function ProjectPanel({project,onClose}){
           </div>
           <div>
             {activeCat.isOverview&&activeCat.shortDesc&&(<div style={{padding:".65rem .85rem",background:`${c}08`,border:`1px solid ${c}22`,borderRadius:"8px",marginBottom:"1rem"}}><p style={{fontSize:".8rem",lineHeight:1.7,color:"rgba(232,232,240,.55)",fontStyle:"italic",textAlign:"left"}}>{renderBold(activeCat.shortDesc)}</p></div>)}
-            {!activeCat.isOverview&&activeCat.text&&(<div style={{marginBottom:"1rem"}}><Lb t={activeCat.label.toUpperCase()} c={c}/><p style={{fontSize:".84rem",lineHeight:1.75,color:"rgba(232,232,240,.72)",whiteSpace:"pre-line",textAlign:"left"}}>{renderBold(activeCat.text)}</p></div>)}
+            {!activeCat.isOverview&&activeCat.text&&<CategoryIntro key={activeCat.id} cat={activeCat} c={c}/>}
             {!activeCat.isOverview&&activeCat.subcategories?.length>0&&(<div>
               <Lb t={t("explore").toUpperCase()} c={c}/>
               <div style={{display:"flex",flexDirection:"column",gap:".5rem"}}>{activeCat.subcategories.map(sc=>(<button key={sc.id} onClick={()=>{setSubcatId(sc.id);setImgIdx(0);}} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:".7rem .9rem",fontSize:".84rem",fontFamily:"'Space Grotesk',sans-serif",background:subcatId===sc.id?`${c}20`:`${c}0a`,border:`1px solid ${subcatId===sc.id?c+"77":c+"33"}`,borderRadius:"8px",color:subcatId===sc.id?"rgba(255,255,255,.95)":"rgba(232,232,240,.85)",cursor:"pointer",transition:"all .2s",textAlign:"left",textTransform:"uppercase",letterSpacing:".03em"}}>{sc.label}<span style={{color:c,fontSize:".7rem",textTransform:"none"}}>{sc.imgs?.length||0} · →</span></button>))}</div>
@@ -703,9 +748,46 @@ function ProjectPanel({project,onClose}){
         {hasCats&&(<><div style={{height:1,background:`linear-gradient(90deg,${pC}33,transparent)`,margin:".4rem 0"}}/><div style={{display:"flex",gap:".28rem",flexWrap:"wrap",margin:".35rem 0 .4rem"}}>{project.categories.map(cat=>(<button key={cat.id} className="pf-tab" onClick={()=>{setCatId(cat.id);setImgIdx(0);}} style={{padding:".22rem .58rem",fontSize:".64rem",fontFamily:"'JetBrains Mono',monospace",background:effCatId===cat.id?`${pC}22`:"transparent",border:`1px solid ${effCatId===cat.id?pC+"55":"rgba(255,255,255,.08)"}`,borderRadius:"100px",color:effCatId===cat.id?pC:"rgba(232,232,240,.35)",cursor:"pointer",transition:"all .2s",letterSpacing:".06em",whiteSpace:"nowrap",textTransform:"uppercase"}}>{cat.label}</button>))}</div><div style={{height:1,background:`linear-gradient(90deg,${pC}22,transparent)`,marginBottom:".55rem"}}/></>)}
         {caption&&(<div key={effCatId} style={{animation:"captionFade .22s ease"}}><div style={{fontSize:".58rem",color:`${pC}88`,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".14em",marginBottom:".3rem"}}>{(imgs[imgIdx]?.label||cat?.label)?.toUpperCase()}{imgs.length>0?` · ${imgIdx+1}/${imgs.length}`:""}</div><p style={{fontSize:".81rem",lineHeight:1.72,color:"rgba(232,232,240,.72)",whiteSpace:"pre-line"}}>{renderBold(caption)}</p><HowItWorks text={imgs[imgIdx]?.details} c={pC}/></div>)}
       </div>
-      <div><div style={{marginBottom:"1.1rem"}}><Lb t={t("aboutProject").toUpperCase()}/><p style={{fontSize:".82rem",lineHeight:1.72,color:"rgba(232,232,240,.65)",textAlign:"justify"}}>{renderBold(project.desc)}</p></div><RightMeta/><div style={{marginBottom:"1.3rem"}}><TagsRow/></div><WishlistBtn/></div>
+      <div><div style={{marginBottom:"1.1rem"}}><Lb t={t("aboutProject").toUpperCase()} c={pC}/><p style={{fontSize:".82rem",lineHeight:1.72,color:"rgba(232,232,240,.65)",textAlign:"justify"}}>{renderBold(project.desc)}</p></div><RightMeta/><div style={{marginBottom:"1.3rem"}}><TagsRow/></div><WishlistBtn/></div>
     </div>
   </Modal>);
+}
+
+function QuickNav({open,onClose,onSelectProject}){
+  if(!open)return null;
+  const cats=PLANETS.filter(p=>p.moons.length>0);
+  return(<div className="qn-scroll" style={{position:"fixed",top:0,left:0,bottom:0,width:"min(25vw,360px)",minWidth:280,background:"rgba(6,6,15,.97)",backdropFilter:"blur(22px)",borderRight:"1px solid rgba(255,255,255,.08)",zIndex:250,overflowY:"auto",padding:"1.4rem 1.15rem 2rem",animation:"qnIn .22s ease",fontFamily:"'Space Grotesk',sans-serif"}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"1.3rem"}}>
+      <div>
+        <div style={{fontSize:"1rem",fontWeight:700,color:"#e8e8f0"}}>All Projects</div>
+        <div style={{fontSize:".6rem",color:"rgba(232,232,240,.4)",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".08em",marginTop:".15rem"}}>Skip the galaxy — jump straight in</div>
+      </div>
+      <button onClick={onClose} style={{background:"none",border:"none",color:"rgba(232,232,240,.5)",fontSize:"1.2rem",cursor:"pointer",lineHeight:1,padding:".2rem"}}>✕</button>
+    </div>
+    {cats.map(p=>(
+      <div key={p.id} style={{marginBottom:"1.4rem"}}>
+        <div style={{display:"flex",alignItems:"center",gap:".45rem",marginBottom:".6rem"}}>
+          <span style={{fontSize:"1rem"}}>{p.icon}</span>
+          <span style={{fontSize:".66rem",fontWeight:700,color:p.hex,letterSpacing:".14em",textTransform:"uppercase",fontFamily:"'JetBrains Mono',monospace"}}>{p.label}</span>
+          <span style={{fontSize:".6rem",color:"rgba(232,232,240,.3)",fontFamily:"'JetBrains Mono',monospace"}}>· {p.moons.length}</span>
+        </div>
+        <div style={{display:"flex",flexDirection:"column",gap:".42rem"}}>
+          {p.moons.map(m=>{
+            const thumb=m.imgs?.[0]?.src||m.categories?.[0]?.imgs?.[0]?.src||m.categories?.[0]?.subcategories?.[0]?.imgs?.[0]?.src||null;
+            return(<button key={m.id} className="qn-item" onClick={()=>onSelectProject(m)} style={{display:"flex",gap:".65rem",alignItems:"center",padding:".5rem",background:"rgba(255,255,255,.02)",border:`1px solid ${m.hex}28`,borderRadius:"9px",cursor:"pointer",textAlign:"left",transition:"all .15s",width:"100%"}}>
+              <div style={{width:46,height:46,borderRadius:"7px",overflow:"hidden",flexShrink:0,background:"rgba(255,255,255,.04)",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                {thumb?<img src={thumb} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>:<span style={{fontSize:"1.15rem"}}>{m.icon}</span>}
+              </div>
+              <div style={{minWidth:0,flex:1}}>
+                <div style={{fontSize:".77rem",fontWeight:600,color:"#e8e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{m.icon} {m.label}</div>
+                <div style={{fontSize:".58rem",color:m.hex,fontFamily:"'JetBrains Mono',monospace",marginTop:"2px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{m.type}</div>
+              </div>
+            </button>);
+          })}
+        </div>
+      </div>
+    ))}
+  </div>);
 }
 
 function HUD({planetId}){
@@ -949,6 +1031,7 @@ export default function Portfolio(){
   const[intro,setIntro]=useState(true);
   const[showNavHint,setShowNavHint]=useState(false);
   const[lang,setLang]=useState("en");
+  const[quickNavOpen,setQuickNavOpen]=useState(false);
   const audioRef=useRef(null);
   const initAudio=useCallback(()=>{if(audioRef.current)return;try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const master=ctx.createGain();master.gain.value=.025;master.connect(ctx.destination);[55,82.5,110].forEach((f,i)=>{const o=ctx.createOscillator();o.type="sine";o.frequency.value=f;const g=ctx.createGain();g.gain.value=1-i*.28;o.connect(g);g.connect(master);o.start();});const lfo=ctx.createOscillator();lfo.frequency.value=.06;const lg=ctx.createGain();lg.gain.value=.008;lfo.connect(lg);lg.connect(master.gain);lfo.start();audioRef.current={ctx,master};setAudioOn(true);}catch(e){}},[]);
   useEffect(()=>{
@@ -961,19 +1044,21 @@ export default function Portfolio(){
   const toggleMute=useCallback(()=>{if(!audioRef.current)return;setMuted(prev=>{audioRef.current.master.gain.value=prev?.025:0;return!prev;});},[]);
   const onStarClick=useCallback(()=>setPanelData({type:"star"}),[]);
   const onMoonClick=useCallback(proj=>setPanelData({type:"project",project:proj}),[]);
-  const onEnterPlanet=useCallback(id=>{setActivePlanetId(id);setPanelData(null);setWarp(true);setTimeout(()=>setWarp(false),550);playEnterSound();},[playEnterSound]);
+  const onEnterPlanet=useCallback(id=>{setActivePlanetId(id);setPanelData(null);setWarp(true);setTimeout(()=>setWarp(false),280);playEnterSound();},[playEnterSound]);
   const onExitPlanet=useCallback(()=>{setActivePlanetId(null);setPanelData(null);},[]);
   const onHoverMoon=useCallback((data,x,y)=>setHovMoon({data,x,y}),[]);
   if(intro)return <IntroScreen onEnter={()=>{setIntro(false);setShowNavHint(true);initAudio();}}/>;
   if(isMobile)return <Mobile/>;
   return(<LangContext.Provider value={lang}><div style={{width:"100%",height:"100vh",background:"#000008",overflow:"hidden",position:"relative"}}>
     <SolarScene onStarClick={onStarClick} onMoonClick={onMoonClick} onEnterPlanet={onEnterPlanet} onExitPlanet={onExitPlanet} onHoverMoon={onHoverMoon}/>
+    <button className="qn-toggle" onClick={()=>setQuickNavOpen(o=>!o)} style={{position:"fixed",top:"1.5rem",right:"1.5rem",background:"rgba(7,7,17,.85)",border:`1px solid ${STAR.hex}66`,borderRadius:"8px",padding:".45rem .7rem",color:STAR.hex,cursor:"pointer",fontSize:".85rem",zIndex:200,display:"flex",alignItems:"center",gap:".4rem",fontFamily:"'JetBrains Mono',monospace"}}>☰ <span style={{fontSize:".62rem",letterSpacing:".08em"}}>PROJECTS</span></button>
+    <QuickNav open={quickNavOpen} onClose={()=>setQuickNavOpen(false)} onSelectProject={m=>{setPanelData({type:"project",project:m});setQuickNavOpen(false);}}/>
     {showNavHint&&<NavHint onDone={()=>setShowNavHint(false)}/>}
     {activePlanetId&&<HUD planetId={activePlanetId}/>}
     {panelData?.type==="star"&&<StarPanel onClose={()=>setPanelData(null)}/>}
     {panelData?.type==="project"&&<ProjectPanel project={panelData.project} onClose={()=>setPanelData(null)}/>}
     {hovMoon.data&&!panelData&&<MoonTooltip moon={hovMoon.data} x={hovMoon.x} y={hovMoon.y}/>}
-    {warp&&<div style={{position:"fixed",inset:0,zIndex:300,pointerEvents:"none",background:"radial-gradient(ellipse at center,rgba(180,220,255,.14) 0%,rgba(100,160,255,.06) 45%,transparent 70%)",animation:"warpIn .55s ease-out forwards"}}/>}
+    {warp&&<div style={{position:"fixed",inset:0,zIndex:300,pointerEvents:"none",background:"radial-gradient(ellipse at center,rgba(180,220,255,.14) 0%,rgba(100,160,255,.06) 45%,transparent 70%)",animation:"warpIn .28s ease-out forwards"}}/>}
     <StatusBar/>
     <button onClick={()=>setLang(l=>LANGS[(LANGS.indexOf(l)+1)%LANGS.length])} style={{position:"fixed",bottom:"1.5rem",right:audioOn?"5.2rem":"1.5rem",background:"rgba(7,7,17,.85)",border:`1px solid ${STAR.hex}66`,borderRadius:"8px",padding:".38rem .65rem",color:STAR.hex,cursor:"pointer",fontSize:".65rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".1em",zIndex:100,transition:"all .2s"}}>{lang.toUpperCase()}</button>
     {audioOn&&<button onClick={toggleMute} style={{position:"fixed",bottom:"1.5rem",right:"1.5rem",background:"rgba(7,7,17,.85)",border:`1px solid ${STAR.hex}${muted?"33":"66"}`,borderRadius:"8px",padding:".38rem .65rem",color:muted?"rgba(232,232,240,.3)":STAR.hex,cursor:"pointer",fontSize:".65rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".1em",zIndex:100,transition:"all .2s"}}>{muted?"🔇":"🔊"}</button>}
