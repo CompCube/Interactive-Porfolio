@@ -965,7 +965,42 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
     const onKD=e=>{if(e.key==="Escape"||e.key===" ")exit();};
     const onW=e=>{if(camS.mode==="solar")camS.solarDistTarget=Math.max(22,Math.min(100,camS.solarDistTarget+e.deltaY*.09));else if(e.deltaY>15)exit();};
     const onR=()=>{camera.aspect=window.innerWidth/window.innerHeight;camera.updateProjectionMatrix();renderer.setSize(window.innerWidth,window.innerHeight);};
-    cv.addEventListener("mousedown",onMD);cv.addEventListener("mousemove",onMM);cv.addEventListener("mouseup",onMU);cv.addEventListener("wheel",onW);window.addEventListener("keydown",onKD);window.addEventListener("resize",onR);cv.style.cursor="grab";
+    let pinching=false,touchDist=0;
+    const tDist=ts=>Math.hypot(ts[0].clientX-ts[1].clientX,ts[0].clientY-ts[1].clientY);
+    const onTS=e=>{
+      if(e.touches.length===1){mDown=true;mMoved=false;downX=e.touches[0].clientX;downY=e.touches[0].clientY;lastMX=downX;lastMY=downY;}
+      else if(e.touches.length===2){pinching=true;mDown=false;touchDist=tDist(e.touches);}
+    };
+    const onTM=e=>{
+      if(pinching&&e.touches.length===2){
+        e.preventDefault();
+        const d=tDist(e.touches),delta=touchDist-d;touchDist=d;
+        if(camS.mode==="solar")camS.solarDistTarget=Math.max(22,Math.min(100,camS.solarDistTarget+delta*.35));
+        else if(delta>12)exit();
+        return;
+      }
+      if(mDown&&e.touches.length===1){
+        e.preventDefault();
+        const cx=e.touches[0].clientX,cy=e.touches[0].clientY;
+        const dx=cx-downX,dy=cy-downY;if(Math.abs(dx)>3||Math.abs(dy)>3)mMoved=true;
+        if(mMoved){const ddx=cx-lastMX,ddy=cy-lastMY;if(camS.mode==="solar")camS.solarAngle-=ddx*.007;else{camS.hAngle-=ddx*.008;camS.vAngle=Math.max(.08,Math.min(1.35,camS.vAngle+ddy*.005));}}
+        lastMX=cx;lastMY=cy;
+      }
+    };
+    const onTE=e=>{
+      if(e.touches.length<2)pinching=false;
+      if(!mDown)return;mDown=false;
+      if(mMoved){mMoved=false;return;}
+      mMoved=false;
+      const tch=e.changedTouches[0];if(!tch)return;
+      const r=cv.getBoundingClientRect();M2.x=((tch.clientX-r.left)/r.width)*2-1;M2.y=-((tch.clientY-r.top)/r.height)*2+1;
+      RC.setFromCamera(M2,camera);const hits=RC.intersectObjects(allTargets);if(!hits.length)return;
+      const ud=hits[0].object.userData;
+      if(ud.type==="star")cbRefs.current.onStarClick();
+      else if(ud.type==="planet"&&camS.mode==="solar"){camS.mode="planet";camS.planetId=ud.id;camS.hAngle=.5;camS.vAngle=.55;cbRefs.current.onEnterPlanet(ud.id);}
+      else if(ud.type==="moon"&&camS.mode==="planet"&&camS.planetId===ud.planetId){const pl=PLANETS.find(p=>p.id===ud.planetId);cbRefs.current.onMoonClick(pl.moons.find(m=>m.id===ud.id));}
+    };
+    cv.addEventListener("mousedown",onMD);cv.addEventListener("mousemove",onMM);cv.addEventListener("mouseup",onMU);cv.addEventListener("wheel",onW);cv.addEventListener("touchstart",onTS,{passive:true});cv.addEventListener("touchmove",onTM,{passive:false});cv.addEventListener("touchend",onTE);window.addEventListener("keydown",onKD);window.addEventListener("resize",onR);cv.style.cursor="grab";
     let t=0;
     const loop=()=>{
       rafRef.current=requestAnimationFrame(loop);t+=.01;
@@ -1011,10 +1046,10 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
       renderer.render(scene,camera);
     };
     loop();
-    return()=>{cancelAnimationFrame(rafRef.current);cv.removeEventListener("mousedown",onMD);cv.removeEventListener("mousemove",onMM);cv.removeEventListener("mouseup",onMU);cv.removeEventListener("wheel",onW);window.removeEventListener("keydown",onKD);window.removeEventListener("resize",onR);renderer.dispose();};
+    return()=>{cancelAnimationFrame(rafRef.current);cv.removeEventListener("mousedown",onMD);cv.removeEventListener("mousemove",onMM);cv.removeEventListener("mouseup",onMU);cv.removeEventListener("wheel",onW);cv.removeEventListener("touchstart",onTS);cv.removeEventListener("touchmove",onTM);cv.removeEventListener("touchend",onTE);window.removeEventListener("keydown",onKD);window.removeEventListener("resize",onR);renderer.dispose();};
   },[]);
   return(<div style={{position:"relative",width:"100%",height:"100%"}}>
-    <canvas ref={cvRef} style={{position:"absolute",inset:0,width:"100%",height:"100%"}}/>
+    <canvas ref={cvRef} style={{position:"absolute",inset:0,width:"100%",height:"100%",touchAction:"none"}}/>
     {ALL_ITEMS.map(item=>(<div key={item.id} ref={el=>{labRefs.current[item.id]=el;}} style={{position:"absolute",pointerEvents:"none",fontFamily:"'Space Grotesk',sans-serif",transition:"opacity .2s,transform .2s",userSelect:"none"}}><div style={{fontSize:item.type==="moon"?".65rem":".73rem",fontWeight:600,color:"#e8e8f0",whiteSpace:"nowrap",background:"rgba(5,5,14,.78)",backdropFilter:"blur(6px)",padding:item.type==="moon"?".15rem .42rem":".2rem .58rem",borderRadius:"5px",border:`1px solid ${item.hex}33`,textShadow:`0 0 12px ${item.hex}`}}>{item.icon} {item.label}</div></div>))}
     <div style={{position:"absolute",top:"1.5rem",left:"1.5rem",fontFamily:"'Space Grotesk',sans-serif",userSelect:"none"}}>
       <div style={{fontSize:"1.05rem",fontWeight:700,color:"rgba(255,248,240,.92)",letterSpacing:".04em",textShadow:`0 0 24px ${STAR.hex}22`}}>Jordi</div>
@@ -1041,9 +1076,9 @@ export default function Portfolio(){
   const initAudio=useCallback(()=>{if(audioRef.current)return;try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const master=ctx.createGain();master.gain.value=.025;master.connect(ctx.destination);[55,82.5,110].forEach((f,i)=>{const o=ctx.createOscillator();o.type="sine";o.frequency.value=f;const g=ctx.createGain();g.gain.value=1-i*.28;o.connect(g);g.connect(master);o.start();});const lfo=ctx.createOscillator();lfo.frequency.value=.06;const lg=ctx.createGain();lg.gain.value=.008;lfo.connect(lg);lg.connect(master.gain);lfo.start();audioRef.current={ctx,master};setAudioOn(true);}catch(e){}},[]);
   useEffect(()=>{
     if(!document.getElementById("pf-css")){const el=document.createElement("style");el.id="pf-css";el.textContent=CSS;document.head.appendChild(el);}
-    const chk=()=>setIsMobile(window.innerWidth<680);chk();window.addEventListener("resize",chk);
+    const chk=()=>setIsMobile(window.innerHeight>window.innerWidth);chk();window.addEventListener("resize",chk);window.addEventListener("orientationchange",chk);
     const fc=()=>{initAudio();window.removeEventListener("click",fc);};window.addEventListener("click",fc);
-    return()=>{window.removeEventListener("resize",chk);window.removeEventListener("click",fc);};
+    return()=>{window.removeEventListener("resize",chk);window.removeEventListener("orientationchange",chk);window.removeEventListener("click",fc);};
   },[initAudio]);
   const playEnterSound=useCallback(()=>{if(!audioRef.current||muted)return;const{ctx}=audioRef.current;const o=ctx.createOscillator();const g=ctx.createGain();o.type="sine";o.frequency.setValueAtTime(350,ctx.currentTime);o.frequency.exponentialRampToValueAtTime(70,ctx.currentTime+.4);g.gain.setValueAtTime(.12,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.45);o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+.45);},[muted]);
   const toggleMute=useCallback(()=>{if(!audioRef.current)return;setMuted(prev=>{audioRef.current.master.gain.value=prev?.025:0;return!prev;});},[]);
