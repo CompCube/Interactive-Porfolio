@@ -70,8 +70,8 @@ const HE_CATEGORIES=[
        {label:"Why Two Story Paths?",src:gh("games/hollow-end/narrative/story-setting/04-why-2-story.png"),bg:"radial-gradient(ellipse at 45% 55%,#0e0a1e,#05030f)",caption:"Hollow End features two distinct story paths that shape the player's experience from the very beginning, turning choice into one of the game's core mechanics. Beyond encouraging replayability, this structure allowed me to explore liminal spaces from two opposing perspectives: the surreal and detached logic of the Backroom, and the grounded decay of the Abandoned zone. By separating these environments into different narrative branches, the project expands beyond a single horror concept and explores how atmosphere, light, and space influence the way players experience fear.\n\nTwo paths, two stories, and two interpretations of liminal horror: one detached from reality, the other rooted in human decay. From the very beginning, players shape both their journey and their understanding of what lies beneath the city."},
      ]},
      {id:"env-storytelling",label:"Environmental Storytelling",imgs:[
-       {label:"How Narrative is Delivered",src:null,bg:"radial-gradient(ellipse at 40% 50%,#100a1e,#060410)",textPlaceholder:true,caption:"Every piece of narrative in Hollow End is delivered through the environment itself. Notes, maintenance logs, graffiti, blood trails, and abandoned objects all serve a dual purpose: guiding the player while gradually revealing the station's history.\n\nA post-it with the combination to an electrical panel is also evidence of the station's dysfunction. A worker's diary explains the blackouts and disorientation, hinting that something was wrong long before the player arrived. In Hollow End, progression and storytelling are inseparable, the clues that unlock the next area are often the same clues that explain what happened there."},
-       {label:"Plot Points",src:null,bg:"radial-gradient(ellipse at 50% 40%,#0e0818,#06040e)",textPlaceholder:true,caption:"Several moments reinforce this approach. Shortly after arriving at the station, the player reaches a central hall where the environment splits into two distinct paths: L2, the illuminated and sterile Backroom, and L1, the dark and decaying Abandoned zone. From the very beginning, the player's choice determines not only the route they will follow, but also the story they will experience.\n\nIn the Backroom, an abandoned chair chained to the floor and a lantern left behind suggest events that are never fully explained. In the Abandoned zone, the player uncovers traces of the criminal group that once occupied the station, gradually piecing together their story through the spaces they left behind.\n\nThe station keeps its secrets until the very end, leaving players to decide how much of what happened they truly understand."},
+       {label:"How Narrative is Delivered",src:gh("games/hollow-end/narrative/environmental-storytelling/01-what-happened-here.png"),bg:"radial-gradient(ellipse at 40% 50%,#100a1e,#060410)",caption:"Every piece of narrative in Hollow End is delivered through the environment itself. Notes, maintenance logs, graffiti, blood trails, and abandoned objects all serve a dual purpose: guiding the player while gradually revealing the station's history.\n\nA post-it with the combination to an electrical panel is also evidence of the station's dysfunction. A worker's diary explains the blackouts and disorientation, hinting that something was wrong long before the player arrived. In Hollow End, progression and storytelling are inseparable, the clues that unlock the next area are often the same clues that explain what happened there."},
+       {label:"Plot Points",src:gh("games/hollow-end/narrative/environmental-storytelling/02-plot-points.png"),bg:"radial-gradient(ellipse at 50% 40%,#0e0818,#06040e)",caption:"Several moments reinforce this approach. Shortly after arriving at the station, the player reaches a central hall where the environment splits into two distinct paths: L2, the illuminated and sterile Backroom, and L1, the dark and decaying Abandoned zone. From the very beginning, the player's choice determines not only the route they will follow, but also the story they will experience.\n\nIn the Backroom, an abandoned chair chained to the floor and a lantern left behind suggest events that are never fully explained. In the Abandoned zone, the player uncovers traces of the criminal group that once occupied the station, gradually piecing together their story through the spaces they left behind.\n\nThe station keeps its secrets until the very end, leaving players to decide how much of what happened they truly understand."},
      ]},
      {id:"endings",label:"Endings",imgs:[
        {label:"Endings",src:gh("games/hollow-end/narrative/endings/01-endings.png"),bg:"radial-gradient(ellipse at 50% 45%,#0a1a0a,#040a04)",caption:"**Good Endings** — Three ways out of the station — Elevator, Ventilation, and Sewers — each reachable through a different combination of paths and choices. Escaping is possible, but never guaranteed: knowing the way out and surviving long enough to reach it are two different challenges.\n\n**Bad Endings: Zone 0 (Backroom)** — The Backroom rarely kills you outright — it traps you instead. Whether you're caught in an endless loop, lost in spaces that no longer follow the station's logic, or confronted by something that should not exist, every ending reflects the same unsettling idea: some places were never meant to be escaped.\n\n**Bad Endings: Hollow End (Abandoned Zone)** — In the Abandoned zone, danger is immediate and tangible. Exposed wiring, flooded tunnels, and encounters with the wrong people turn every mistake into a consequence. Here, survival depends not on understanding the impossible, but on making the right choices before it's too late."},
@@ -532,6 +532,41 @@ function StatusBar(){
   </div>);
 }
 
+function Lightbox({src,onClose}){
+  const[zoom,setZoom]=useState(1);
+  const[pos,setPos]=useState({x:0,y:0});
+  const dragRef=useRef(null);
+  const pinchRef=useRef({dist:0,zoom:1});
+  useEffect(()=>{
+    const onKey=e=>{if(e.key==="Escape")onClose();};
+    window.addEventListener("keydown",onKey);
+    return()=>window.removeEventListener("keydown",onKey);
+  },[onClose]);
+  const onWheel=e=>{e.preventDefault();e.stopPropagation();setZoom(z=>{const nz=Math.max(1,Math.min(5,z-e.deltaY*.0016));if(nz<=1)setPos({x:0,y:0});return nz;});};
+  const startDrag=(x,y)=>{if(zoom>1)dragRef.current={x:x-pos.x,y:y-pos.y};};
+  const moveDrag=(x,y)=>{if(dragRef.current)setPos({x:x-dragRef.current.x,y:y-dragRef.current.y});};
+  const endDrag=()=>{dragRef.current=null;};
+  const dist2=ts=>Math.hypot(ts[0].clientX-ts[1].clientX,ts[0].clientY-ts[1].clientY);
+  const onTouchStart=e=>{
+    if(e.touches.length===2)pinchRef.current={dist:dist2(e.touches),zoom};
+    else if(e.touches.length===1)startDrag(e.touches[0].clientX,e.touches[0].clientY);
+  };
+  const onTouchMove=e=>{
+    if(e.touches.length===2){e.preventDefault();const d=dist2(e.touches);const nz=Math.max(1,Math.min(5,pinchRef.current.zoom*(d/pinchRef.current.dist)));setZoom(nz);if(nz<=1)setPos({x:0,y:0});}
+    else if(e.touches.length===1&&dragRef.current){e.preventDefault();moveDrag(e.touches[0].clientX,e.touches[0].clientY);}
+  };
+  return(
+    <div onClick={e=>{if(e.target===e.currentTarget&&zoom<=1)onClose();}} onWheel={onWheel}
+      onMouseDown={e=>startDrag(e.clientX,e.clientY)} onMouseMove={e=>moveDrag(e.clientX,e.clientY)} onMouseUp={endDrag} onMouseLeave={endDrag}
+      onTouchStart={onTouchStart} onTouchMove={onTouchMove} onTouchEnd={endDrag}
+      style={{position:"fixed",inset:0,background:"rgba(4,4,10,.96)",zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",cursor:zoom>1?"grab":"zoom-out",touchAction:"none"}}>
+      <img src={src} alt="" draggable={false} style={{maxWidth:"96vw",maxHeight:"96vh",objectFit:"contain",transform:`scale(${zoom}) translate(${pos.x/zoom}px,${pos.y/zoom}px)`,transition:dragRef.current?"none":"transform .12s ease-out",userSelect:"none",cursor:"inherit"}}/>
+      <button onClick={onClose} style={{position:"fixed",top:"1.2rem",right:"1.2rem",background:"rgba(255,255,255,.08)",border:"1px solid rgba(255,255,255,.25)",color:"#fff",width:38,height:38,borderRadius:"50%",fontSize:"1.15rem",cursor:"pointer",zIndex:1001}}>✕</button>
+      <div style={{position:"fixed",bottom:"1.2rem",left:"50%",transform:"translateX(-50%)",fontSize:".62rem",fontFamily:"'JetBrains Mono',monospace",color:"rgba(255,255,255,.4)",letterSpacing:".08em",whiteSpace:"nowrap"}}>SCROLL OR PINCH TO ZOOM · DRAG TO PAN · ESC TO CLOSE</div>
+    </div>
+  );
+}
+
 function Gallery({imgs,videoId,c,idx,onIdx,maxH}){
   if(!imgs?.length)return null;
   const[failed,setFailed]=useState(()=>new Set());
@@ -552,11 +587,12 @@ function Gallery({imgs,videoId,c,idx,onIdx,maxH}){
   const activeVid=cur.videoId??videoId;
   const showImg=cur.src&&!failed.has(cur.src);
   const mh=maxH||"44vh";
+  const[lbOpen,setLbOpen]=useState(false);
   const nb=(dir,fn)=>(<button className="pf-nav" onClick={fn} style={{position:"absolute",[dir]:8,top:"50%",transform:"translateY(-50%)",background:"rgba(0,0,0,.6)",border:`1px solid ${c}44`,color:c,width:26,height:26,borderRadius:"50%",cursor:"pointer",fontSize:"1rem",display:"flex",alignItems:"center",justifyContent:"center",transition:"background .2s",zIndex:2}}>{dir==="left"?"‹":"›"}</button>);
   return(<div style={{marginBottom:".75rem"}}>
     <div ref={wrapRef} style={{position:"relative",width:"100%",borderRadius:"10px",overflow:"hidden",aspectRatio:"16/9",maxHeight:mh,border:`1px solid ${c}28`}}>
       {activeVid?<iframe src={`https://www.youtube.com/embed/${activeVid}?autoplay=1&mute=1`} title={cur.label||"video"} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{width:"100%",height:"100%",border:"none",display:"block"}}/>
-        :showImg?<div style={{width:"100%",height:"100%",background:cur.bg||"rgba(10,10,18,.65)",display:"flex",alignItems:"center",justifyContent:"center"}}><img src={cur.src} alt={cur.label||""} onError={()=>setFailed(s=>new Set(s).add(cur.src))} style={{width:"100%",height:"100%",objectFit:"contain"}}/></div>
+        :showImg?<div onClick={()=>setLbOpen(true)} style={{width:"100%",height:"100%",background:cur.bg||"rgba(10,10,18,.65)",display:"flex",alignItems:"center",justifyContent:"center",cursor:"zoom-in"}}><img src={cur.src} alt={cur.label||""} onError={()=>setFailed(s=>new Set(s).add(cur.src))} style={{width:"100%",height:"100%",objectFit:"contain"}}/></div>
         :cur.textPlaceholder?<div style={{width:"100%",height:"100%",background:"rgba(255,255,255,.02)",border:`1px dashed ${c}22`,display:"flex",alignItems:"center",justifyContent:"center",padding:"1.5rem",boxSizing:"border-box",overflowY:"auto"}}>
           <p style={{fontSize:".72rem",lineHeight:1.7,color:`${c}77`,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".02em",whiteSpace:"pre-line",textAlign:"center",margin:0}}>{cur.caption}</p>
         </div>
@@ -566,9 +602,11 @@ function Gallery({imgs,videoId,c,idx,onIdx,maxH}){
           {[["top","left"],["top","right"],["bottom","left"],["bottom","right"]].map(([v,h])=>(<div key={v+h} style={{position:"absolute",[v]:8,[h]:8,width:14,height:14,borderTop:v==="top"?`1.5px solid ${c}55`:"none",borderBottom:v==="bottom"?`1.5px solid ${c}55`:"none",borderLeft:h==="left"?`1.5px solid ${c}55`:"none",borderRight:h==="right"?`1.5px solid ${c}55`:"none"}}/>))}
           <div style={{position:"absolute",bottom:7,left:10,fontSize:".58rem",color:`${c}88`,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".12em"}}>{(cur.label||"PLACEHOLDER").toUpperCase()}</div>
         </div>}
+      {showImg&&!activeVid&&<button onClick={()=>setLbOpen(true)} style={{position:"absolute",top:8,right:8,background:"rgba(0,0,0,.6)",border:`1px solid ${c}44`,color:c,width:26,height:26,borderRadius:"50%",cursor:"pointer",fontSize:".85rem",display:"flex",alignItems:"center",justifyContent:"center",zIndex:2}}>⤢</button>}
       {imgs.length>1&&<>{nb("left",()=>onIdx(i=>(i-1+imgs.length)%imgs.length))}{nb("right",()=>onIdx(i=>(i+1)%imgs.length))}</>}
       {imgs.length>1&&(<div style={{position:"absolute",bottom:8,right:10,display:"flex",gap:4,zIndex:2}}>{imgs.map((_,i)=><div key={i} onClick={()=>onIdx(i)} style={{width:i===idx?14:5,height:5,borderRadius:"100px",background:i===idx?c:`${c}44`,cursor:"pointer",transition:"all .2s"}}/>)}</div>)}
     </div>
+    {lbOpen&&showImg&&<Lightbox src={cur.src} onClose={()=>setLbOpen(false)}/>}
   </div>);
 }
 
@@ -914,6 +952,8 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
       if(pfrag){pMat=new THREE.ShaderMaterial({uniforms:{u_t:{value:0},u_hover:{value:0}},vertexShader:PVERT,fragmentShader:pfrag});}
       else{const pC=new THREE.Color(p.hex);pMat=new THREE.MeshStandardMaterial({color:pC.clone().multiplyScalar(.5),emissive:pC,emissiveIntensity:.42,roughness:.55,metalness:.1});}
       const pMesh=new THREE.Mesh(new THREE.SphereGeometry(p.radius,32,32),pMat);pMesh.userData={type:"planet",id:p.id};scene.add(pMesh);allTargets.push(pMesh);
+      const pOrbHit=new THREE.Mesh(new THREE.RingGeometry(Math.max(.15,p.orbitRadius-p.radius*3.8),p.orbitRadius+p.radius*3.8,96),new THREE.MeshBasicMaterial({transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false}));
+      pOrbHit.rotation.x=-Math.PI/2+(p.orbitTilt||0);pOrbHit.userData={type:"planet",id:p.id};scene.add(pOrbHit);allTargets.push(pOrbHit);
       const pC2=new THREE.Color(p.hex);
       const atmoMat=new THREE.MeshBasicMaterial({color:pC2,transparent:true,opacity:.14,side:THREE.BackSide,depthWrite:false});
       const atmo=new THREE.Mesh(new THREE.SphereGeometry(p.radius*1.32,16,16),atmoMat);scene.add(atmo);
@@ -934,7 +974,7 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
       p.moons.forEach(m=>{angles[m.id]=m.startAngle;
         const mOPts=[];for(let i=0;i<=64;i++){const a=(i/64)*Math.PI*2;mOPts.push(new THREE.Vector3(Math.cos(a)*m.orbitRadius,0,Math.sin(a)*m.orbitRadius));}
         const mol=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(mOPts),new THREE.LineBasicMaterial({color:new THREE.Color(m.hex),transparent:true,opacity:.16}));mol.rotation.x=m.inclination;mol.visible=false;scene.add(mol);moonOrbitLines[m.id]={line:mol};
-        const molHit=new THREE.Mesh(new THREE.RingGeometry(Math.max(.05,m.orbitRadius-.16),m.orbitRadius+.16,64),new THREE.MeshBasicMaterial({transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false}));molHit.rotation.x=-Math.PI/2+m.inclination;molHit.userData={type:"moon",id:m.id,planetId:p.id};scene.add(molHit);allTargets.push(molHit);moonOrbitLines[m.id].hit=molHit;
+        const molHit=new THREE.Mesh(new THREE.RingGeometry(Math.max(.08,m.orbitRadius-m.radius*3),m.orbitRadius+m.radius*3,64),new THREE.MeshBasicMaterial({transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false}));molHit.rotation.x=-Math.PI/2+m.inclination;molHit.userData={type:"moon",id:m.id,planetId:p.id};scene.add(molHit);allTargets.push(molHit);moonOrbitLines[m.id].hit=molHit;
         const mC=new THREE.Color(p.hex).lerp(new THREE.Color(0xffffff),.25);const mMat=new THREE.MeshStandardMaterial({color:mC.clone().multiplyScalar(.72),emissive:mC,emissiveIntensity:.36,roughness:.6,metalness:.08,bumpMap:moonBumpTex,bumpScale:.018});
         const mMesh=new THREE.Mesh(new THREE.SphereGeometry(m.radius,20,20),mMat);mMesh.userData={type:"moon",id:m.id,planetId:p.id};scene.add(mMesh);allTargets.push(mMesh);pMeshes[p.id].mMeshes[m.id]={mesh:mMesh,mat:mMat};});
     });
@@ -946,6 +986,12 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
     const hov={current:null};
     const getND=e=>{const r=cv.getBoundingClientRect();M2.x=((e.clientX-r.left)/r.width)*2-1;M2.y=-((e.clientY-r.top)/r.height)*2+1;};
     const exit=()=>{if(camS.mode==="planet"){camS.mode="solar";camS.planetId=null;cbRefs.current.onExitPlanet();}};
+    const enterPlanetMode=id=>{
+      const pl=PLANETS.find(x=>x.id===id),pPos=pMeshes[id].mesh.position;
+      const dx=camera.position.x-pPos.x,dz=camera.position.z-pPos.z,dy=camera.position.y-(pPos.y+pl.radius*5);
+      camS.hAngle=Math.atan2(dx,dz);camS.vAngle=Math.max(.32,Math.min(.85,Math.atan2(dy,Math.hypot(dx,dz))));
+      camS.mode="planet";camS.planetId=id;cbRefs.current.onEnterPlanet(id);
+    };
     const onMD=e=>{mDown=true;mMoved=false;downX=e.clientX;downY=e.clientY;lastMX=e.clientX;lastMY=e.clientY;};
     const onMM=e=>{
       getND(e);RC.setFromCamera(M2,camera);const hits=RC.intersectObjects(allTargets);hov.current=hits.length?hits[0].object.userData:null;
@@ -959,7 +1005,7 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
       getND(e);RC.setFromCamera(M2,camera);const hits=RC.intersectObjects(allTargets);if(!hits.length)return;
       const ud=hits[0].object.userData;
       if(ud.type==="star")cbRefs.current.onStarClick();
-      else if(ud.type==="planet"&&camS.mode==="solar"){camS.mode="planet";camS.planetId=ud.id;camS.hAngle=.5;camS.vAngle=.55;cbRefs.current.onEnterPlanet(ud.id);}
+      else if(ud.type==="planet"&&camS.mode==="solar"){enterPlanetMode(ud.id);}
       else if(ud.type==="moon"&&camS.mode==="planet"&&camS.planetId===ud.planetId){const pl=PLANETS.find(p=>p.id===ud.planetId);cbRefs.current.onMoonClick(pl.moons.find(m=>m.id===ud.id));}
     };
     const onKD=e=>{if(e.key==="Escape"||e.key===" ")exit();};
@@ -997,7 +1043,7 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
       RC.setFromCamera(M2,camera);const hits=RC.intersectObjects(allTargets);if(!hits.length)return;
       const ud=hits[0].object.userData;
       if(ud.type==="star")cbRefs.current.onStarClick();
-      else if(ud.type==="planet"&&camS.mode==="solar"){camS.mode="planet";camS.planetId=ud.id;camS.hAngle=.5;camS.vAngle=.55;cbRefs.current.onEnterPlanet(ud.id);}
+      else if(ud.type==="planet"&&camS.mode==="solar"){enterPlanetMode(ud.id);}
       else if(ud.type==="moon"&&camS.mode==="planet"&&camS.planetId===ud.planetId){const pl=PLANETS.find(p=>p.id===ud.planetId);cbRefs.current.onMoonClick(pl.moons.find(m=>m.id===ud.id));}
     };
     cv.addEventListener("mousedown",onMD);cv.addEventListener("mousemove",onMM);cv.addEventListener("mouseup",onMU);cv.addEventListener("wheel",onW);cv.addEventListener("touchstart",onTS,{passive:true});cv.addEventListener("touchmove",onTM,{passive:false});cv.addEventListener("touchend",onTE);window.addEventListener("keydown",onKD);window.addEventListener("resize",onR);cv.style.cursor="grab";
@@ -1030,7 +1076,7 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
       camS.solarDist+=(camS.solarDistTarget-camS.solarDist)*.09;
       const SD=camS.solarDist,SH=SD*.82;
       if(camS.mode==="solar"){tmp1.set(SD*Math.sin(camS.solarAngle),SH,SD*Math.cos(camS.solarAngle));camera.position.lerp(tmp1,.06);camLookAt.lerp(new THREE.Vector3(0,0,0),.07);}
-      else{const p=PLANETS.find(x=>x.id===camS.planetId),pPos=pMeshes[p.id].mesh.position;const maxMR=p.moons.length?Math.max(...p.moons.map(m=>m.orbitRadius)):p.radius;const dist=Math.max(maxMR*2.8,p.radius*7);tmp1.set(pPos.x+dist*Math.sin(camS.hAngle)*Math.cos(camS.vAngle),pPos.y+p.radius*5+dist*Math.sin(camS.vAngle),pPos.z+dist*Math.cos(camS.hAngle)*Math.cos(camS.vAngle));camera.position.lerp(tmp1,.06);tmp2.copy(pPos);camLookAt.lerp(tmp2,.08);}
+      else{const p=PLANETS.find(x=>x.id===camS.planetId),pPos=pMeshes[p.id].mesh.position;const maxMR=p.moons.length?Math.max(...p.moons.map(m=>m.orbitRadius)):p.radius;const dist=Math.max(maxMR*2.8,p.radius*7);tmp1.set(pPos.x+dist*Math.sin(camS.hAngle)*Math.cos(camS.vAngle),pPos.y+p.radius*5+dist*Math.sin(camS.vAngle),pPos.z+dist*Math.cos(camS.hAngle)*Math.cos(camS.vAngle));camera.position.lerp(tmp1,.045);tmp2.copy(pPos);camLookAt.lerp(tmp2,.05);}
       camera.lookAt(camLookAt);
       if(hintRef.current)hintRef.current.textContent=camS.mode==="planet"?"DRAG TO ORBIT · CLICK MOONS · ESC":"DRAG · SCROLL TO ZOOM · CLICK PLANETS";
       const cw=renderer.domElement.clientWidth,ch=renderer.domElement.clientHeight;
@@ -1066,28 +1112,21 @@ export default function Portfolio(){
   const[isMobile,setIsMobile]=useState(false);
   const[warp,setWarp]=useState(false);
   const[hovMoon,setHovMoon]=useState({data:null,x:0,y:0});
-  const[audioOn,setAudioOn]=useState(false);
-  const[muted,setMuted]=useState(false);
   const[intro,setIntro]=useState(true);
   const[showNavHint,setShowNavHint]=useState(false);
-  const[lang,setLang]=useState("en");
+  const lang="en";
   const[quickNavOpen,setQuickNavOpen]=useState(false);
-  const audioRef=useRef(null);
-  const initAudio=useCallback(()=>{if(audioRef.current)return;try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const master=ctx.createGain();master.gain.value=.025;master.connect(ctx.destination);[55,82.5,110].forEach((f,i)=>{const o=ctx.createOscillator();o.type="sine";o.frequency.value=f;const g=ctx.createGain();g.gain.value=1-i*.28;o.connect(g);g.connect(master);o.start();});const lfo=ctx.createOscillator();lfo.frequency.value=.06;const lg=ctx.createGain();lg.gain.value=.008;lfo.connect(lg);lg.connect(master.gain);lfo.start();audioRef.current={ctx,master};setAudioOn(true);}catch(e){}},[]);
   useEffect(()=>{
     if(!document.getElementById("pf-css")){const el=document.createElement("style");el.id="pf-css";el.textContent=CSS;document.head.appendChild(el);}
     const chk=()=>setIsMobile(window.innerHeight>window.innerWidth);chk();window.addEventListener("resize",chk);window.addEventListener("orientationchange",chk);
-    const fc=()=>{initAudio();window.removeEventListener("click",fc);};window.addEventListener("click",fc);
-    return()=>{window.removeEventListener("resize",chk);window.removeEventListener("orientationchange",chk);window.removeEventListener("click",fc);};
-  },[initAudio]);
-  const playEnterSound=useCallback(()=>{if(!audioRef.current||muted)return;const{ctx}=audioRef.current;const o=ctx.createOscillator();const g=ctx.createGain();o.type="sine";o.frequency.setValueAtTime(350,ctx.currentTime);o.frequency.exponentialRampToValueAtTime(70,ctx.currentTime+.4);g.gain.setValueAtTime(.12,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.45);o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+.45);},[muted]);
-  const toggleMute=useCallback(()=>{if(!audioRef.current)return;setMuted(prev=>{audioRef.current.master.gain.value=prev?.025:0;return!prev;});},[]);
+    return()=>{window.removeEventListener("resize",chk);window.removeEventListener("orientationchange",chk);};
+  },[]);
   const onStarClick=useCallback(()=>setPanelData({type:"star"}),[]);
   const onMoonClick=useCallback(proj=>setPanelData({type:"project",project:proj}),[]);
-  const onEnterPlanet=useCallback(id=>{setActivePlanetId(id);setPanelData(null);setWarp(true);setTimeout(()=>setWarp(false),280);playEnterSound();},[playEnterSound]);
+  const onEnterPlanet=useCallback(id=>{setActivePlanetId(id);setPanelData(null);setWarp(true);setTimeout(()=>setWarp(false),280);},[]);
   const onExitPlanet=useCallback(()=>{setActivePlanetId(null);setPanelData(null);},[]);
   const onHoverMoon=useCallback((data,x,y)=>setHovMoon({data,x,y}),[]);
-  if(intro)return <IntroScreen onEnter={()=>{setIntro(false);setShowNavHint(true);initAudio();}}/>;
+  if(intro)return <IntroScreen onEnter={()=>{setIntro(false);setShowNavHint(true);}}/>;
   if(isMobile)return <Mobile/>;
   return(<LangContext.Provider value={lang}><div style={{width:"100%",height:"100vh",background:"#000008",overflow:"hidden",position:"relative"}}>
     <SolarScene onStarClick={onStarClick} onMoonClick={onMoonClick} onEnterPlanet={onEnterPlanet} onExitPlanet={onExitPlanet} onHoverMoon={onHoverMoon}/>
@@ -1100,7 +1139,6 @@ export default function Portfolio(){
     {hovMoon.data&&!panelData&&<MoonTooltip moon={hovMoon.data} x={hovMoon.x} y={hovMoon.y}/>}
     {warp&&<div style={{position:"fixed",inset:0,zIndex:300,pointerEvents:"none",background:"radial-gradient(ellipse at center,rgba(180,220,255,.14) 0%,rgba(100,160,255,.06) 45%,transparent 70%)",animation:"warpIn .28s ease-out forwards"}}/>}
     <StatusBar/>
-    <button onClick={()=>setLang(l=>LANGS[(LANGS.indexOf(l)+1)%LANGS.length])} style={{position:"fixed",bottom:"1.5rem",right:audioOn?"5.2rem":"1.5rem",background:"rgba(7,7,17,.85)",border:`1px solid ${STAR.hex}66`,borderRadius:"8px",padding:".38rem .65rem",color:STAR.hex,cursor:"pointer",fontSize:".65rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".1em",zIndex:100,transition:"all .2s"}}>{lang.toUpperCase()}</button>
-    {audioOn&&<button onClick={toggleMute} style={{position:"fixed",bottom:"1.5rem",right:"1.5rem",background:"rgba(7,7,17,.85)",border:`1px solid ${STAR.hex}${muted?"33":"66"}`,borderRadius:"8px",padding:".38rem .65rem",color:muted?"rgba(232,232,240,.3)":STAR.hex,cursor:"pointer",fontSize:".65rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".1em",zIndex:100,transition:"all .2s"}}>{muted?"🔇":"🔊"}</button>}
+
   </div></LangContext.Provider>);
 }
