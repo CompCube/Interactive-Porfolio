@@ -553,7 +553,7 @@ function Gallery({imgs,videoId,c,idx,onIdx,maxH}){
   return(<div style={{marginBottom:".75rem"}}>
     <div ref={wrapRef} style={{position:"relative",width:"100%",borderRadius:"10px",overflow:"hidden",aspectRatio:"16/9",maxHeight:mh,border:`1px solid ${c}28`}}>
       {activeVid?<iframe src={`https://www.youtube.com/embed/${activeVid}?autoplay=1&mute=1`} title={cur.label||"video"} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{width:"100%",height:"100%",border:"none",display:"block"}}/>
-        :showImg?<img src={cur.src} alt={cur.label||""} onError={()=>setFailed(s=>new Set(s).add(cur.src))} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+        :showImg?<div style={{width:"100%",height:"100%",background:cur.bg||"rgba(10,10,18,.65)",display:"flex",alignItems:"center",justifyContent:"center"}}><img src={cur.src} alt={cur.label||""} onError={()=>setFailed(s=>new Set(s).add(cur.src))} style={{width:"100%",height:"100%",objectFit:"contain"}}/></div>
         :cur.textPlaceholder?<div style={{width:"100%",height:"100%",background:"rgba(255,255,255,.02)",border:`1px dashed ${c}22`,display:"flex",alignItems:"center",justifyContent:"center",padding:"1.5rem",boxSizing:"border-box",overflowY:"auto"}}>
           <p style={{fontSize:".72rem",lineHeight:1.7,color:`${c}77`,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".02em",whiteSpace:"pre-line",textAlign:"center",margin:0}}>{cur.caption}</p>
         </div>
