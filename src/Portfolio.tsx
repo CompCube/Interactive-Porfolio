@@ -391,6 +391,7 @@ const PLANETS=[
       tags:["Unity","C#","Editor Tools","Procedural","ScriptableObject"],
       features:["Two modes: weighted Replace and procedural Scatter","Weighted prefab system with cumulative probability","Tag and name filtering for target selection","Surface alignment via downward raycasting","Configurable transform and scale randomization","Seeded determinism with isolated random state","Non-destructive preview with ghost instances","ScriptableObject-based preset system","Full Unity Undo integration"],
       imgs:[
+        {label:"Thumbnail",src:gh("tools/scatter-tool/thumbnail.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a0e1a,#050810)"},
         {label:"Hook Video",src:null,bg:"radial-gradient(ellipse at 50% 40%,#0a0e1a,#050810)",videoId:"sqHVsmYYLsU",caption:"Quick look at the tool in action."},
         {label:"Full Demo",src:null,bg:"radial-gradient(ellipse at 50% 40%,#080c18,#040610)",videoId:"TYoK6CLA0mY",caption:"Full walkthrough of all tool features and workflow."},
       ],cta:"View on GitHub",
@@ -431,19 +432,19 @@ const PLANETS=[
       desc:"Club website for Club Ciclista BTT Valls. Custom WordPress build covering routes, news, events and member information for the mountain bike community of Valls.",
       tags:["WordPress","Web Design","CSS","PHP"],
       features:["Route and event listings","Member area","News and media section","Mobile-first design","Custom theme"],
-      imgs:[{label:"btt-valls.com",src:null,bg:"radial-gradient(ellipse at 50% 40%,#041a0c,#020e06)",caption:"Club website for Club Ciclista BTT Valls, covering routes, news, events and member information for the local mountain bike community. Live and in use by the club, covering the full range of content needs from route publishing to event announcements."}],cta:"Visit Website",ctaHref:"https://btt-valls.com"},
+      imgs:[{label:"btt-valls.com",src:gh("web/btt-valls/thumbnail.png"),bg:"radial-gradient(ellipse at 50% 40%,#041a0c,#020e06)",caption:"Club website for Club Ciclista BTT Valls, covering routes, news, events and member information for the local mountain bike community. Live and in use by the club, covering the full range of content needs from route publishing to event announcements."}],cta:"Visit Website",ctaHref:"https://btt-valls.com"},
     {id:"edujuguetes",label:"edujuguetes.com",icon:"🧸",orbitRadius:2.8,orbitSpeed:.010,startAngle:2.6,inclination:-.2,radius:.22,hex:"#58cc8c",
       type:"Website",status:"Live",devPct:null,
       desc:"E-commerce site for an educational toy store. Product catalog, cart integration and order management for a specialty retail shop.",
       tags:["WordPress","WooCommerce","Web Design","CSS"],
       features:["Full WooCommerce product catalog","Cart and checkout integration","Category and filter system","Mobile-first design","Custom theme"],
-      imgs:[{label:"edujuguetes.com",src:null,bg:"radial-gradient(ellipse at 50% 40%,#061808,#030e04)",caption:"E-commerce site for an educational toy store. Product catalog, shopping cart integration and order management built on WooCommerce. Live store with full product catalog and checkout flow operational."}],cta:"Visit Website",ctaHref:"https://edujuguetes.com"},
+      imgs:[{label:"edujuguetes.com",src:gh("web/edujuguetes/thumbnail.png"),bg:"radial-gradient(ellipse at 50% 40%,#061808,#030e04)",caption:"E-commerce site for an educational toy store. Product catalog, shopping cart integration and order management built on WooCommerce. Live store with full product catalog and checkout flow operational."}],cta:"Visit Website",ctaHref:"https://edujuguetes.com"},
     {id:"tirambarcosta",label:"tirambarcostadaurada.com",icon:"🍹",orbitRadius:3.6,orbitSpeed:.008,startAngle:4.2,inclination:.13,radius:.22,hex:"#84e0b4",
       type:"Website",status:"Live",devPct:null,
       desc:"Landing page for a bar-restaurant on the Costa Daurada. Menu showcase, location and contact information for a hospitality client.",
       tags:["WordPress","Web Design","CSS","Hospitality"],
       features:["Menu and food showcase","Location and contact section","Image gallery","Reservation info","Mobile-first design"],
-      imgs:[{label:"tirambarcostadaurada.com",src:null,bg:"radial-gradient(ellipse at 50% 40%,#041610,#020c08)",caption:"Landing page for a bar-restaurant on the Costa Daurada. Menu showcase, gallery, contact information and location for a hospitality client. Live and in use by the client, serving as the main digital presence for the restaurant."}],cta:"Visit Website",ctaHref:"https://tirambarcostadaurada.com"},
+      imgs:[{label:"tirambarcostadaurada.com",src:gh("web/tirambarcosta/thumbnail.png"),bg:"radial-gradient(ellipse at 50% 40%,#041610,#020c08)",caption:"Landing page for a bar-restaurant on the Costa Daurada. Menu showcase, gallery, contact information and location for a hospitality client. Live and in use by the client, serving as the main digital presence for the restaurant."}],cta:"Visit Website",ctaHref:"https://tirambarcostadaurada.com"},
   ]},
 ];
 
@@ -672,8 +673,8 @@ function ProjectPanel({project,onClose}){
               <div style={{marginBottom:"1.1rem"}}><Lb t={t("aboutProject").toUpperCase()} c={pC}/><p style={{fontSize:".82rem",lineHeight:1.72,color:"rgba(232,232,240,.65)",textAlign:"justify"}}>{renderBold(project.desc)}</p></div>
               <RightMeta c={pC}/>
               {ovImgs.length>1&&(<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:".5rem",marginTop:"1.1rem"}}>
-                <button onClick={()=>setImgIdx(0)} style={{padding:".55rem",fontSize:".72rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".04em",background:imgIdx===0?`${pC}22`:`${pC}0a`,border:`1px solid ${imgIdx===0?pC+"66":pC+"28"}`,borderRadius:"8px",color:imgIdx===0?pC:"rgba(232,232,240,.55)",cursor:"pointer",transition:"all .2s"}}>▸ {t("shortVideo")}</button>
-                <button onClick={()=>setImgIdx(1)} style={{padding:".55rem",fontSize:".72rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".04em",background:imgIdx===1?`${pC}22`:`${pC}0a`,border:`1px solid ${imgIdx===1?pC+"66":pC+"28"}`,borderRadius:"8px",color:imgIdx===1?pC:"rgba(232,232,240,.55)",cursor:"pointer",transition:"all .2s"}}>▸ {t("fullShowcase")}</button>
+                <button onClick={()=>setImgIdx(ovImgs.length-2)} style={{padding:".55rem",fontSize:".72rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".04em",background:imgIdx===ovImgs.length-2?`${pC}22`:`${pC}0a`,border:`1px solid ${imgIdx===ovImgs.length-2?pC+"66":pC+"28"}`,borderRadius:"8px",color:imgIdx===ovImgs.length-2?pC:"rgba(232,232,240,.55)",cursor:"pointer",transition:"all .2s"}}>▸ {t("shortVideo")}</button>
+                <button onClick={()=>setImgIdx(ovImgs.length-1)} style={{padding:".55rem",fontSize:".72rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".04em",background:imgIdx===ovImgs.length-1?`${pC}22`:`${pC}0a`,border:`1px solid ${imgIdx===ovImgs.length-1?pC+"66":pC+"28"}`,borderRadius:"8px",color:imgIdx===ovImgs.length-1?pC:"rgba(232,232,240,.55)",cursor:"pointer",transition:"all .2s"}}>▸ {t("fullShowcase")}</button>
               </div>)}
               {project.launchDate&&<div style={{marginTop:"1.1rem"}}><Countdown targetDate={project.launchDate} c={pC}/></div>}
             </div>
