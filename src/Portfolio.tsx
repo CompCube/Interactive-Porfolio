@@ -351,7 +351,7 @@ const PLANETS=[
       desc:"A real-time energy shield built in Unity URP, combining Shader Graph and VFX Graph into a single reusable effect. The project focuses on rendering efficiency, using a single-pass double-sided shader while layering vertex animation, bloom, and particle effects without unnecessary rendering cost.",
       tags:["Unity","URP","VFX Graph","Shader Graph","Blender"],
       features:["Single-pass double-face shader via IsFrontFace","HDR Fresnel rim with post-processing bloom","VFX Graph vertex displacement and aura","Event-driven spawn and auto-despawn in 6s","Zero continuous particle emission"],
-      imgs:[],cta:"View on ArtStation",ctaHref:"https://www.artstation.com/artwork/L4qQJk",
+      imgs:[],thumbnail:gh("vfx/magic-barrier/01-thumbnail.png"),cta:"View on ArtStation",ctaHref:"https://www.artstation.com/artwork/L4qQJk",
       categories:[
         {id:"overview",label:"Overview",caption:"The shield spawns on SendEvent, holds for 6 seconds and auto-despawns. No continuous emission, no second material, no extra pass.",imgs:[{label:"Magic Barrier",src:gh("vfx/magic-barrier/overview/01-magic-barrier.png"),bg:"radial-gradient(ellipse at 50% 40%,#18041a,#0c020c)"}],videoId:"WvI2CbB6ZAU"},
         {id:"showcase",label:"Showcase",caption:"",imgs:[
@@ -369,7 +369,7 @@ const PLANETS=[
       desc:"A stylized waterfall built in Unity using Shader Graph, VFX Graph, and Particle Systems. The effect is split into two independent systems with different performance priorities: a shader-driven waterfall body and a lightweight splash system, balancing visual quality, runtime flexibility, and mobile-friendly performance.",
       tags:["Unity","VFX Graph","Shader Graph","Blender","Mobile Optimized"],
       features:["One draw call for main body via Mesh Output","Normals generated in-shader via NormalFromHeight","Two-layer UV scrolling without physics simulation","1000 quad particles with noise-based alpha clip","Runtime UI with sliders and colour picker"],
-      imgs:[],cta:"View on ArtStation",ctaHref:"https://www.artstation.com/artwork/2BgoNy",
+      imgs:[],thumbnail:gh("vfx/waterfall/01-thumbnail.png"),cta:"View on ArtStation",ctaHref:"https://www.artstation.com/artwork/2BgoNy",
       categories:[
         {id:"overview",label:"Overview",caption:"Main water body at one draw call. Splash and fog at the base kept deliberately cheap to contain overdraw where particles overlap heavily.",imgs:[{label:"Stylized Waterfall",src:gh("vfx/waterfall/overview/01-stylized-waterfall.png"),bg:"radial-gradient(ellipse at 40% 70%,#041018,#020810)"}],videoId:"S8ndamM_ybg"},
         {id:"showcase",label:"Showcase",caption:"",imgs:[
@@ -391,10 +391,10 @@ const PLANETS=[
       tags:["Unity","C#","Editor Tools","Procedural","ScriptableObject"],
       features:["Two modes: weighted Replace and procedural Scatter","Weighted prefab system with cumulative probability","Tag and name filtering for target selection","Surface alignment via downward raycasting","Configurable transform and scale randomization","Seeded determinism with isolated random state","Non-destructive preview with ghost instances","ScriptableObject-based preset system","Full Unity Undo integration"],
       imgs:[
-        {label:"Thumbnail",src:gh("tools/scatter-tool/thumbnail.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a0e1a,#050810)"},
+        {label:"Thumbnail",src:gh("tools/scatter-tool/01-thumbnail.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a0e1a,#050810)"},
         {label:"Hook Video",src:null,bg:"radial-gradient(ellipse at 50% 40%,#0a0e1a,#050810)",videoId:"sqHVsmYYLsU",caption:"Quick look at the tool in action."},
         {label:"Full Demo",src:null,bg:"radial-gradient(ellipse at 50% 40%,#080c18,#040610)",videoId:"TYoK6CLA0mY",caption:"Full walkthrough of all tool features and workflow."},
-      ],cta:"View on GitHub",
+      ],thumbnail:gh("tools/scatter-tool/01-thumbnail.png"),cta:"View on GitHub",
       categories:[
         {id:"core-systems",label:"Core Systems",hex:"#7080e0",
          imgs:[{label:"Tool Overview",src:null,bg:"radial-gradient(ellipse at 50% 40%,#0a0e1a,#050810)",videoId:"Dl6SS5CLTXE",caption:"The Object Replacement Tool is a Unity Editor extension designed to automate scene population workflows. It operates in two modes: Replace, which swaps selected objects with weighted-random prefabs, and Scatter, which distributes instances around existing objects without modifying them. Both modes share a unified system for transforms, randomization, surface alignment, undo support, and previewing."}],
@@ -432,19 +432,19 @@ const PLANETS=[
       desc:"Club website for Club Ciclista BTT Valls. Custom WordPress build covering routes, news, events and member information for the mountain bike community of Valls.",
       tags:["WordPress","Web Design","CSS","PHP"],
       features:["Route and event listings","Member area","News and media section","Mobile-first design","Custom theme"],
-      imgs:[{label:"btt-valls.com",src:gh("web/btt-valls/thumbnail.png"),bg:"radial-gradient(ellipse at 50% 40%,#041a0c,#020e06)",caption:"Club website for Club Ciclista BTT Valls, covering routes, news, events and member information for the local mountain bike community. Live and in use by the club, covering the full range of content needs from route publishing to event announcements."}],cta:"Visit Website",ctaHref:"https://btt-valls.com"},
+      imgs:[{label:"btt-valls.com",src:gh("web/btt-valls/01-thumbnail.png"),bg:"radial-gradient(ellipse at 50% 40%,#041a0c,#020e06)",caption:"Club website for Club Ciclista BTT Valls, covering routes, news, events and member information for the local mountain bike community. Live and in use by the club, covering the full range of content needs from route publishing to event announcements."}],cta:"Visit Website",ctaHref:"https://btt-valls.com"},
     {id:"edujuguetes",label:"edujuguetes.com",icon:"🧸",orbitRadius:2.8,orbitSpeed:.010,startAngle:2.6,inclination:-.2,radius:.22,hex:"#58cc8c",
       type:"Website",status:"Live",devPct:null,
       desc:"E-commerce site for an educational toy store. Product catalog, cart integration and order management for a specialty retail shop.",
       tags:["WordPress","WooCommerce","Web Design","CSS"],
       features:["Full WooCommerce product catalog","Cart and checkout integration","Category and filter system","Mobile-first design","Custom theme"],
-      imgs:[{label:"edujuguetes.com",src:gh("web/edujuguetes/thumbnail.png"),bg:"radial-gradient(ellipse at 50% 40%,#061808,#030e04)",caption:"E-commerce site for an educational toy store. Product catalog, shopping cart integration and order management built on WooCommerce. Live store with full product catalog and checkout flow operational."}],cta:"Visit Website",ctaHref:"https://edujuguetes.com"},
+      imgs:[{label:"edujuguetes.com",src:gh("web/edujuguetes/01-thumbnail.png"),bg:"radial-gradient(ellipse at 50% 40%,#061808,#030e04)",caption:"E-commerce site for an educational toy store. Product catalog, shopping cart integration and order management built on WooCommerce. Live store with full product catalog and checkout flow operational."}],cta:"Visit Website",ctaHref:"https://edujuguetes.com"},
     {id:"tirambarcosta",label:"tirambarcostadaurada.com",icon:"🍹",orbitRadius:3.6,orbitSpeed:.008,startAngle:4.2,inclination:.13,radius:.22,hex:"#84e0b4",
       type:"Website",status:"Live",devPct:null,
       desc:"Landing page for a bar-restaurant on the Costa Daurada. Menu showcase, location and contact information for a hospitality client.",
       tags:["WordPress","Web Design","CSS","Hospitality"],
       features:["Menu and food showcase","Location and contact section","Image gallery","Reservation info","Mobile-first design"],
-      imgs:[{label:"tirambarcostadaurada.com",src:gh("web/tirambarcosta/thumbnail.png"),bg:"radial-gradient(ellipse at 50% 40%,#041610,#020c08)",caption:"Landing page for a bar-restaurant on the Costa Daurada. Menu showcase, gallery, contact information and location for a hospitality client. Live and in use by the client, serving as the main digital presence for the restaurant."}],cta:"Visit Website",ctaHref:"https://tirambarcostadaurada.com"},
+      imgs:[{label:"tirambarcostadaurada.com",src:gh("web/tirambarcosta/01-thumbnail.png"),bg:"radial-gradient(ellipse at 50% 40%,#041610,#020c08)",caption:"Landing page for a bar-restaurant on the Costa Daurada. Menu showcase, gallery, contact information and location for a hospitality client. Live and in use by the client, serving as the main digital presence for the restaurant."}],cta:"Visit Website",ctaHref:"https://tirambarcostadaurada.com"},
   ]},
 ];
 
@@ -513,7 +513,7 @@ function Countdown({targetDate,c}){
 
 function MoonTooltip({moon,x,y}){
   if(!moon)return null;
-  const thumb=moon.imgs?.[0]?.src||moon.categories?.[0]?.imgs?.[0]?.src||moon.categories?.[0]?.subcategories?.[0]?.imgs?.[0]?.src||null;
+  const thumb=moon.thumbnail||moon.imgs?.[0]?.src||moon.categories?.[0]?.imgs?.[0]?.src||moon.categories?.[0]?.subcategories?.[0]?.imgs?.[0]?.src||null;
   return(<div style={{position:"fixed",left:x+18,top:thumb?y-172:y-58,background:"rgba(7,7,17,.94)",backdropFilter:"blur(16px)",border:`1px solid ${moon.hex}44`,borderRadius:"10px",padding:".55rem .8rem",pointerEvents:"none",zIndex:150,fontFamily:"'Space Grotesk',sans-serif",minWidth:180,maxWidth:210,animation:"tipIn .15s ease"}}>
     {thumb&&<div style={{width:"100%",height:96,borderRadius:"7px",overflow:"hidden",marginBottom:".5rem",background:"rgba(255,255,255,.03)"}}><img src={thumb} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/></div>}
     <div style={{fontSize:".78rem",fontWeight:600,color:"#e8e8f0",marginBottom:".18rem"}}>{moon.icon} {moon.label}</div>
@@ -774,7 +774,7 @@ function QuickNav({open,onClose,onSelectProject}){
         </div>
         <div style={{display:"flex",flexDirection:"column",gap:".42rem"}}>
           {p.moons.map(m=>{
-            const thumb=m.imgs?.[0]?.src||m.categories?.[0]?.imgs?.[0]?.src||m.categories?.[0]?.subcategories?.[0]?.imgs?.[0]?.src||null;
+            const thumb=m.thumbnail||m.imgs?.[0]?.src||m.categories?.[0]?.imgs?.[0]?.src||m.categories?.[0]?.subcategories?.[0]?.imgs?.[0]?.src||null;
             return(<button key={m.id} className="qn-item" onClick={()=>onSelectProject(m)} style={{display:"flex",gap:".65rem",alignItems:"center",padding:".5rem",background:"rgba(255,255,255,.02)",border:`1px solid ${m.hex}28`,borderRadius:"9px",cursor:"pointer",textAlign:"left",transition:"all .15s",width:"100%"}}>
               <div style={{width:46,height:46,borderRadius:"7px",overflow:"hidden",flexShrink:0,background:"rgba(255,255,255,.04)",display:"flex",alignItems:"center",justifyContent:"center"}}>
                 {thumb?<img src={thumb} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>:<span style={{fontSize:"1.15rem"}}>{m.icon}</span>}
