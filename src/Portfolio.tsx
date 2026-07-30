@@ -140,8 +140,8 @@ const HE_CATEGORIES=[
              {label:"L2 Render",src:gh("games/hollow-end/game-art/environment-art/results/03-l2render.png"),bg:"radial-gradient(ellipse at 55% 45%,#0a1a0a,#040a04)"},
            ]},
            right:{label:"Abandoned",imgs:[
-             {label:"L1 Render",src:gh("games/hollow-end/game-art/environment-art/results/04-l1-render2.png"),bg:"radial-gradient(ellipse at 50% 50%,#1a0c08,#0a0504)"},
              {label:"L1 Render",src:gh("games/hollow-end/game-art/environment-art/results/05-l1-render1.png"),bg:"radial-gradient(ellipse at 45% 55%,#1a0c08,#0a0504)"},
+             {label:"L1 Render",src:gh("games/hollow-end/game-art/environment-art/results/04-l1-render2.png"),bg:"radial-gradient(ellipse at 50% 50%,#1a0c08,#0a0504)"},
              {label:"L1 Render",src:gh("games/hollow-end/game-art/environment-art/results/06-l1-render3.png"),bg:"radial-gradient(ellipse at 55% 45%,#1a0c08,#0a0504)"},
            ]},
          }},
@@ -292,24 +292,25 @@ const PLANETS=[
            ]},
          ]},
         {id:"modular-kit",label:"MODULAR KIT SYSTEM",hex:"#7abba8",
-         imgs:[{label:"Full Modular Kit",src:gh("environments/subway-modular-kit/modular-kit/01-fullmodularkit.png"),bg:"radial-gradient(ellipse at 50% 50%,#0a1a14,#040a08)"}],
-         text:"The Modular Kit is the **structural backbone** of *Hollow End*, consisting of **78 reusable pieces** used to construct every playable environment. Organized into two main sets (New and Abandoned) and built around a strict **4-meter grid**, the system ensures predictable snapping, consistent UV layouts, and a uniform texel density across the entire project.\n\nRather than creating unique assets for each area, the kit prioritizes **modularity and reuse**. The same geometry supports multiple environments, with materials, lighting, and environmental dressing providing each space with its own visual identity.",
-         dualGallery:{
-           left:{label:"Backroom (L2)",imgs:[
-             {label:"Walls",src:gh("environments/subway-modular-kit/modular-kit/backroom-l2/01-walls.png"),bg:"radial-gradient(ellipse at 50% 50%,#0a1a0a,#040a04)",caption:"The Backroom showcases the modular system in its purest form. Clean materials, uniform lighting, and repetitive architectural elements intentionally expose the underlying structure, reinforcing the **artificial and unsettling atmosphere** of the space."},
-             {label:"Floors",src:gh("environments/subway-modular-kit/modular-kit/backroom-l2/02-floors.png"),bg:"radial-gradient(ellipse at 45% 55%,#081a08,#040a04)",caption:"The Backroom showcases the modular system in its purest form. Clean materials, uniform lighting, and repetitive architectural elements intentionally expose the underlying structure, reinforcing the **artificial and unsettling atmosphere** of the space."},
-             {label:"Full Modular Kit",src:gh("environments/subway-modular-kit/modular-kit/backroom-l2/03-fullmodularkit.png"),bg:"radial-gradient(ellipse at 55% 45%,#0a1c0a,#040c04)",caption:"The Backroom showcases the modular system in its purest form. Clean materials, uniform lighting, and repetitive architectural elements intentionally expose the underlying structure, reinforcing the **artificial and unsettling atmosphere** of the space."},
-             {label:"Pieces",src:gh("environments/subway-modular-kit/modular-kit/backroom-l2/04-pieces-1.png"),bg:"radial-gradient(ellipse at 50% 60%,#081808,#040a04)",caption:"The Backroom showcases the modular system in its purest form. Clean materials, uniform lighting, and repetitive architectural elements intentionally expose the underlying structure, reinforcing the **artificial and unsettling atmosphere** of the space."},
-             {label:"Pieces",src:gh("environments/subway-modular-kit/modular-kit/backroom-l2/05-pieces-2.png"),bg:"radial-gradient(ellipse at 45% 45%,#0a1a08,#040c04)",caption:"The Backroom showcases the modular system in its purest form. Clean materials, uniform lighting, and repetitive architectural elements intentionally expose the underlying structure, reinforcing the **artificial and unsettling atmosphere** of the space."},
-             {label:"Pieces",src:gh("environments/subway-modular-kit/modular-kit/backroom-l2/06-pieces-3.png"),bg:"radial-gradient(ellipse at 55% 55%,#081a0a,#040a04)",caption:"The Backroom showcases the modular system in its purest form. Clean materials, uniform lighting, and repetitive architectural elements intentionally expose the underlying structure, reinforcing the **artificial and unsettling atmosphere** of the space."},
-           ]},
-           right:{label:"Abandoned (L1)",imgs:[
-             {label:"Full Modular Kit",src:gh("environments/subway-modular-kit/modular-kit/abandoned-l1/01-fullmodularkit.png"),bg:"radial-gradient(ellipse at 50% 50%,#1a0a08,#0a0504)",caption:"The Abandoned Zone is built from the **exact same modular pieces**, recontextualized through material degradation, lighting, and environmental dressing. This demonstrates the core strength of the system: creating a completely different atmosphere without increasing the structural asset count."},
-             {label:"Pieces",src:gh("environments/subway-modular-kit/modular-kit/abandoned-l1/02-pieces.png"),bg:"radial-gradient(ellipse at 45% 55%,#180a08,#0a0504)",caption:"The Abandoned Zone is built from the **exact same modular pieces**, recontextualized through material degradation, lighting, and environmental dressing. This demonstrates the core strength of the system: creating a completely different atmosphere without increasing the structural asset count."},
-             {label:"Pieces",src:gh("environments/subway-modular-kit/modular-kit/abandoned-l1/03-pieces.png"),bg:"radial-gradient(ellipse at 55% 45%,#1a0c08,#0c0604)",caption:"The Abandoned Zone is built from the **exact same modular pieces**, recontextualized through material degradation, lighting, and environmental dressing. This demonstrates the core strength of the system: creating a completely different atmosphere without increasing the structural asset count."},
-             {label:"Pieces",src:gh("environments/subway-modular-kit/modular-kit/abandoned-l1/04-pieces.png"),bg:"radial-gradient(ellipse at 50% 60%,#180808,#0a0404)",caption:"The Abandoned Zone is built from the **exact same modular pieces**, recontextualized through material degradation, lighting, and environmental dressing. This demonstrates the core strength of the system: creating a completely different atmosphere without increasing the structural asset count."},
-           ]},
-         }},
+         imgs:[
+           {label:"Modular Kit Comparison",src:null,caption:"The Modular Kit is the **structural backbone** of *Hollow End*, consisting of **78 reusable pieces** used to construct every playable environment. The Backroom (L2) and the Abandoned Zone (L1) share the exact same underlying geometry, each achieving a distinct visual identity through material variation, lighting, and environmental dressing.",compare:{
+             left:{label:"Backroom (L2)",imgs:[
+               {label:"Walls",src:gh("environments/subway-modular-kit/modular-kit/backroom-l2/01-walls.png"),bg:"radial-gradient(ellipse at 50% 50%,#0a1a0a,#040a04)"},
+               {label:"Floors",src:gh("environments/subway-modular-kit/modular-kit/backroom-l2/02-floors.png"),bg:"radial-gradient(ellipse at 45% 55%,#081a08,#040a04)"},
+               {label:"Full Modular Kit",src:gh("environments/subway-modular-kit/modular-kit/backroom-l2/03-fullmodularkit.png"),bg:"radial-gradient(ellipse at 55% 45%,#0a1c0a,#040c04)"},
+               {label:"Pieces",src:gh("environments/subway-modular-kit/modular-kit/backroom-l2/04-pieces-1.png"),bg:"radial-gradient(ellipse at 50% 60%,#081808,#040a04)"},
+               {label:"Pieces",src:gh("environments/subway-modular-kit/modular-kit/backroom-l2/05-pieces-2.png"),bg:"radial-gradient(ellipse at 45% 45%,#0a1a08,#040c04)"},
+               {label:"Pieces",src:gh("environments/subway-modular-kit/modular-kit/backroom-l2/06-pieces-3.png"),bg:"radial-gradient(ellipse at 55% 55%,#081a0a,#040a04)"},
+             ]},
+             right:{label:"Abandoned (L1)",imgs:[
+               {label:"Full Modular Kit",src:gh("environments/subway-modular-kit/modular-kit/abandoned-l1/01-fullmodularkit.png"),bg:"radial-gradient(ellipse at 50% 50%,#1a0a08,#0a0504)"},
+               {label:"Pieces",src:gh("environments/subway-modular-kit/modular-kit/abandoned-l1/02-pieces.png"),bg:"radial-gradient(ellipse at 45% 55%,#180a08,#0a0504)"},
+               {label:"Pieces",src:gh("environments/subway-modular-kit/modular-kit/abandoned-l1/03-pieces.png"),bg:"radial-gradient(ellipse at 55% 45%,#1a0c08,#0c0604)"},
+               {label:"Pieces",src:gh("environments/subway-modular-kit/modular-kit/abandoned-l1/04-pieces.png"),bg:"radial-gradient(ellipse at 50% 60%,#180808,#0a0404)"},
+             ]},
+           }},
+         ],
+         text:"The Modular Kit is the **structural backbone** of *Hollow End*, consisting of **78 reusable pieces** used to construct every playable environment. Organized into two main sets (New and Abandoned) and built around a strict **4-meter grid**, the system ensures predictable snapping, consistent UV layouts, and a uniform texel density across the entire project.\n\nRather than creating unique assets for each area, the kit prioritizes **modularity and reuse**. The same geometry supports multiple environments, with materials, lighting, and environmental dressing providing each space with its own visual identity."},
         {id:"results",label:"Results",hex:"#99bbaa",
          dualGallery:{
            left:{label:"Backroom",imgs:[
