@@ -487,13 +487,10 @@ const CSS=`
 @keyframes driftB{0%{transform:translate3d(0,0,0)}100%{transform:translate3d(110px,-70px,0)}}
 @keyframes orbSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 @keyframes twinkle{0%,100%{opacity:.25}50%{opacity:.7}}
-.bg-grid-a{animation:driftA 160s linear infinite}
-.bg-grid-b{animation:driftB 210s linear infinite}
-.bg-grid-c{animation:driftA 280s linear infinite reverse}
 @keyframes secIn{from{opacity:0;transform:translateY(38px)}to{opacity:1;transform:translateY(0)}}
 .sec-rv{opacity:0}
 .sec-rv.on{animation:secIn .8s cubic-bezier(.16,1,.3,1) both}
-@media(prefers-reduced-motion:reduce){.bg-grid-a,.bg-grid-b,.bg-grid-c{animation:none!important}.sec-rv{opacity:1!important}.sec-rv.on{animation:none!important}}
+@media(prefers-reduced-motion:reduce){.sec-rv{opacity:1!important}.sec-rv.on{animation:none!important}}
 .bg-orb{animation:orbSpin 220s linear infinite}
 .bg-orb-2{animation:orbSpin 320s linear infinite reverse}
 @media(prefers-reduced-motion:reduce){.bg-orb,.bg-orb-2{animation:none!important}}
@@ -715,6 +712,9 @@ function StarPanel({onClose,initialTab}){
     </div>
     {tab==="about"&&(<div style={{padding:"0 1.75rem 1.75rem",display:"grid",gridTemplateColumns:"1fr 1fr",gap:"2rem"}}>
       <div>
+        <div style={{width:"100%",maxWidth:210,aspectRatio:"1/1",borderRadius:"20px",overflow:"hidden",border:`2px solid ${c}44`,boxShadow:`0 0 40px ${c}18`,background:`radial-gradient(ellipse at 50% 30%,${c}12,#0a0a12)`,marginBottom:"1.3rem"}}>
+          <img src={gh("profile_picture.png")} alt="Jordi Altisèn" style={{width:"100%",height:"100%",objectFit:"cover"}} onError={e=>{e.currentTarget.style.display="none";}}/>
+        </div>
         <L t="PROFESSIONAL SUMMARY"/>
         <p style={{fontSize:".85rem",lineHeight:1.7,color:"rgba(232,232,240,.85)",marginBottom:"1.3rem",padding:".8rem .9rem",background:`${c}0c`,border:`1px solid ${c}28`,borderRadius:"10px"}}>{STAR.summary}</p>
         <L t="BIO"/>
@@ -1088,22 +1088,71 @@ const featuredProjects=()=>FEATURED_IDS.map(id=>{
   return null;
 }).filter(Boolean);
 
+function hexToRgb(h){const n=parseInt(h.slice(1),16);return[(n>>16)&255,(n>>8)&255,n&255];}
+
 function SpaceBg({c,fixed}){
-  const line=`${c}1a`,faint=`${c}0e`;
+  const cvRef=useRef(null);
+  useEffect(()=>{
+    const cv=cvRef.current;if(!cv)return;
+    const ctx=cv.getContext("2d");
+    const reduce=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    const[r,g,b]=hexToRgb(c);
+    let w=0,h=0,cells=[],raf=0,t=0;
+    const R=26;                         // radi de l'hexagon
+    const HW=Math.sqrt(3)*R, VH=1.5*R;  // amplada i pas vertical
+    const build=()=>{
+      w=cv.width=cv.offsetWidth*Math.min(devicePixelRatio,2);
+      h=cv.height=cv.offsetHeight*Math.min(devicePixelRatio,2);
+      const s=Math.min(devicePixelRatio,2);
+      cells=[];
+      const cols=Math.ceil(w/(HW*s))+2, rows=Math.ceil(h/(VH*s))+2;
+      for(let row=-1;row<rows;row++)for(let col=-1;col<cols;col++){
+        const x=col*HW+(row%2?HW/2:0), y=row*VH;
+        cells.push({x,y,seed:Math.random()*Math.PI*2,amp:.35+Math.random()*.65,lit:Math.random()<.05});
+      }
+    };
+    const hexPath=(x,y)=>{
+      ctx.beginPath();
+      for(let i=0;i<6;i++){const a=Math.PI/180*(60*i-30);const px=x+R*Math.cos(a),py=y+R*Math.sin(a);i?ctx.lineTo(px,py):ctx.moveTo(px,py);}
+      ctx.closePath();
+    };
+    const draw=()=>{
+      const s=Math.min(devicePixelRatio,2);
+      ctx.setTransform(s,0,0,s,0,0);
+      const W=w/s,H=h/s;
+      ctx.clearRect(0,0,W,H);
+      const cx=W*.5,cy=H*.42,maxD=Math.hypot(W,H)*.62;
+      for(const cell of cells){
+        const d=Math.hypot(cell.x-cx,cell.y-cy)/maxD;
+        const falloff=Math.max(0,1-d*.85);
+        const pulse=reduce?.6:.55+.45*Math.sin(t*.00042+cell.seed);
+        const base=falloff*cell.amp*pulse;
+        hexPath(cell.x,cell.y);
+        ctx.fillStyle=`rgba(${r},${g},${b},${base*.022})`;
+        ctx.fill();
+        ctx.lineWidth=1;
+        ctx.strokeStyle=`rgba(${r},${g},${b},${base*.11})`;
+        ctx.stroke();
+        if(cell.lit){
+          ctx.save();
+          ctx.shadowBlur=12;ctx.shadowColor=`rgba(${r},${g},${b},${base*.5})`;
+          ctx.strokeStyle=`rgba(${Math.min(255,r+60)},${Math.min(255,g+60)},${Math.min(255,b+70)},${base*.3})`;
+          ctx.lineWidth=1.1;hexPath(cell.x,cell.y);ctx.stroke();
+          ctx.restore();
+        }
+      }
+    };
+    const loop=ts=>{t=ts;draw();raf=requestAnimationFrame(loop);};
+    const onR=()=>{build();draw();};
+    build();
+    if(reduce)draw();else raf=requestAnimationFrame(loop);
+    window.addEventListener("resize",onR);
+    return()=>{cancelAnimationFrame(raf);window.removeEventListener("resize",onR);};
+  },[c]);
   return(<div style={{position:fixed?"fixed":"absolute",inset:0,pointerEvents:"none",overflow:"hidden",zIndex:0}}>
-    <div className="bg-grid-a" style={{position:"absolute",inset:"-20%",opacity:.5,
-      backgroundImage:`linear-gradient(60deg,${line} 1px,transparent 1px),linear-gradient(-60deg,${line} 1px,transparent 1px),linear-gradient(0deg,${faint} 1px,transparent 1px)`,
-      backgroundSize:"92px 160px,92px 160px,92px 160px"}}/>
-    <div className="bg-grid-b" style={{position:"absolute",inset:"-20%",opacity:.32,
-      backgroundImage:`radial-gradient(circle,${c}33 1.6px,transparent 1.8px)`,
-      backgroundSize:"92px 160px",backgroundPosition:"46px 80px"}}/>
-    <div className="bg-grid-c" style={{position:"absolute",inset:"-20%",opacity:.22,
-      backgroundImage:`linear-gradient(30deg,${faint} 1px,transparent 1px),linear-gradient(-30deg,${faint} 1px,transparent 1px)`,
-      backgroundSize:"210px 210px"}}/>
-    <div className="bg-orb" style={{position:"absolute",top:"38%",left:"50%",width:"min(1300px,140vw)",height:"min(1300px,140vw)",marginTop:"min(-650px,-70vw)",marginLeft:"min(-650px,-70vw)",borderRadius:"50%",border:`1px solid ${c}0d`}}/>
-    <div style={{position:"absolute",width:"min(880px,95vw)",height:"min(880px,95vw)",borderRadius:"50%",background:`radial-gradient(ellipse,${c}16 0%,transparent 62%)`,top:"4%",left:"50%",transform:"translate(-50%,-50%)",animation:"glowPulse 16s ease-in-out infinite"}}/>
-    <div style={{position:"absolute",width:"min(680px,80vw)",height:"min(680px,80vw)",borderRadius:"50%",background:`radial-gradient(ellipse,${c}10 0%,transparent 60%)`,bottom:"-14%",right:"-10%",animation:"glowPulse 21s ease-in-out infinite"}}/>
-    <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse at 50% 40%,transparent 30%,rgba(0,0,8,.55) 100%)"}}/>
+    <div style={{position:"absolute",inset:0,background:`radial-gradient(ellipse at 50% 25%,${c}12,transparent 55%),radial-gradient(ellipse at 15% 80%,rgba(90,70,190,.10),transparent 55%),#04040c`}}/>
+    <canvas ref={cvRef} style={{position:"absolute",inset:0,width:"100%",height:"100%"}}/>
+    <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse at 50% 40%,transparent 20%,rgba(2,2,8,.8) 100%)"}}/>
   </div>);
 }
 
@@ -1114,9 +1163,9 @@ function FeaturedCarousel({onOpen,big}){
   if(!items.length)return null;
   const n=items.length;
   const go=d=>setIdx(i=>(i+d+n)%n);
-  const cardW=big?"clamp(280px,42vw,460px)":"clamp(260px,34vw,380px)";
+  const cardW=big?"clamp(280px,42vw,460px)":"clamp(234px,30.6vw,342px)";
   return(<div style={{position:"relative",width:"100%"}}>
-    <div style={{position:"relative",height:big?"clamp(430px,58vh,540px)":"clamp(390px,50vh,470px)",display:"flex",alignItems:"center",justifyContent:"center",perspective:"1400px"}}>
+    <div style={{position:"relative",height:big?"clamp(430px,58vh,540px)":"clamp(351px,45vh,423px)",display:"flex",alignItems:"center",justifyContent:"center",perspective:"1400px"}}>
       {items.map((m,i)=>{
         let off=i-idx;if(off>n/2)off-=n;if(off<-n/2)off+=n;
         const abs=Math.abs(off),center=off===0;
@@ -1396,7 +1445,7 @@ function IntroScreen({onEnter,onOpenProject}){
           <div style={{position:"relative",...heroStyle(PX.photoShift)}}>
             <div style={{position:"absolute",inset:"-18%",borderRadius:"50%",background:`radial-gradient(ellipse,${c}22 0%,transparent 68%)`,filter:"blur(6px)",pointerEvents:"none",animation:"introIn 1.2s both"}}/>
             <div style={{position:"relative",width:"100%",aspectRatio:"1/1",borderRadius:"28px",overflow:"hidden",border:`2px solid ${c}55`,boxShadow:`0 0 80px ${c}28,inset 0 0 40px rgba(0,0,0,.3)`,background:`radial-gradient(ellipse at 50% 30%,${c}14,#0a0a12)`,animation:"introIn .8s both"}}>
-              <img src={gh("profile/01-portrait.png")} alt="Jordi Altisèn" style={{width:"100%",height:"100%",objectFit:"cover"}} onError={e=>{e.currentTarget.style.display="none";}}/>
+              <img src={gh("profile_picture.png")} alt="Jordi Altisèn" style={{width:"100%",height:"100%",objectFit:"cover"}} onError={e=>{e.currentTarget.style.display="none";}}/>
             </div>
           </div>
           <div style={heroStyle(PX.textShift)}>
@@ -1406,7 +1455,7 @@ function IntroScreen({onEnter,onOpenProject}){
               <span className="word" style={{animationDelay:".31s",color:c,textShadow:`0 0 28px ${c}66`}}>Jordi.</span><br/>
               {["Welcome","to","my","portfolio!"].map((w,i)=><span key={i} className="word" style={{animationDelay:`${.42+i*.07}s`,marginRight:".32em"}}>{w}</span>)}
             </h1>
-            <p style={{fontSize:"clamp(.85rem,1.3vw,.95rem)",color:"rgba(232,232,240,.62)",lineHeight:1.7,maxWidth:520,margin:"0 0 1.8rem",animation:"introIn .8s .3s both"}}>Technical Artist & Game Developer who designs and builds tools, games, and interactive experiences. Passionate about exploring Intelligent Systems and Generative AI, and the intersection between art and engineering.</p>
+            <p style={{fontSize:"clamp(.85rem,1.3vw,.95rem)",color:"rgba(232,232,240,.62)",lineHeight:1.7,maxWidth:520,margin:"0 0 1.8rem",animation:"introIn .8s .3s both"}}>Game Developer focused on Technical Art, with a passion for building AI-powered systems and interactive experiences.</p>
             <div style={{display:"flex",gap:".7rem",flexWrap:"wrap",animation:"introIn .8s .45s both"}}>
               <button onClick={()=>go()} style={{padding:".78rem 1.6rem",background:c,border:"none",borderRadius:"9px",color:"#0a0a12",cursor:"pointer",fontSize:".85rem",fontWeight:700,fontFamily:"'Space Grotesk',sans-serif",boxShadow:`0 0 30px ${c}33`}}>Explore Portfolio</button>
               <button onClick={()=>go("contact")} style={{padding:".78rem 1.6rem",background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.18)",borderRadius:"9px",color:"#e8e8f0",cursor:"pointer",fontSize:".85rem",fontWeight:600,fontFamily:"'Space Grotesk',sans-serif"}}>Contact</button>
@@ -1425,7 +1474,7 @@ function IntroScreen({onEnter,onOpenProject}){
         </div>
       </div>
 
-        <SecReveal root={wrapRef}><div style={{display:"grid",gridTemplateColumns:"minmax(260px,.85fr) 1.15fr",gap:"clamp(2.5rem,6vw,5rem)",alignItems:"center"}} className="feat-grid">
+        <SecReveal root={wrapRef}><div style={{display:"grid",gridTemplateColumns:"minmax(260px,.85fr) 1.15fr",gap:"clamp(3.5rem,8vw,7rem)",alignItems:"center"}} className="feat-grid">
           <div>
             <h2 style={{fontSize:"clamp(1.5rem,3vw,2.1rem)",fontWeight:700,color:"#e8e8f0",margin:"0 0 1rem",lineHeight:1.2}}>Featured <span style={{color:c}}>projects</span></h2>
             <p style={{fontSize:".88rem",color:TK.tx.mid,lineHeight:1.75,margin:"0 0 1.8rem",maxWidth:420}}>A selection of the projects that best represent my work across game development, technical art and intelligent systems.</p>
@@ -1497,9 +1546,9 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
     const W=window.innerWidth,H=window.innerHeight;
     const scene=new THREE.Scene();scene.fog=new THREE.FogExp2(0x000008,.0022);
     const camera=new THREE.PerspectiveCamera(55,W/H,.1,600);
-    const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
+    const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});
     renderer.setSize(W,H);renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-    renderer.setClearColor(0x000008);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;
+    renderer.setClearColor(0x000008,0);renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.25;
     scene.add(new THREE.AmbientLight(0x111133,2.0));
     const starLight=new THREE.PointLight(0xe2943d,8,350);scene.add(starLight);
     const starLight2=new THREE.PointLight(0xffbb66,3.5,200);scene.add(starLight2);
@@ -1713,6 +1762,7 @@ export default function Portfolio(){
   const onHoverMoon=useCallback((data,x,y)=>setHovMoon({data,x,y}),[]);
   if(isMobile)return <Mobile/>;
   return(<LangContext.Provider value={lang}><div style={{width:"100%",height:"100vh",background:"#000008",overflow:"hidden",position:"relative"}}>
+    <div style={{position:"absolute",inset:0,zIndex:0}}><SpaceBg c={STAR.hex}/></div>
     <SolarScene onStarClick={onStarClick} onMoonClick={onMoonClick} onEnterPlanet={onEnterPlanet} onExitPlanet={onExitPlanet} onHoverMoon={onHoverMoon}/>
     {intro&&<IntroScreen onOpenProject={m=>{setIntro(false);setPanelData({type:"project",project:m});}} onEnter={dest=>{setIntro(false);if(dest==="contact"){setStarTab("contact");setPanelData({type:"star"});}else if(dest==="projects"){setNavFilter("all");setJumpAll(true);setQuickNavOpen(true);}else setShowNavHint(true);}}/>}
     {!intro&&<>
