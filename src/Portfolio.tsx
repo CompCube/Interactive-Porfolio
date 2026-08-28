@@ -427,7 +427,13 @@ const PLANETS=[
         },
       ]},
   ]},
-  {id:"ai",label:"AI Projects",icon:"🤖",hex:"#1BC2E3",orbitRadius:54,orbitSpeed:.00065,startAngle:5.8,radius:.58,orbitTilt:.38,desc:"AI tools and micro-SaaS - coming soon.",moons:[]},
+  {id:"ai",label:"AI Projects",icon:"🤖",hex:"#1BC2E3",orbitRadius:54,orbitSpeed:.00065,startAngle:5.8,radius:1.35,orbitTilt:.38,desc:"AI tools and multi-agent systems.",moons:[
+    {id:"careerpilot-ai",label:"CareerPilotAI",icon:"🧩",orbitRadius:2.6,orbitSpeed:.01,startAngle:1.2,inclination:.2,radius:.32,type:"Multi-Agent AI App",status:"In development",
+     desc:"[TEMPLATE — pending real content] A multi-agent app that analyzes job postings, does honest CV tailoring, and simulates interviews using an Analyzer Agent, a Resume Tailor Agent, and an Interview Agent.",
+     tags:["Next.js","TypeScript","Multi-Agent","LLM","Vercel"],
+     imgs:[{label:"CareerPilotAI",src:null,bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)",textPlaceholder:true,caption:"[TEMPLATE] Overview placeholder — real screenshots and copy to be added."}],
+     cta:"View Demo",ctaHref:"https://career-pilot-ai-tan-ten.vercel.app"},
+  ]},
   {id:"web",label:"Web Dev",icon:"🌐",hex:"#3CC87A",orbitRadius:66,orbitSpeed:.00038,startAngle:2.4,radius:.52,orbitTilt:.64,desc:"Client websites deployed for clubs, stores and hospitality.",moons:[
     {id:"btt-valls",label:"btt-valls.com",icon:"🚵",orbitRadius:2.0,orbitSpeed:.013,startAngle:.8,inclination:.32,radius:.22,hex:"#70d4a0",
       type:"Website",status:"Live",devPct:null,
@@ -450,13 +456,65 @@ const PLANETS=[
   ]},
 ];
 
+function lightenHex(hex,amt){
+  const n=parseInt(hex.slice(1),16);let r=(n>>16)&255,g=(n>>8)&255,b=n&255;
+  r=Math.round(r+(255-r)*amt);g=Math.round(g+(255-g)*amt);b=Math.round(b+(255-b)*amt);
+  return "#"+[r,g,b].map(v=>v.toString(16).padStart(2,"0")).join("");
+}
+PLANETS.forEach(p=>p.moons.forEach(m=>{m.hex=lightenHex(p.hex,.25);}));
 const ALL_ITEMS=[{id:"star",type:"star",label:"Jordi",icon:"⭐",hex:STAR.hex},...PLANETS.map(p=>({id:p.id,type:"planet",label:p.label,icon:p.icon,hex:p.hex})),...PLANETS.flatMap(p=>p.moons.map(m=>({id:m.id,type:"moon",label:m.label,icon:m.icon,hex:m.hex,planetId:p.id})))];
 
+const TK={
+  fs:{xs:".6rem",sm:".72rem",base:".84rem",md:".95rem",lg:"1.15rem",xl:"1.5rem"},
+  r:{sm:"8px",md:"12px",lg:"20px"},
+  op:{faint:"14",soft:"28",mid:"55",strong:"88"},
+  tx:{hi:"rgba(232,232,240,.92)",mid:"rgba(232,232,240,.66)",lo:"rgba(232,232,240,.42)"},
+  mono:"'JetBrains Mono',monospace",
+  sans:"'Space Grotesk',sans-serif",
+};
 const CSS=`
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
 @keyframes progFill{from{width:0}to{}}
 @keyframes modalIn{from{opacity:0;transform:scale(.93) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes modalOut{from{opacity:1;transform:scale(1) translateY(0)}to{opacity:0;transform:scale(.96) translateY(8px)}}
+@keyframes revealL{from{opacity:0;transform:translateX(-46px)}to{opacity:1;transform:translateX(0)}}
+@keyframes cardIn{from{opacity:0;transform:translateY(26px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes wordIn{from{opacity:0;transform:translateY(22px) rotateX(-35deg)}to{opacity:1;transform:translateY(0) rotateX(0)}}
+@keyframes headIn{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:translateX(0)}}
+@keyframes glowPulse{0%,100%{opacity:.35}50%{opacity:.85}}
+@keyframes driftA{0%{transform:translate3d(0,0,0)}100%{transform:translate3d(-140px,-90px,0)}}
+@keyframes driftB{0%{transform:translate3d(0,0,0)}100%{transform:translate3d(110px,-70px,0)}}
+@keyframes orbSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+@keyframes twinkle{0%,100%{opacity:.25}50%{opacity:.7}}
+.bg-grid-a{animation:driftA 160s linear infinite}
+.bg-grid-b{animation:driftB 210s linear infinite}
+.bg-grid-c{animation:driftA 280s linear infinite reverse}
+@keyframes secIn{from{opacity:0;transform:translateY(38px)}to{opacity:1;transform:translateY(0)}}
+.sec-rv{opacity:0}
+.sec-rv.on{animation:secIn .8s cubic-bezier(.16,1,.3,1) both}
+@media(prefers-reduced-motion:reduce){.bg-grid-a,.bg-grid-b,.bg-grid-c{animation:none!important}.sec-rv{opacity:1!important}.sec-rv.on{animation:none!important}}
+.bg-orb{animation:orbSpin 220s linear infinite}
+.bg-orb-2{animation:orbSpin 320s linear infinite reverse}
+@media(prefers-reduced-motion:reduce){.bg-orb,.bg-orb-2{animation:none!important}}
+.feat-grid{grid-template-columns:minmax(260px,.85fr) 1.15fr}
+@media(max-width:860px){.feat-grid{grid-template-columns:1fr!important}}
+@keyframes shimmer{0%{background-position:-180% 0}100%{background-position:180% 0}}
+.qn-item{transition:transform .34s cubic-bezier(.2,.9,.3,1),border-color .28s ease,box-shadow .34s ease!important}
+.qn-item:hover{transform:translateY(-7px)}
+.qn-item img{transition:transform .55s cubic-bezier(.2,.9,.3,1)}
+.qn-item:hover img{transform:scale(1.07)}
+.pf-btn{transition:transform .22s cubic-bezier(.2,.9,.3,1),filter .22s ease,box-shadow .22s ease!important}
+.pf-btn:hover{transform:translateY(-2px)}
+.pf-btn:active{transform:translateY(0) scale(.985)}
+.pill-a{transition:transform .24s cubic-bezier(.2,.9,.3,1),background .24s ease,border-color .24s ease,color .24s ease!important}
+.pill-a:hover{transform:translateY(-2px)}
+.word{display:inline-block;animation:wordIn .75s cubic-bezier(.16,1,.3,1) both}
+.shine{background:linear-gradient(100deg,transparent 35%,rgba(255,255,255,.55) 50%,transparent 65%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:shimmer 4.5s ease-in-out infinite}
+:focus-visible{outline:2px solid rgba(237,195,43,.85);outline-offset:3px;border-radius:4px}
+@media(prefers-reduced-motion:reduce){.qn-item,.pf-btn,.pill-a,.word,.shine{animation:none!important;transition:none!important;transform:none!important}}
+@keyframes revealR{from{opacity:0;transform:translateX(46px)}to{opacity:1;transform:translateX(0)}}
+@media(prefers-reduced-motion:reduce){.cs-reveal{animation:none!important;opacity:1!important;transform:none!important}}
 @keyframes hintPanelIn{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 @keyframes hintPanelOut{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(24px)}}
 @keyframes warpIn{0%{opacity:0;transform:scale(.4)}35%{opacity:1}100%{opacity:0;transform:scale(3)}}
@@ -518,7 +576,7 @@ function MoonTooltip({moon,x,y}){
   const thumb=moon.thumbnail||moon.imgs?.[0]?.src||moon.categories?.[0]?.imgs?.[0]?.src||moon.categories?.[0]?.subcategories?.[0]?.imgs?.[0]?.src||null;
   return(<div style={{position:"fixed",left:x+18,top:thumb?y-172:y-58,background:"rgba(7,7,17,.94)",backdropFilter:"blur(16px)",border:`1px solid ${moon.hex}44`,borderRadius:"10px",padding:".55rem .8rem",pointerEvents:"none",zIndex:150,fontFamily:"'Space Grotesk',sans-serif",minWidth:180,maxWidth:210,animation:"tipIn .15s ease"}}>
     {thumb&&<div style={{width:"100%",height:96,borderRadius:"7px",overflow:"hidden",marginBottom:".5rem",background:"rgba(255,255,255,.03)"}}><img src={thumb} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/></div>}
-    <div style={{fontSize:".78rem",fontWeight:600,color:"#e8e8f0",marginBottom:".18rem"}}>{moon.icon} {moon.label}</div>
+    <div style={{fontSize:".78rem",fontWeight:600,color:"#e8e8f0",marginBottom:".18rem"}}>{moon.label}</div>
     <div style={{fontSize:".62rem",color:moon.hex,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".06em"}}>{moon.type}{moon.status?` · ${moon.status}`:""}</div>
   </div>);
 }
@@ -637,8 +695,8 @@ function Modal({c,onClose,children,width}){
   </div>);
 }
 
-function StarPanel({onClose}){
-  const[tab,setTab]=useState("about");const[msg,setMsg]=useState({n:"",e:"",t:""});
+function StarPanel({onClose,initialTab}){
+  const[tab,setTab]=useState(initialTab||"about");const[msg,setMsg]=useState({n:"",e:"",t:""});
   const[bioX,setBioX]=useState(false);
   const c=STAR.hex;
   const inp=(ex={})=>({display:"block",width:"100%",padding:".55rem .7rem",marginBottom:".45rem",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",borderRadius:"8px",color:"#e8e8f0",fontSize:".83rem",outline:"none",fontFamily:"'Space Grotesk',sans-serif",...ex});
@@ -677,6 +735,179 @@ function StarPanel({onClose}){
   </Modal>);
 }
 
+function CaseStudy({project,onClose}){
+  const pC=project.hex;
+  const cats=(project.categories||[]).filter(c=>!c.isOverview);
+  const ordered=[...cats.filter(c=>c.id!=="results"),...cats.filter(c=>c.id==="results")];
+  const[activeId,setActiveId]=useState("overview");
+  const[ovIdx,setOvIdx]=useState(0);
+  const secRefs=useRef({});
+  const scrollRef=useRef(null);
+  const reduce=typeof window!=="undefined"&&window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  const dlgRef=useDialog(onClose);
+  const parentCat=PLANETS.find(p=>p.moons.some(m=>m.id===project.id))?.id;
+  const ovImgs=(project.imgs?.length?project.imgs:null)||project.categories?.[0]?.subcategories?.[0]?.imgs||project.categories?.[0]?.imgs||[];
+  const inOverview=activeId==="overview";
+  useEffect(()=>{
+    const root=scrollRef.current;if(!root)return;
+    const io=new IntersectionObserver(es=>{
+      const vis=es.filter(e=>e.isIntersecting).sort((a,b)=>a.boundingClientRect.top-b.boundingClientRect.top);
+      if(vis[0])setActiveId(vis[0].target.dataset.secid);
+    },{root,rootMargin:"-30% 0px -60% 0px",threshold:0});
+    Object.values(secRefs.current).forEach(el=>el&&io.observe(el));
+    return()=>io.disconnect();
+  },[project.id]);
+  const[prog,setProg]=useState(0);
+  useEffect(()=>{
+    const el=scrollRef.current;if(!el)return;
+    const on=()=>{const max=el.scrollHeight-el.clientHeight;setProg(max>0?Math.min(1,el.scrollTop/max):0);};
+    on();el.addEventListener("scroll",on,{passive:true});
+    return()=>el.removeEventListener("scroll",on);
+  },[]);
+  const jump=id=>{const el=secRefs.current[id];if(el)el.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"});};
+  return(<div ref={dlgRef} role="dialog" aria-modal="true" aria-label={project.label} tabIndex={-1} style={{position:"fixed",inset:0,zIndex:260,background:"rgba(5,5,13,.99)",fontFamily:TK.sans,display:"flex",flexDirection:"column",animation:"modalIn .4s cubic-bezier(.16,1,.3,1) both",outline:"none"}}>
+    <div style={{flexShrink:0,background:"linear-gradient(180deg,rgba(5,5,13,.98),rgba(5,5,13,.9))",backdropFilter:"blur(16px)",borderBottom:"1px solid rgba(255,255,255,.07)"}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:"1rem",padding:"1rem clamp(1.2rem,4vw,3rem) .7rem",maxWidth:1500,margin:"0 auto",width:"100%",boxSizing:"border-box"}}>
+        <div style={{minWidth:0}}>
+          <div style={{fontSize:".6rem",color:pC,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".22em",marginBottom:".2rem"}}>{[project.type,project.status].filter(Boolean).join(" · ").toUpperCase()}</div>
+          <div style={{fontSize:"1.3rem",fontWeight:700,color:"#e8e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{project.label}</div>
+        </div>
+        <button onClick={onClose} style={{background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.18)",color:"#e8e8f0",width:38,height:38,borderRadius:"50%",cursor:"pointer",fontSize:"1.1rem",flexShrink:0}}>✕</button>
+      </div>
+      <div style={{height:2,background:"rgba(255,255,255,.06)"}}><div style={{height:"100%",width:`${prog*100}%`,background:`linear-gradient(90deg,${pC}66,${pC})`,transition:"width .1s linear"}}/></div>
+      {ordered.length>0&&(<div className="qn-scroll" style={{display:"flex",gap:".45rem",overflowX:"auto",padding:inOverview?"0 clamp(1.2rem,4vw,3rem)":".9rem clamp(1.2rem,4vw,3rem)",maxWidth:1500,margin:"0 auto",width:"100%",boxSizing:"border-box",maxHeight:inOverview?0:76,opacity:inOverview?0:1,overflowY:"hidden",transition:"all .35s ease",pointerEvents:inOverview?"none":"auto"}}>
+        {ordered.map(cat=>{
+          const on=activeId===cat.id,ch=cat.hex||pC;
+          return(<button key={cat.id} className="pill-a" onClick={()=>jump(cat.id)} style={{padding:".42rem .95rem",background:on?`${ch}22`:"rgba(255,255,255,.035)",border:`1px solid ${on?ch+"77":"rgba(255,255,255,.1)"}`,borderRadius:"100px",color:on?ch:"rgba(232,232,240,.55)",cursor:"pointer",fontSize:".72rem",fontWeight:600,fontFamily:TK.sans,whiteSpace:"nowrap",flexShrink:0,boxShadow:on?`0 0 18px ${ch}22`:"none"}}>{cat.label}</button>);
+        })}
+      </div>)}
+    </div>
+    <div ref={scrollRef} className="qn-scroll" style={{flex:1,overflowY:"auto",scrollBehavior:reduce?"auto":"smooth",background:"#0b0b16",position:"relative"}}>
+      <div style={{position:"absolute",inset:0,pointerEvents:"none",opacity:.55,...patFor(parentCat,pC)}}/>
+      <SpaceBg c={pC}/>
+      <div style={{position:"absolute",inset:0,pointerEvents:"none",background:`radial-gradient(ellipse at 50% 0%,${pC}16,transparent 55%)`}}/>
+      <div style={{position:"relative",zIndex:1,maxWidth:1100,margin:"0 auto",padding:"1.5rem clamp(1.2rem,4vw,3rem) 6rem"}}>
+        <section data-secid="overview" ref={el=>{secRefs.current.overview=el;}} style={{scrollMarginTop:"1rem"}}>
+          {ovImgs.length>0&&<Gallery imgs={ovImgs} videoId={project.videoId} c={pC} idx={ovIdx} onIdx={setOvIdx} maxH="56vh"/>}
+          {project.desc&&<p style={{fontSize:"clamp(.9rem,1.4vw,1rem)",lineHeight:1.75,color:"rgba(232,232,240,.72)",margin:"1.4rem 0 0",width:"100%",textAlign:"justify",hyphens:"auto",WebkitHyphens:"auto"}}>{renderBold(project.desc)}</p>}
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:"1.6rem",marginTop:"2rem"}}>
+            {project.features?.length>0&&(<div>
+              <Lb t="HIGHLIGHTS" c={pC}/>
+              {project.features.map((f,i)=><div key={i} style={{display:"flex",gap:".5rem",fontSize:".84rem",lineHeight:1.6,color:"rgba(232,232,240,.72)",marginBottom:".45rem"}}><span style={{color:pC,flexShrink:0,fontSize:".65rem",marginTop:".25rem"}}>▸</span>{f}</div>)}
+            </div>)}
+            <div>
+              {project.tags?.length>0&&(<div style={{marginBottom:"1.3rem"}}>
+                <Lb t="STACK" c={pC}/>
+                <div style={{display:"flex",flexWrap:"wrap",gap:".38rem"}}>{project.tags.map(tg=><span key={tg} style={{padding:".2rem .62rem",background:`${pC}18`,border:`1px solid ${pC}44`,borderRadius:"100px",fontSize:".68rem",color:pC,fontFamily:"'JetBrains Mono',monospace"}}>{tg}</span>)}</div>
+              </div>)}
+              {project.devPct!=null&&(<div style={{marginBottom:"1.3rem"}}>
+                <div style={{display:"flex",justifyContent:"space-between",marginBottom:"5px"}}><span style={{fontSize:".6rem",color:pC,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".18em"}}>DEV PROGRESS</span><span style={{fontSize:".6rem",color:pC,fontFamily:"'JetBrains Mono',monospace"}}>{project.devPct}%</span></div>
+                <div style={{height:3,background:"rgba(255,255,255,.06)",borderRadius:2}}><div style={{height:"100%",width:`${project.devPct}%`,background:`linear-gradient(90deg,${pC}66,${pC})`,borderRadius:2}}/></div>
+              </div>)}
+              {project.launchDate&&<div style={{marginBottom:"1.3rem"}}><Countdown targetDate={project.launchDate} c={pC}/></div>}
+              {project.cta&&(()=>{const href=project.ctaHref||"#";const ext=href.startsWith("http");const lp=ext?{href,target:"_blank",rel:"noopener noreferrer"}:{href:"#",onClick:e=>e.preventDefault()};
+                return(<a {...lp} className="pf-btn" style={{display:"block",textAlign:"center",padding:".85rem",background:`${pC}22`,border:`1px solid ${pC}66`,borderRadius:"10px",color:pC,textDecoration:"none",fontSize:".9rem",fontWeight:600,transition:"filter .2s"}}>{project.cta}</a>);})()}
+            </div>
+          </div>
+        </section>
+        {ordered.length>0&&(<div style={{minHeight:"26vh",display:"flex",alignItems:"flex-end",justifyContent:"center",paddingBottom:"3rem",marginTop:"5rem"}}>
+          <div style={{textAlign:"center",opacity:.5}}>
+            <div style={{fontSize:".58rem",color:"rgba(232,232,240,.35)",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".3em"}}>END OF OVERVIEW</div>
+          </div>
+        </div>)}
+      </div>
+      {ordered.length>0&&(<div style={{position:"relative",zIndex:1,background:"#07070f",borderTop:`2px solid ${pC}55`,borderRadius:"26px 26px 0 0",boxShadow:`0 -30px 80px rgba(0,0,0,.85),0 -2px 40px ${pC}22`,marginTop:"-1px"}}>
+        <div style={{position:"absolute",top:0,left:"50%",transform:"translate(-50%,-50%)",width:54,height:54,borderRadius:"50%",background:"#07070f",border:`2px solid ${pC}55`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"1.2rem",color:pC}}>↓</div>
+        <div style={{maxWidth:1100,margin:"0 auto",padding:"clamp(3.5rem,9vh,6rem) clamp(1.2rem,4vw,3rem) 6rem"}}>
+          <div style={{textAlign:"center",marginBottom:"1rem"}}>
+            <div className="shine" style={{fontSize:"clamp(1.3rem,2.8vw,1.9rem)",fontWeight:700,color:"#e8e8f0",letterSpacing:".1em",marginBottom:".5rem"}}>FULL CASE STUDY</div>
+            <div style={{fontSize:".64rem",color:`${pC}aa`,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".24em"}}>{ordered.length} SECTIONS</div>
+          </div>
+        {ordered.map(cat=>{
+          const ch=cat.hex||pC;
+          return(<section key={cat.id} data-secid={cat.id} ref={el=>{secRefs.current[cat.id]=el;}} style={{paddingTop:"3.5rem",scrollMarginTop:"1rem"}}>
+            <Reveal dir="l"><div style={{display:"flex",alignItems:"center",gap:".9rem",marginBottom:"1.4rem"}}>
+              <h2 style={{fontSize:"clamp(1.3rem,2.7vw,1.85rem)",fontWeight:700,color:ch,margin:0,letterSpacing:".06em",textTransform:"uppercase",textShadow:`0 0 34px ${ch}44`}}>{cat.label}</h2>
+              <div style={{flex:1,height:1,background:`linear-gradient(90deg,${ch}44,transparent)`}}/>
+            </div></Reveal>
+            {cat.lead&&<p style={{fontSize:"clamp(.95rem,1.5vw,1.08rem)",fontWeight:600,lineHeight:1.6,color:"rgba(255,255,255,.92)",margin:"0 0 1.1rem",maxWidth:820}}>{renderBold(cat.lead)}</p>}
+            {cat.text&&<p style={{fontSize:".88rem",lineHeight:1.8,color:"rgba(232,232,240,.66)",whiteSpace:"pre-line",margin:"0 0 1.8rem",width:"100%",textAlign:"justify",hyphens:"auto",WebkitHyphens:"auto"}}>{renderBold(cat.text)}</p>}
+            {cat.imgs?.length>0&&<CaseGallery imgs={cat.imgs} c={ch}/>}
+            {cat.subcategories?.map(sub=>(
+              <div key={sub.id} style={{marginTop:"2.6rem",paddingLeft:"clamp(0px,1.5vw,18px)",borderLeft:`2px solid ${ch}22`}}>
+                <h3 style={{fontSize:"clamp(1rem,1.8vw,1.15rem)",fontWeight:600,color:"rgba(232,232,240,.9)",margin:"0 0 .3rem",paddingLeft:"1rem"}}>{sub.label}</h3>
+                <div style={{paddingLeft:"1rem"}}>
+                  {sub.groups?.length>0
+                    ? sub.groups.map(g=>(<div key={g.id||g.label} style={{marginTop:"1.5rem"}}>
+                        <div style={{fontSize:".62rem",color:`${ch}99`,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".16em",marginBottom:".6rem"}}>{(g.label||"").toUpperCase()}</div>
+                        <CaseGallery imgs={g.imgs||[]} c={ch} vid={g.videoId}/>
+                      </div>))
+                    : <CaseGallery imgs={sub.imgs||[]} c={ch} vid={sub.videoId} fallbackCaption={sub.caption}/>}
+                </div>
+              </div>
+            ))}
+          </section>);
+        })}
+        </div>
+      </div>)}
+    </div>
+  </div>);
+}
+
+function SmartImg({im,c,onClick}){
+  const[loaded,setLoaded]=useState(false);
+  return(<div onClick={onClick} style={{position:"relative",width:"100%",borderRadius:TK.r.md,overflow:"hidden",border:`1px solid ${c}${TK.op.soft}`,background:im.bg||"rgba(10,10,18,.6)",cursor:"zoom-in",display:"flex",alignItems:"center",justifyContent:"center",maxHeight:"78vh",minHeight:loaded?0:180}}>
+    {!loaded&&<div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
+      <div style={{fontSize:TK.fs.xs,color:`${c}66`,fontFamily:TK.mono,letterSpacing:".2em",animation:"introBlink 1.4s infinite"}}>LOADING</div>
+    </div>}
+    <img src={im.src} alt={im.label||""} loading="lazy" onLoad={()=>setLoaded(true)} onError={()=>setLoaded(true)} style={{width:"100%",height:"auto",maxHeight:"78vh",objectFit:"contain",display:"block",opacity:loaded?1:0,transition:"opacity .45s ease"}}/>
+  </div>);
+}
+
+function Reveal({dir,children}){
+  const ref=useRef(null);
+  const[on,setOn]=useState(false);
+  useEffect(()=>{
+    const el=ref.current;if(!el)return;
+    const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){setOn(true);io.unobserve(e.target);}});},{rootMargin:"0px 0px -12% 0px",threshold:.08});
+    io.observe(el);return()=>io.disconnect();
+  },[]);
+  return <div ref={ref} className="cs-reveal" style={{opacity:on?1:0,animation:on?`${dir==="l"?"revealL":"revealR"} .7s cubic-bezier(.16,1,.3,1) both`:"none"}}>{children}</div>;
+}
+
+function CaseGallery({imgs,c,vid,fallbackCaption,offset=0}){
+  const[lb,setLb]=useState(-1);
+  if(!imgs?.length)return fallbackCaption?<p style={{fontSize:".84rem",lineHeight:1.75,color:"rgba(232,232,240,.66)",whiteSpace:"pre-line",marginTop:".8rem",width:"100%",textAlign:"justify",hyphens:"auto",WebkitHyphens:"auto"}}>{renderBold(fallbackCaption)}</p>:null;
+  const shots=imgs.filter(im=>im.src||im.videoId||im.compare||im.textPlaceholder);
+  return(<div style={{marginTop:".9rem",display:"flex",flexDirection:"column",gap:"2.2rem"}}>
+    {shots.map((im,i)=>{
+      const dir=(i+offset)%2===0?"l":"r";
+      const cap=im.caption||(shots.length===1?fallbackCaption:null);
+      return(<Reveal key={i} dir={dir}>
+        {im.compare
+          ? <div style={{display:"grid",gridTemplateColumns:im.compare.stacked?"1fr":"1fr 1fr",gap:"1rem"}}>
+              {["left","right"].map(side=>{const cd=im.compare[side];if(!cd)return null;
+                return(<div key={side}>
+                  <div style={{fontSize:".6rem",color:`${c}99`,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".14em",marginBottom:".45rem"}}>{(cd.label||"").toUpperCase()}</div>
+                  <CaseGallery imgs={cd.imgs||[]} c={c} offset={side==="right"?1:0}/>
+                </div>);})}
+            </div>
+          : im.videoId||vid
+            ? <div style={{width:"100%",aspectRatio:"16/9",borderRadius:"12px",overflow:"hidden",border:`1px solid ${c}28`}}>
+                <iframe src={`https://www.youtube.com/embed/${im.videoId||vid}`} title={im.label||"video"} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{width:"100%",height:"100%",border:"none",display:"block"}}/>
+              </div>
+            : im.src
+              ? <SmartImg im={im} c={c} onClick={()=>setLb(i)}/>
+              : <div style={{width:"100%",padding:"1.6rem",borderRadius:"12px",border:`1px dashed ${c}22`,background:"rgba(255,255,255,.02)"}}>
+                  <p style={{fontSize:".8rem",lineHeight:1.7,color:`${c}88`,fontFamily:"'JetBrains Mono',monospace",whiteSpace:"pre-line",margin:0,textAlign:"center"}}>{im.caption}</p>
+                </div>}
+        {cap&&!(im.textPlaceholder&&!im.src)&&<p style={{fontSize:".84rem",lineHeight:1.75,color:"rgba(232,232,240,.66)",whiteSpace:"pre-line",marginTop:".8rem",width:"100%",textAlign:"justify",hyphens:"auto",WebkitHyphens:"auto"}}>{renderBold(cap)}</p>}
+      </Reveal>);
+    })}
+    {lb>=0&&shots[lb]?.src&&<Lightbox imgs={shots} idx={lb} onIdx={setLb} onClose={()=>setLb(-1)}/>}
+  </div>);
+}
+
 function ProjectPanel({project,onClose}){
   const t=useT();
   const hasCats=!!(project.categories?.length);
@@ -705,7 +936,7 @@ function ProjectPanel({project,onClose}){
     return(<a {...lp} className="pf-btn" style={{display:"block",textAlign:"center",padding:".85rem",background:`${c}22`,border:`1px solid ${c}66`,borderRadius:"10px",color:c,textDecoration:"none",fontSize:".9rem",fontWeight:600,transition:"filter .2s"}}>{project.cta}</a>);
   };
   const typeLabel=[project.type,project.status].filter(s=>s&&s.trim()).map(s=>s.toUpperCase()).join(" · ");
-  const linkBtn=(l,c)=>{const ext=(l.href||"#").startsWith("http");const lp=ext?{href:l.href,target:"_blank",rel:"noopener noreferrer"}:{href:"#",onClick:e=>e.preventDefault()};return(<a key={l.label} {...lp} className="pf-btn" style={{display:"flex",alignItems:"center",gap:".6rem",padding:".7rem",background:`${c}22`,border:`1px solid ${c}66`,borderRadius:"10px",color:c,textDecoration:"none",fontWeight:600,marginTop:".6rem",fontSize:".88rem",transition:"filter .2s"}}><span>{l.icon}</span>{l.label}</a>);};
+  const linkBtn=(l,c)=>{const ext=(l.href||"#").startsWith("http");const lp=ext?{href:l.href,target:"_blank",rel:"noopener noreferrer"}:{href:"#",onClick:e=>e.preventDefault()};return(<a key={l.label} {...lp} className="pf-btn" style={{display:"flex",alignItems:"center",gap:".6rem",padding:".7rem",background:`${c}22`,border:`1px solid ${c}66`,borderRadius:"10px",color:c,textDecoration:"none",fontWeight:600,marginTop:".6rem",fontSize:".88rem",transition:"filter .2s"}}>{l.label}</a>);};
 
   if(hasSubcats){
     const activeCat=project.categories.find(c=>c.id===catId);
@@ -717,10 +948,10 @@ function ProjectPanel({project,onClose}){
     const caption=imgs[imgIdx]?.caption||activeSubcat?.caption;
     return(<Modal c={pC} onClose={onClose} width="min(1400px,94vw)">
       <div style={{padding:"1.75rem 1.75rem 0"}}>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:".75rem"}}><div><div style={{fontSize:".62rem",color:c,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".22em",marginBottom:".25rem"}}>{typeLabel}</div><h2 style={{fontSize:"1.5rem",fontWeight:600,display:"flex",gap:".5rem",alignItems:"center"}}>{project.icon} {project.label}</h2></div><CloseBtn/></div>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:".75rem"}}><div><div style={{fontSize:".62rem",color:c,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".22em",marginBottom:".25rem"}}>{typeLabel}</div><h2 style={{fontSize:"1.5rem",fontWeight:600,display:"flex",gap:".5rem",alignItems:"center"}}>{project.label}</h2></div><CloseBtn/></div>
         <div style={{display:"flex",gap:".28rem",flexWrap:"wrap",margin:".65rem 0 .85rem"}}>
           <button onClick={()=>setCatId(null)} style={{padding:".22rem .58rem",fontSize:".66rem",fontFamily:"'JetBrains Mono',monospace",background:catId===null?`${pC}22`:"transparent",border:`1px solid ${catId===null?pC+"66":"rgba(255,255,255,.07)"}`,borderRadius:"100px",color:catId===null?pC:"rgba(232,232,240,.35)",cursor:"pointer",transition:"all .2s",whiteSpace:"nowrap",letterSpacing:".06em",textTransform:"uppercase"}}>{t("overview")}</button>
-          {project.categories.map(cat=>(<button key={cat.id} onClick={()=>setCatId(cat.id)} style={{padding:".22rem .58rem",fontSize:".66rem",fontFamily:"'JetBrains Mono',monospace",background:catId===cat.id?`${cat.hex||pC}22`:"transparent",border:`1px solid ${catId===cat.id?(cat.hex||pC)+"66":"rgba(255,255,255,.07)"}`,borderRadius:"100px",color:catId===cat.id?(cat.hex||pC):"rgba(232,232,240,.35)",cursor:"pointer",transition:"all .2s",whiteSpace:"nowrap",letterSpacing:".06em",textTransform:"uppercase"}}>{cat.icon||""} {cat.label}</button>))}
+          {project.categories.map(cat=>(<button key={cat.id} onClick={()=>setCatId(cat.id)} style={{padding:".22rem .58rem",fontSize:".66rem",fontFamily:"'JetBrains Mono',monospace",background:catId===cat.id?`${cat.hex||pC}22`:"transparent",border:`1px solid ${catId===cat.id?(cat.hex||pC)+"66":"rgba(255,255,255,.07)"}`,borderRadius:"100px",color:catId===cat.id?(cat.hex||pC):"rgba(232,232,240,.35)",cursor:"pointer",transition:"all .2s",whiteSpace:"nowrap",letterSpacing:".06em",textTransform:"uppercase"}}>{cat.label}</button>))}
         </div>
         <div style={{height:1,background:`linear-gradient(90deg,${c}55,transparent)`,marginBottom:"1.25rem"}}/>
       </div>
@@ -803,7 +1034,7 @@ function ProjectPanel({project,onClose}){
   const imgs=cat?.imgs||project.imgs||[];const vid=cat?.videoId??project.videoId;const caption=imgs[imgIdx]?.caption||cat?.caption;
   return(<Modal c={pC} onClose={onClose}>
     <div style={{padding:"1.75rem 1.75rem 0"}}>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:".75rem"}}><div><div style={{fontSize:".62rem",color:pC,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".22em",marginBottom:".25rem"}}>{typeLabel}</div><h2 style={{fontSize:"1.5rem",fontWeight:600,display:"flex",gap:".5rem",alignItems:"center"}}>{project.icon} {project.label}</h2></div><CloseBtn/></div>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:".75rem"}}><div><div style={{fontSize:".62rem",color:pC,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".22em",marginBottom:".25rem"}}>{typeLabel}</div><h2 style={{fontSize:"1.5rem",fontWeight:600,display:"flex",gap:".5rem",alignItems:"center"}}>{project.label}</h2></div><CloseBtn/></div>
       <div style={{height:1,background:`linear-gradient(90deg,${pC}55,transparent)`,marginBottom:"1.25rem"}}/>
     </div>
     <div style={{padding:"0 1.75rem 1.75rem",display:"grid",gridTemplateColumns:"55fr 45fr",gap:"2rem"}}>
@@ -817,40 +1048,224 @@ function ProjectPanel({project,onClose}){
   </Modal>);
 }
 
-function QuickNav({open,onClose,onSelectProject}){
-  if(!open)return null;
-  const cats=PLANETS.filter(p=>p.moons.length>0);
-  return(<div className="qn-scroll" style={{position:"fixed",top:0,left:0,bottom:0,width:"min(25vw,360px)",minWidth:280,background:"rgba(6,6,15,.97)",backdropFilter:"blur(22px)",borderRight:"1px solid rgba(255,255,255,.08)",zIndex:250,overflowY:"auto",padding:"1.4rem 1.15rem 2rem",animation:"qnIn .22s ease",fontFamily:"'Space Grotesk',sans-serif"}}>
-    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"1.3rem"}}>
-      <div>
-        <div style={{fontSize:"1rem",fontWeight:700,color:"#e8e8f0"}}>All Projects</div>
-        <div style={{fontSize:".6rem",color:"rgba(232,232,240,.4)",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".08em",marginTop:".15rem"}}>Skip the galaxy — jump straight in</div>
-      </div>
-      <button onClick={onClose} style={{background:"none",border:"none",color:"rgba(232,232,240,.5)",fontSize:"1.2rem",cursor:"pointer",lineHeight:1,padding:".2rem"}}>✕</button>
+function useDialog(onClose){
+  const ref=useRef(null);
+  useEffect(()=>{
+    const prev=document.activeElement;
+    const el=ref.current;
+    if(el){const f=el.querySelector("button,a[href],input,textarea,[tabindex]:not([tabindex='-1'])");(f||el).focus?.();}
+    const onKey=e=>{
+      if(e.key==="Escape"){e.stopPropagation();onClose?.();return;}
+      if(e.key!=="Tab"||!el)return;
+      const items=[...el.querySelectorAll("button,a[href],input,textarea,select,[tabindex]:not([tabindex='-1'])")].filter(n=>n.offsetParent!==null);
+      if(!items.length)return;
+      const first=items[0],last=items[items.length-1];
+      if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+      else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+    };
+    document.addEventListener("keydown",onKey);
+    return()=>{document.removeEventListener("keydown",onKey);prev?.focus?.();};
+  },[onClose]);
+  return ref;
+}
+
+const PATTERNS={
+  games:c=>`repeating-linear-gradient(45deg,${c}0d 0 2px,transparent 2px 11px),repeating-linear-gradient(-45deg,${c}0a 0 2px,transparent 2px 11px)`,
+  environments:c=>`linear-gradient(${c}0e 1px,transparent 1px),linear-gradient(90deg,${c}0e 1px,transparent 1px)`,
+  props:c=>`radial-gradient(circle at 50% 50%,${c}18 1.4px,transparent 1.6px)`,
+  vfx:c=>`radial-gradient(ellipse at 20% 30%,${c}14,transparent 55%),radial-gradient(ellipse at 80% 70%,${c}12,transparent 55%)`,
+  tools:c=>`repeating-linear-gradient(90deg,${c}12 0 1px,transparent 1px 26px),repeating-linear-gradient(0deg,${c}0a 0 1px,transparent 1px 26px)`,
+  ai:c=>`radial-gradient(circle at 25% 25%,${c}16 2px,transparent 2.4px),radial-gradient(circle at 75% 75%,${c}12 2px,transparent 2.4px)`,
+  web:c=>`repeating-linear-gradient(0deg,${c}10 0 1px,transparent 1px 18px)`,
+};
+const PATSIZE={games:"22px 22px",environments:"34px 34px",props:"18px 18px",vfx:"100% 100%",tools:"26px 26px",ai:"46px 46px",web:"18px 18px"};
+const patFor=(id,c)=>PATTERNS[id]?{backgroundImage:PATTERNS[id](c),backgroundSize:PATSIZE[id]||"28px 28px"}:{};
+
+const FEATURED_IDS=["hollow-end","magic-barrier","careerpilot-ai","scatter-tool"];
+const CF={sideScale:.82,sideX:56,sideRot:26,sideOp:.45,farOp:.12};
+const featuredProjects=()=>FEATURED_IDS.map(id=>{
+  for(const p of PLANETS){const m=p.moons.find(x=>x.id===id);if(m)return{...m,catLabel:p.label,catHex:p.hex,catId:p.id};}
+  return null;
+}).filter(Boolean);
+
+function SpaceBg({c,fixed}){
+  const line=`${c}1a`,faint=`${c}0e`;
+  return(<div style={{position:fixed?"fixed":"absolute",inset:0,pointerEvents:"none",overflow:"hidden",zIndex:0}}>
+    <div className="bg-grid-a" style={{position:"absolute",inset:"-20%",opacity:.5,
+      backgroundImage:`linear-gradient(60deg,${line} 1px,transparent 1px),linear-gradient(-60deg,${line} 1px,transparent 1px),linear-gradient(0deg,${faint} 1px,transparent 1px)`,
+      backgroundSize:"92px 160px,92px 160px,92px 160px"}}/>
+    <div className="bg-grid-b" style={{position:"absolute",inset:"-20%",opacity:.32,
+      backgroundImage:`radial-gradient(circle,${c}33 1.6px,transparent 1.8px)`,
+      backgroundSize:"92px 160px",backgroundPosition:"46px 80px"}}/>
+    <div className="bg-grid-c" style={{position:"absolute",inset:"-20%",opacity:.22,
+      backgroundImage:`linear-gradient(30deg,${faint} 1px,transparent 1px),linear-gradient(-30deg,${faint} 1px,transparent 1px)`,
+      backgroundSize:"210px 210px"}}/>
+    <div className="bg-orb" style={{position:"absolute",top:"38%",left:"50%",width:"min(1300px,140vw)",height:"min(1300px,140vw)",marginTop:"min(-650px,-70vw)",marginLeft:"min(-650px,-70vw)",borderRadius:"50%",border:`1px solid ${c}0d`}}/>
+    <div style={{position:"absolute",width:"min(880px,95vw)",height:"min(880px,95vw)",borderRadius:"50%",background:`radial-gradient(ellipse,${c}16 0%,transparent 62%)`,top:"4%",left:"50%",transform:"translate(-50%,-50%)",animation:"glowPulse 16s ease-in-out infinite"}}/>
+    <div style={{position:"absolute",width:"min(680px,80vw)",height:"min(680px,80vw)",borderRadius:"50%",background:`radial-gradient(ellipse,${c}10 0%,transparent 60%)`,bottom:"-14%",right:"-10%",animation:"glowPulse 21s ease-in-out infinite"}}/>
+    <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse at 50% 40%,transparent 30%,rgba(0,0,8,.55) 100%)"}}/>
+  </div>);
+}
+
+function FeaturedCarousel({onOpen,big}){
+  const items=featuredProjects();
+  const[idx,setIdx]=useState(0);
+  const reduce=typeof window!=="undefined"&&window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  if(!items.length)return null;
+  const n=items.length;
+  const go=d=>setIdx(i=>(i+d+n)%n);
+  const cardW=big?"clamp(280px,42vw,460px)":"clamp(260px,34vw,380px)";
+  return(<div style={{position:"relative",width:"100%"}}>
+    <div style={{position:"relative",height:big?"clamp(430px,58vh,540px)":"clamp(390px,50vh,470px)",display:"flex",alignItems:"center",justifyContent:"center",perspective:"1400px"}}>
+      {items.map((m,i)=>{
+        let off=i-idx;if(off>n/2)off-=n;if(off<-n/2)off+=n;
+        const abs=Math.abs(off),center=off===0;
+        const thumb=m.thumbnail||m.imgs?.[0]?.src||m.categories?.[0]?.imgs?.[0]?.src||m.categories?.[0]?.subcategories?.[0]?.imgs?.[0]?.src||null;
+        const style=reduce
+          ? {opacity:center?1:0,pointerEvents:center?"auto":"none",transform:"none"}
+          : {transform:`translateX(${off*CF.sideX}%) scale(${center?1:Math.pow(CF.sideScale,abs)}) rotateY(${-off*CF.sideRot}deg)`,
+             opacity:center?1:abs===1?CF.sideOp:CF.farOp,
+             zIndex:20-abs,
+             pointerEvents:abs>1?"none":"auto",
+             filter:center?"none":`blur(${abs*1.4}px)`};
+        return(<button key={m.id} onClick={()=>center?onOpen(m):setIdx(i)} aria-label={center?`Open ${m.label}`:`Show ${m.label}`} style={{position:"absolute",width:cardW,textAlign:"left",background:"rgba(12,12,22,.96)",border:`1px solid ${m.catHex}44`,borderRadius:"18px",overflow:"hidden",cursor:"pointer",padding:0,boxShadow:center?`0 30px 70px rgba(0,0,0,.7),0 0 40px ${m.catHex}1f`:"0 16px 40px rgba(0,0,0,.6)",transition:"transform .55s cubic-bezier(.2,.9,.3,1),opacity .45s ease,filter .45s ease,box-shadow .45s ease",...style}}>
+          <div style={{height:4,background:`linear-gradient(90deg,${m.catHex},${m.catHex}55)`}}/>
+          <div style={{width:"100%",aspectRatio:"16/10",background:"rgba(255,255,255,.04)",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center"}}>
+            {thumb?<img src={thumb} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>:<span style={{fontSize:"2.2rem"}}>{m.icon}</span>}
+          </div>
+          <div style={{padding:big?"1.15rem 1.3rem 1.4rem":"1rem 1.15rem 1.25rem"}}>
+            <div style={{fontSize:".58rem",color:m.catHex,fontFamily:TK.mono,letterSpacing:".18em",marginBottom:".4rem"}}>{m.catLabel.toUpperCase()}</div>
+            <div style={{fontSize:big?"1.1rem":".98rem",fontWeight:700,color:"#e8e8f0",marginBottom:".45rem"}}>{m.label}</div>
+            <div style={{fontSize:".76rem",color:TK.tx.mid,lineHeight:1.55,marginBottom:".8rem",display:"-webkit-box",WebkitLineClamp:3,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{m.desc||m.type}</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:".3rem"}}>
+              {(m.tags||[]).slice(0,4).map(tg=><span key={tg} style={{fontSize:".58rem",padding:".18rem .5rem",background:`${m.catHex}18`,border:`1px solid ${m.catHex}38`,borderRadius:"5px",color:m.catHex,fontFamily:TK.mono}}>{tg}</span>)}
+            </div>
+          </div>
+        </button>);
+      })}
+      <button onClick={()=>go(-1)} aria-label="Previous project" className="pf-btn" style={{position:"absolute",left:"1%",zIndex:30,width:42,height:42,borderRadius:"50%",background:"rgba(10,10,20,.8)",border:"1px solid rgba(255,255,255,.18)",color:"#e8e8f0",cursor:"pointer",fontSize:"1.3rem",display:"flex",alignItems:"center",justifyContent:"center"}}>‹</button>
+      <button onClick={()=>go(1)} aria-label="Next project" className="pf-btn" style={{position:"absolute",right:"1%",zIndex:30,width:42,height:42,borderRadius:"50%",background:"rgba(10,10,20,.8)",border:"1px solid rgba(255,255,255,.18)",color:"#e8e8f0",cursor:"pointer",fontSize:"1.3rem",display:"flex",alignItems:"center",justifyContent:"center"}}>›</button>
     </div>
-    {cats.map(p=>(
-      <div key={p.id} style={{marginBottom:"1.4rem"}}>
-        <div style={{display:"flex",alignItems:"center",gap:".45rem",marginBottom:".6rem"}}>
-          <span style={{fontSize:"1rem"}}>{p.icon}</span>
-          <span style={{fontSize:".66rem",fontWeight:700,color:p.hex,letterSpacing:".14em",textTransform:"uppercase",fontFamily:"'JetBrains Mono',monospace"}}>{p.label}</span>
-          <span style={{fontSize:".6rem",color:"rgba(232,232,240,.3)",fontFamily:"'JetBrains Mono',monospace"}}>· {p.moons.length}</span>
+    <div style={{display:"flex",gap:".45rem",justifyContent:"center",marginTop:"1rem"}}>
+      {items.map((m,i)=><button key={m.id} onClick={()=>setIdx(i)} aria-label={`Go to ${m.label}`} style={{width:i===idx?22:7,height:7,borderRadius:"100px",background:i===idx?m.catHex:"rgba(255,255,255,.22)",border:"none",cursor:"pointer",transition:"all .3s",padding:0}}/>)}
+    </div>
+  </div>);
+}
+
+function PlanetNav({onSelect}){
+  return(<nav aria-label="Project categories" style={{position:"fixed",left:"1.2rem",bottom:"1.2rem",zIndex:150,display:"flex",flexDirection:"column",gap:".3rem"}}>
+    {PLANETS.filter(p=>p.moons.length>0).map(p=>(
+      <button key={p.id} onClick={()=>onSelect(p.id)} title={`${p.label} — ${p.moons.length} projects`} style={{display:"flex",alignItems:"center",gap:".5rem",padding:".3rem .6rem",background:"rgba(7,7,17,.6)",border:`1px solid ${p.hex}33`,borderRadius:"100px",color:TK.tx.mid,cursor:"pointer",fontSize:TK.fs.xs,fontFamily:TK.mono,letterSpacing:".08em",transition:"all .2s",backdropFilter:"blur(8px)",opacity:.55}} onFocus={e=>{e.currentTarget.style.opacity="1";}} onBlur={e=>{e.currentTarget.style.opacity=".55";}} onMouseEnter={e=>{e.currentTarget.style.opacity="1";}} onMouseLeave={e=>{e.currentTarget.style.opacity=".55";}}>
+        <span style={{width:7,height:7,borderRadius:"50%",background:p.hex,flexShrink:0}}/>{p.label.toUpperCase()}
+      </button>))}
+  </nav>);
+}
+
+function Header({onHome,onAbout,onProjects,onContact}){
+  const c=STAR.hex;
+  const items=[["Home",onHome],["About me",onAbout],["Projects",onProjects],["Contact",onContact]];
+  return(<div style={{position:"fixed",top:0,left:0,right:0,zIndex:180,display:"flex",alignItems:"center",justifyContent:"space-between",padding:"1.1rem clamp(1.2rem,4vw,2.5rem)",background:"linear-gradient(180deg,rgba(4,4,10,.7),transparent)",pointerEvents:"none"}}>
+    <div style={{fontFamily:"'Space Grotesk',sans-serif",fontWeight:700,fontSize:"1.02rem",color:"#e8e8f0",letterSpacing:".02em",pointerEvents:"auto"}}>Jordi Altisèn</div>
+    <nav style={{display:"flex",gap:".5rem",pointerEvents:"auto"}}>
+      {items.map(([label,fn])=>(
+        <button key={label} onClick={fn} className="pf-btn" style={{background:"rgba(7,7,17,.6)",border:`1px solid ${c}44`,borderRadius:"8px",padding:".48rem 1rem",color:"rgba(232,232,240,.85)",cursor:"pointer",fontSize:".78rem",fontFamily:"'Space Grotesk',sans-serif",fontWeight:600,letterSpacing:".01em",transition:"all .2s",backdropFilter:"blur(10px)"}}>{label}</button>
+      ))}
+    </nav>
+  </div>);
+}
+
+function QuickNav({open,onClose,onSelectProject,filter,onFilterChange,jumpToAll}){
+  const[visible,setVisible]=useState(open);
+  const[closing,setClosing]=useState(false);
+  const dlgRef=useDialog(onClose);
+  const gridRef=useRef(null);
+  useEffect(()=>{
+    if(open&&jumpToAll){const t=setTimeout(()=>{gridRef.current?.scrollIntoView({behavior:"auto",block:"start"});},60);return()=>clearTimeout(t);}
+  },[open,jumpToAll]);
+  useEffect(()=>{
+    if(open){setVisible(true);setClosing(false);}
+    else if(visible){setClosing(true);const t=setTimeout(()=>{setVisible(false);setClosing(false);},400);return()=>clearTimeout(t);}
+  },[open]);
+  if(!visible)return null;
+  const cats=PLANETS.filter(p=>p.moons.length>0);
+  const active=filter||"all";
+  const shown=active==="all"?cats:cats.filter(p=>p.id===active);
+  const pill=(id,label,icon,hex)=>(<button key={id} onClick={()=>onFilterChange(id)} style={{display:"flex",alignItems:"center",gap:".4rem",padding:".5rem 1.05rem",background:active===id?`${hex}22`:"rgba(255,255,255,.04)",border:`1px solid ${active===id?hex+"77":"rgba(255,255,255,.12)"}`,borderRadius:"100px",color:active===id?hex:"rgba(232,232,240,.6)",cursor:"pointer",fontSize:".76rem",fontWeight:600,fontFamily:TK.sans,whiteSpace:"nowrap"}} className="pill-a">{label}</button>);
+  const actCat=cats.find(p=>p.id===active);
+  const aC=actCat?.hex||STAR.hex;
+  const pat=actCat?patFor(actCat.id,aC):{};
+  return(<div ref={dlgRef} role="dialog" aria-modal="true" aria-label="All projects" tabIndex={-1} className="qn-scroll" style={{position:"fixed",inset:0,zIndex:250,background:"rgba(5,5,13,.98)",backdropFilter:"blur(18px)",overflowY:"auto",animation:closing?"modalOut .38s ease forwards":"modalIn .4s cubic-bezier(.16,1,.3,1) both",fontFamily:TK.sans,outline:"none"}}>
+    <div style={{position:"fixed",inset:0,pointerEvents:"none",transition:"opacity .5s ease,background .5s ease",opacity:actCat?1:.5,background:actCat?`radial-gradient(ellipse at 50% 0%,${aC}1f,transparent 62%)`:"radial-gradient(ellipse at 50% 0%,rgba(255,255,255,.03),transparent 62%)"}}/>
+    <div style={{position:"fixed",inset:0,pointerEvents:"none",opacity:actCat?.6:.2,transition:"opacity .5s ease",...(actCat?pat:patFor("props",STAR.hex))}}/>
+    <SpaceBg c={aC} fixed/>
+    <div style={{position:"sticky",top:0,zIndex:3,background:"linear-gradient(180deg,rgba(5,5,13,.97),rgba(5,5,13,.85))",backdropFilter:"blur(14px)",borderBottom:"1px solid rgba(255,255,255,.07)"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"1.3rem clamp(1.2rem,4vw,3rem) 1rem"}}>
+        <div style={{textAlign:"center",flex:1}}>
+          <div style={{fontSize:"1.25rem",fontWeight:700,color:"#e8e8f0"}}>All Projects</div>
+          <div style={{fontSize:".66rem",color:"rgba(232,232,240,.4)",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".08em",marginTop:".2rem"}}>Click any project to see the full case study</div>
         </div>
-        <div style={{display:"flex",flexDirection:"column",gap:".42rem"}}>
-          {p.moons.map(m=>{
+        <button onClick={onClose} style={{position:"absolute",right:"clamp(1.2rem,4vw,3rem)",background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.18)",color:"#e8e8f0",width:40,height:40,borderRadius:"50%",cursor:"pointer",fontSize:"1.2rem",flexShrink:0}}>✕</button>
+      </div>
+      <div style={{display:"flex",gap:".55rem",flexWrap:"wrap",justifyContent:"center",padding:"0 clamp(1.2rem,4vw,3rem) 1.15rem"}}>
+        {pill("all","All",null,STAR.hex)}
+        {cats.map(p=>pill(p.id,p.label,p.icon,p.hex))}
+      </div>
+    </div>
+    <div style={{position:"relative",zIndex:1,padding:"2.2rem clamp(1.2rem,4vw,3rem) 4rem",maxWidth:1360,margin:"0 auto"}}>
+      {active==="all"&&(<div style={{marginBottom:"3.5rem"}}>
+        <div style={{textAlign:"center",marginBottom:"1.6rem"}}>
+          <div style={{fontSize:"clamp(1.2rem,2.4vw,1.7rem)",fontWeight:700,color:"#e8e8f0",marginBottom:".4rem"}}>Featured Projects</div>
+          <div style={{fontSize:".64rem",color:TK.tx.lo,fontFamily:TK.mono,letterSpacing:".24em"}}>THE WORK THAT BEST REPRESENTS ME</div>
+        </div>
+        <FeaturedCarousel big onOpen={onSelectProject}/>
+        <div style={{display:"flex",alignItems:"center",gap:"1rem",margin:"3rem 0 0"}}>
+          <div style={{flex:1,height:1,background:"rgba(255,255,255,.09)"}}/>
+          <div ref={gridRef} style={{fontSize:".64rem",color:TK.tx.lo,fontFamily:TK.mono,letterSpacing:".24em",whiteSpace:"nowrap",scrollMarginTop:"120px"}}>ALL PROJECTS</div>
+          <div style={{flex:1,height:1,background:"rgba(255,255,255,.09)"}}/>
+        </div>
+      </div>)}
+      {active==="all"?(
+        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"1.2rem"}}>
+          {cats.flatMap(p=>p.moons.map(m=>({...m,_catHex:p.hex}))).map((m,i)=>{
             const thumb=m.thumbnail||m.imgs?.[0]?.src||m.categories?.[0]?.imgs?.[0]?.src||m.categories?.[0]?.subcategories?.[0]?.imgs?.[0]?.src||null;
-            return(<button key={m.id} className="qn-item" onClick={()=>onSelectProject(m)} style={{display:"flex",gap:".65rem",alignItems:"center",padding:".5rem",background:"rgba(255,255,255,.02)",border:`1px solid ${m.hex}28`,borderRadius:"9px",cursor:"pointer",textAlign:"left",transition:"all .15s",width:"100%"}}>
-              <div style={{width:46,height:46,borderRadius:"7px",overflow:"hidden",flexShrink:0,background:"rgba(255,255,255,.04)",display:"flex",alignItems:"center",justifyContent:"center"}}>
-                {thumb?<img src={thumb} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>:<span style={{fontSize:"1.15rem"}}>{m.icon}</span>}
+            return(<button key={m.id} className="qn-item" onClick={()=>onSelectProject(m)} style={{textAlign:"left",background:"rgba(255,255,255,.025)",border:`1px solid ${m.hex}28`,borderRadius:"14px",overflow:"hidden",cursor:"pointer",display:"flex",flexDirection:"column",padding:0,animation:`cardIn .6s cubic-bezier(.16,1,.3,1) ${Math.min(i*.045,.5)}s both`}}>
+              <div style={{height:4,background:`linear-gradient(90deg,${m.hex},${m.hex}55)`,flexShrink:0}}/>
+              <div style={{width:"100%",aspectRatio:"16/10",background:"rgba(255,255,255,.04)",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                {thumb?<img src={thumb} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>:<span style={{fontSize:"2.1rem"}}>{m.icon}</span>}
               </div>
-              <div style={{minWidth:0,flex:1}}>
-                <div style={{fontSize:".77rem",fontWeight:600,color:"#e8e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{m.icon} {m.label}</div>
-                <div style={{fontSize:".58rem",color:m.hex,fontFamily:"'JetBrains Mono',monospace",marginTop:"2px",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{m.type}</div>
+              <div style={{padding:"1rem 1.15rem 1.2rem"}}>
+                <div style={{fontSize:".95rem",fontWeight:700,color:"#e8e8f0",marginBottom:".35rem"}}>{m.label}</div>
+                <div style={{fontSize:".73rem",color:"rgba(232,232,240,.55)",lineHeight:1.55,marginBottom:".75rem",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{m.desc||m.type}</div>
+                <div style={{display:"flex",flexWrap:"wrap",gap:".32rem"}}>
+                  {(m.tags||[]).slice(0,4).map(tg=><span key={tg} style={{fontSize:".6rem",padding:".2rem .5rem",background:`${m.hex}14`,border:`1px solid ${m.hex}33`,borderRadius:"5px",color:m.hex,fontFamily:"'JetBrains Mono',monospace"}}>{tg}</span>)}
+                </div>
               </div>
             </button>);
           })}
         </div>
-      </div>
-    ))}
+      ):shown.map(p=>(
+        <div key={p.id} style={{marginBottom:"2.8rem"}}>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"1.2rem"}}>
+            {p.moons.map((m,i)=>{
+              const thumb=m.thumbnail||m.imgs?.[0]?.src||m.categories?.[0]?.imgs?.[0]?.src||m.categories?.[0]?.subcategories?.[0]?.imgs?.[0]?.src||null;
+              return(<button key={m.id} className="qn-item" onClick={()=>onSelectProject(m)} style={{textAlign:"left",background:"rgba(255,255,255,.025)",border:`1px solid ${m.hex}28`,borderRadius:"14px",overflow:"hidden",cursor:"pointer",display:"flex",flexDirection:"column",padding:0,animation:`cardIn .6s cubic-bezier(.16,1,.3,1) ${Math.min(i*.045,.5)}s both`}}>
+                <div style={{height:4,background:`linear-gradient(90deg,${m.hex},${m.hex}55)`,flexShrink:0}}/>
+                <div style={{width:"100%",aspectRatio:"16/10",background:"rgba(255,255,255,.04)",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center"}}>
+                  {thumb?<img src={thumb} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>:<span style={{fontSize:"2.1rem"}}>{m.icon}</span>}
+                </div>
+                <div style={{padding:"1rem 1.15rem 1.2rem"}}>
+                  <div style={{fontSize:".95rem",fontWeight:700,color:"#e8e8f0",marginBottom:".35rem"}}>{m.label}</div>
+                  <div style={{fontSize:".73rem",color:"rgba(232,232,240,.55)",lineHeight:1.55,marginBottom:".75rem",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{m.desc||m.type}</div>
+                  <div style={{display:"flex",flexWrap:"wrap",gap:".32rem"}}>
+                    {(m.tags||[]).slice(0,4).map(tg=><span key={tg} style={{fontSize:".6rem",padding:".2rem .5rem",background:`${m.hex}14`,border:`1px solid ${m.hex}33`,borderRadius:"5px",color:m.hex,fontFamily:"'JetBrains Mono',monospace"}}>{tg}</span>)}
+                  </div>
+                </div>
+              </button>);
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
   </div>);
 }
 
@@ -872,8 +1287,8 @@ function Mobile(){
     <div style={{position:"relative",maxWidth:480,margin:"0 auto"}}>
       <div style={{textAlign:"center",marginBottom:"2rem",paddingTop:"1rem"}}><h1 style={{fontSize:"1.8rem",fontWeight:700,color:"#fff8f0"}}>Jordi</h1><p style={{color:STAR.hex,fontSize:".75rem",fontFamily:"'JetBrains Mono',monospace",marginTop:".5rem",letterSpacing:".06em"}}>Game Developer · Technical Artist · Barcelona</p></div>
       {PLANETS.map(p=>{const open=openId===p.id;return(<div key={p.id} style={{marginBottom:".7rem",background:"rgba(8,8,20,.88)",backdropFilter:"blur(16px)",border:`1px solid ${open?p.hex+"66":p.hex+"22"}`,borderRadius:"12px",overflow:"hidden",transition:"all .3s"}}>
-        <div onClick={()=>setOpenId(open?null:p.id)} style={{padding:".9rem 1.1rem",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer"}}><div style={{display:"flex",gap:".65rem",alignItems:"center"}}><span style={{fontSize:"1.2rem"}}>{p.icon}</span><div><div style={{fontWeight:600,fontSize:".9rem"}}>{p.label}</div><div style={{fontSize:".6rem",color:p.hex,fontFamily:"'JetBrains Mono',monospace",marginTop:".1rem"}}>{p.moons.length} project{p.moons.length!==1?"s":""}</div></div></div><span style={{color:p.hex,transition:"transform .3s",transform:open?"rotate(90deg)":"none"}}>›</span></div>
-        {open&&p.moons.map(m=>(<div key={m.id} style={{padding:".8rem 1.1rem",borderTop:`1px solid ${p.hex}22`,background:"rgba(0,0,0,.2)"}}><div style={{fontWeight:600,fontSize:".88rem",marginBottom:".4rem"}}>{m.icon} {m.label}</div><p style={{fontSize:".8rem",lineHeight:1.65,color:"rgba(232,232,240,.65)",marginBottom:".7rem"}}>{m.desc}</p><a href="#" onClick={e=>e.preventDefault()} style={{display:"block",textAlign:"center",padding:".55rem",background:`${m.hex}18`,border:`1px solid ${m.hex}55`,borderRadius:"8px",color:m.hex,textDecoration:"none",fontSize:".82rem",fontWeight:600}}>{m.cta}</a></div>))}
+        <div onClick={()=>setOpenId(open?null:p.id)} style={{padding:".9rem 1.1rem",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer"}}><div style={{display:"flex",gap:".65rem",alignItems:"center"}}><div><div style={{fontWeight:600,fontSize:".9rem"}}>{p.label}</div><div style={{fontSize:".6rem",color:p.hex,fontFamily:"'JetBrains Mono',monospace",marginTop:".1rem"}}>{p.moons.length} project{p.moons.length!==1?"s":""}</div></div></div><span style={{color:p.hex,transition:"transform .3s",transform:open?"rotate(90deg)":"none"}}>›</span></div>
+        {open&&p.moons.map(m=>(<div key={m.id} style={{padding:".8rem 1.1rem",borderTop:`1px solid ${p.hex}22`,background:"rgba(0,0,0,.2)"}}><div style={{fontWeight:600,fontSize:".88rem",marginBottom:".4rem"}}>{m.label}</div><p style={{fontSize:".8rem",lineHeight:1.65,color:"rgba(232,232,240,.65)",marginBottom:".7rem"}}>{m.desc}</p><a href="#" onClick={e=>e.preventDefault()} style={{display:"block",textAlign:"center",padding:".55rem",background:`${m.hex}18`,border:`1px solid ${m.hex}55`,borderRadius:"8px",color:m.hex,textDecoration:"none",fontSize:".82rem",fontWeight:600}}>{m.cta}</a></div>))}
         {open&&p.moons.length===0&&<div style={{padding:".8rem 1.1rem",borderTop:`1px solid ${p.hex}22`,fontSize:".8rem",color:"rgba(232,232,240,.4)",fontFamily:"'JetBrains Mono',monospace"}}>Coming soon</div>}
       </div>);})}
     </div>
@@ -904,21 +1319,171 @@ function NavHint({onDone}){
     </div>
   </div>);
 }
-function IntroScreen({onEnter}){
+function SecReveal({children,root}){
+  const ref=useRef(null);
+  const[on,setOn]=useState(false);
+  useEffect(()=>{
+    const el=ref.current;if(!el)return;
+    const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){setOn(true);io.unobserve(e.target);}});},{root:root?.current||null,rootMargin:"0px 0px -14% 0px",threshold:.12});
+    io.observe(el);return()=>io.disconnect();
+  },[root]);
+  return <div ref={ref} className={`sec-rv${on?" on":""}`}>{children}</div>;
+}
+
+function SecTitle({t,c}){
+  return(<div style={{display:"flex",alignItems:"center",gap:"1rem",marginBottom:"1.5rem",justifyContent:"center"}}>
+    <div style={{flex:1,maxWidth:120,height:1,background:`linear-gradient(90deg,transparent,${c}44)`}}/>
+    <div style={{fontSize:".64rem",color:"rgba(232,232,240,.45)",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".32em",whiteSpace:"nowrap"}}>{t}</div>
+    <div style={{flex:1,maxWidth:120,height:1,background:`linear-gradient(90deg,${c}44,transparent)`}}/>
+  </div>);
+}
+
+const PX={
+  heroExitVh:.62,      // fracció del viewport en què el hero acaba de desapareixer
+  photoShift:150,      // px que puja la foto al llarg de la sortida
+  textShift:78,        // px que puja el text (mes lent = sensacio de profunditat)
+  heroScale:.10,       // quant s'encongeix el hero (0.10 = fins al 90%)
+  heroBlur:5,          // px de desenfocament maxim
+  panelExitVh:.22,     // fracció del viewport final en què el panell comença a sortir
+  panelShift:14,       // % d'alçada que puja el panell durant la sortida lligada al scroll
+};
+const clamp01=v=>v<0?0:v>1?1:v;
+
+function IntroScreen({onEnter,onOpenProject}){
+  const c=STAR.hex;
+  const wrapRef=useRef(null);
+  const[fading,setFading]=useState(false);
+  const[sp,setSp]=useState(0);   // progres de sortida del hero (0-1)
+  const[ep,setEp]=useState(0);   // progres de sortida del panell (0-1)
+  const reduce=typeof window!=="undefined"&&window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  const go=useCallback(dest=>{
+    if(fading)return;
+    setFading(true);
+    setTimeout(()=>onEnter(typeof dest==="string"?dest:undefined),820);
+  },[fading,onEnter]);
+  useEffect(()=>{
+    const el=wrapRef.current;if(!el)return;
+    let raf=0;
+    const update=()=>{
+      raf=0;
+      const st=el.scrollTop,vh=el.clientHeight;
+      if(!reduce){
+        setSp(clamp01(st/(vh*PX.heroExitVh)));
+        const rest=el.scrollHeight-vh-st;
+        setEp(clamp01(1-rest/(vh*PX.panelExitVh)));
+      }
+      if(st+vh>=el.scrollHeight-4)go();
+    };
+    const onScroll=()=>{if(!raf)raf=requestAnimationFrame(update);};
+    el.addEventListener("scroll",onScroll,{passive:true});
+    update();
+    return()=>{el.removeEventListener("scroll",onScroll);if(raf)cancelAnimationFrame(raf);};
+  },[go,reduce]);
+  const heroOpacity=1-sp;
+  const heroStyle=shift=>({opacity:heroOpacity,transform:`translateY(${-sp*shift}px) scale(${1-sp*PX.heroScale})`,filter:sp>.02?`blur(${sp*PX.heroBlur}px)`:"none",willChange:sp>0&&sp<1?"transform,opacity":"auto",pointerEvents:heroOpacity<.05?"none":"auto"});
+  const pillars=[
+    {icon:"✦",title:"Intelligent Systems",text:"Design and build end-to-end tools, agents, and workflows powered by Generative AI."},
+    {icon:"✦",title:"Game Development",text:"Design and build games, from gameplay systems and mechanics to complete interactive experiences, with a strong focus on environment art, game design and player experience."},
+    {icon:"✦",title:"Technical Art",text:"Bridge art and engineering with custom tools, shaders, and real-time production pipelines."},
+  ];
   return(<>
     <style>{`@keyframes introUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}@keyframes introIn{from{opacity:0}to{opacity:1}}@keyframes introBlink{0%,100%{opacity:.14}50%{opacity:.44}}`}</style>
-    <div onClick={onEnter} style={{position:"fixed",inset:0,zIndex:500,background:"#000008",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",cursor:"pointer",userSelect:"none",overflow:"hidden",fontFamily:"'Space Grotesk',sans-serif"}}>
-      <div style={{position:"absolute",inset:0,backgroundImage:"radial-gradient(circle,rgba(255,255,255,.4) 1px,transparent 1px)",backgroundSize:"55px 55px",opacity:.07,pointerEvents:"none"}}/>
-      <div style={{position:"absolute",inset:0,backgroundImage:"radial-gradient(circle,rgba(255,255,255,.25) 1px,transparent 1px)",backgroundSize:"28px 28px",backgroundPosition:"14px 14px",opacity:.04,pointerEvents:"none"}}/>
-      <div style={{position:"absolute",width:"700px",height:"700px",borderRadius:"50%",background:`radial-gradient(ellipse,${STAR.hex}0c 0%,transparent 65%)`,top:"50%",left:"50%",transform:"translate(-50%,-50%)",pointerEvents:"none"}}/>
-      <div style={{textAlign:"center"}}>
-        <div style={{fontSize:".65rem",color:`${STAR.hex}66`,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".4em",marginBottom:"1.5rem",animation:"introIn .8s .1s both"}}>PORTFOLIO 2026</div>
-        <h1 style={{fontSize:"clamp(2.2rem,5.5vw,4.8rem)",fontWeight:700,color:"rgba(255,248,240,.95)",letterSpacing:".1em",lineHeight:1,fontFamily:"'Space Grotesk',sans-serif",margin:0,animation:"introUp 1s cubic-bezier(.16,1,.3,1) both"}}>JORDI ALTISEN</h1>
-        <div style={{height:"1px",background:`linear-gradient(90deg,transparent,${STAR.hex}77,transparent)`,margin:"1.5rem auto",width:"280px",animation:"introIn .6s .3s both"}}/>
-        <p style={{fontSize:"clamp(.7rem,1.4vw,.85rem)",color:STAR.hex,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".22em",margin:"0 0 2.4rem",animation:"introIn .6s .4s both"}}>GAME DEVELOPER · TECHNICAL ARTIST</p>
-        <p style={{fontSize:"clamp(.85rem,1.6vw,.95rem)",color:"rgba(232,232,240,.35)",fontFamily:"'Space Grotesk',sans-serif",letterSpacing:".04em",fontStyle:"italic",margin:0,animation:"introIn .8s .6s both"}}>"Where art meets engineering."</p>
+    <div ref={wrapRef} className="qn-scroll" style={{position:"fixed",inset:0,zIndex:500,background:"rgba(0,0,8,.93)",backdropFilter:"blur(3px)",overflowY:"auto",userSelect:"none",fontFamily:"'Space Grotesk',sans-serif",opacity:fading?0:1-ep*.55,transform:fading?"translateY(-100%)":`translateY(${-ep*PX.panelShift}%)`,transition:fading?"opacity .75s ease,transform .85s cubic-bezier(.7,0,.3,1)":"none",willChange:ep>0?"transform,opacity":"auto"}}>
+      <SpaceBg c={c} fixed/>
+      <div style={{position:"relative",zIndex:1,maxWidth:1180,margin:"0 auto",padding:"0 clamp(1.3rem,4vw,2.5rem) 3.5rem",display:"flex",flexDirection:"column",gap:"clamp(3rem,8vh,5rem)"}}>
+      <div style={{minHeight:"100vh",display:"flex",flexDirection:"column",justifyContent:"center",gap:"clamp(2rem,5vh,3.5rem)",paddingTop:"clamp(3.5rem,7vh,5rem)",paddingBottom:"clamp(1.5rem,4vh,3rem)"}}>
+        <div style={{display:"grid",gridTemplateColumns:"minmax(180px,250px) 1fr",gap:"clamp(1.8rem,4vw,3rem)",alignItems:"center",maxWidth:940,margin:"0 auto",width:"100%"}}>
+          <div style={{position:"relative",...heroStyle(PX.photoShift)}}>
+            <div style={{position:"absolute",inset:"-18%",borderRadius:"50%",background:`radial-gradient(ellipse,${c}22 0%,transparent 68%)`,filter:"blur(6px)",pointerEvents:"none",animation:"introIn 1.2s both"}}/>
+            <div style={{position:"relative",width:"100%",aspectRatio:"1/1",borderRadius:"28px",overflow:"hidden",border:`2px solid ${c}55`,boxShadow:`0 0 80px ${c}28,inset 0 0 40px rgba(0,0,0,.3)`,background:`radial-gradient(ellipse at 50% 30%,${c}14,#0a0a12)`,animation:"introIn .8s both"}}>
+              <img src={gh("profile/01-portrait.png")} alt="Jordi Altisèn" style={{width:"100%",height:"100%",objectFit:"cover"}} onError={e=>{e.currentTarget.style.display="none";}}/>
+            </div>
+          </div>
+          <div style={heroStyle(PX.textShift)}>
+            <div style={{fontSize:".64rem",color:`${c}88`,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".32em",marginBottom:"1rem",animation:"introIn .8s .1s both"}}>PORTFOLIO 2026</div>
+            <h1 style={{fontSize:"clamp(1.7rem,3.4vw,2.5rem)",fontWeight:700,color:"rgba(255,248,240,.96)",lineHeight:1.2,margin:"0 0 1.1rem",perspective:"600px"}}>
+              {["Hi,","I'm"].map((w,i)=><span key={i} className="word" style={{animationDelay:`${.15+i*.08}s`,marginRight:".32em"}}>{w}</span>)}
+              <span className="word" style={{animationDelay:".31s",color:c,textShadow:`0 0 28px ${c}66`}}>Jordi.</span><br/>
+              {["Welcome","to","my","portfolio!"].map((w,i)=><span key={i} className="word" style={{animationDelay:`${.42+i*.07}s`,marginRight:".32em"}}>{w}</span>)}
+            </h1>
+            <p style={{fontSize:"clamp(.85rem,1.3vw,.95rem)",color:"rgba(232,232,240,.62)",lineHeight:1.7,maxWidth:520,margin:"0 0 1.8rem",animation:"introIn .8s .3s both"}}>Technical Artist & Game Developer who designs and builds tools, games, and interactive experiences. Passionate about exploring Intelligent Systems and Generative AI, and the intersection between art and engineering.</p>
+            <div style={{display:"flex",gap:".7rem",flexWrap:"wrap",animation:"introIn .8s .45s both"}}>
+              <button onClick={()=>go()} style={{padding:".78rem 1.6rem",background:c,border:"none",borderRadius:"9px",color:"#0a0a12",cursor:"pointer",fontSize:".85rem",fontWeight:700,fontFamily:"'Space Grotesk',sans-serif",boxShadow:`0 0 30px ${c}33`}}>Explore Portfolio</button>
+              <button onClick={()=>go("contact")} style={{padding:".78rem 1.6rem",background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.18)",borderRadius:"9px",color:"#e8e8f0",cursor:"pointer",fontSize:".85rem",fontWeight:600,fontFamily:"'Space Grotesk',sans-serif"}}>Contact</button>
+            </div>
+          </div>
+        </div>
+        <div style={{animation:"introIn 1s .5s both"}}>
+          <div style={{fontSize:".64rem",color:"rgba(232,232,240,.4)",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".32em",textAlign:"center",marginBottom:"1.4rem"}}>WHAT I DO</div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:"1rem"}}>
+            {pillars.map(pl=>(<div key={pl.title} style={{background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.09)",borderRadius:"14px",padding:"1.3rem 1.4rem",backdropFilter:"blur(6px)"}}>
+              <div style={{fontSize:"1.5rem",color:c,marginBottom:".6rem",textShadow:`0 0 16px ${c}44`}}>{pl.icon}</div>
+              <div style={{fontSize:".92rem",fontWeight:700,color:"#e8e8f0",marginBottom:".45rem"}}>{pl.title}</div>
+              <div style={{fontSize:".76rem",color:"rgba(232,232,240,.5)",lineHeight:1.6}}>{pl.text}</div>
+            </div>))}
+          </div>
+        </div>
       </div>
-      <div style={{position:"absolute",bottom:"2.5rem",fontSize:".58rem",color:"rgba(232,232,240,.18)",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".22em",animation:"introBlink 2.5s 1.2s infinite"}}>CLICK ANYWHERE TO ENTER</div>
+
+        <SecReveal root={wrapRef}><div style={{display:"grid",gridTemplateColumns:"minmax(260px,.85fr) 1.15fr",gap:"clamp(2.5rem,6vw,5rem)",alignItems:"center"}} className="feat-grid">
+          <div>
+            <h2 style={{fontSize:"clamp(1.5rem,3vw,2.1rem)",fontWeight:700,color:"#e8e8f0",margin:"0 0 1rem",lineHeight:1.2}}>Featured <span style={{color:c}}>projects</span></h2>
+            <p style={{fontSize:".88rem",color:TK.tx.mid,lineHeight:1.75,margin:"0 0 1.8rem",maxWidth:420}}>A selection of the projects that best represent my work across game development, technical art and intelligent systems.</p>
+            <div style={{display:"flex",gap:".6rem",flexWrap:"wrap"}}>
+              <button onClick={()=>go()} className="pf-btn" style={{padding:".75rem 1.5rem",background:c,border:"none",borderRadius:"100px",color:"#0a0a12",cursor:"pointer",fontSize:".82rem",fontWeight:700,fontFamily:TK.sans,boxShadow:`0 0 30px ${c}33`}}>Explore Portfolio</button>
+              <button onClick={()=>go("projects")} className="pf-btn" style={{padding:".75rem 1.5rem",background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.2)",borderRadius:"100px",color:"#e8e8f0",cursor:"pointer",fontSize:".82rem",fontWeight:600,fontFamily:TK.sans}}>View all projects</button>
+              <button onClick={()=>go("contact")} className="pf-btn" style={{padding:".75rem 1.5rem",background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.14)",borderRadius:"100px",color:TK.tx.mid,cursor:"pointer",fontSize:".82rem",fontWeight:600,fontFamily:TK.sans}}>Contact</button>
+            </div>
+          </div>
+          <FeaturedCarousel onOpen={onOpenProject}/>
+        </div></SecReveal>
+
+        <SecReveal root={wrapRef}><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:"1rem",maxWidth:940,margin:"0 auto",width:"100%"}}>
+          {[["140+","Production assets"],["3+","Years in game dev"],["3,000+","Hours in Blender"],["High Honors","Final degree project"]].map(([n,l],mi)=>(
+            <div key={l} style={{textAlign:"center",padding:"1rem .6rem",background:"rgba(255,255,255,.025)",border:"1px solid rgba(255,255,255,.07)",borderRadius:TK.r.md,animation:"none"}}>
+              <div style={{fontSize:"clamp(1.1rem,2.2vw,1.5rem)",fontWeight:700,color:c,marginBottom:".25rem",textShadow:`0 0 20px ${c}44`}}>{n}</div>
+              <div style={{fontSize:".64rem",color:TK.tx.lo,fontFamily:TK.mono,letterSpacing:".1em",lineHeight:1.4}}>{l.toUpperCase()}</div>
+            </div>))}
+        </div></SecReveal>
+
+        <SecReveal root={wrapRef}><div>
+          <SecTitle t="ABOUT ME" c={c}/>
+          <p style={{fontSize:".88rem",lineHeight:1.8,color:"rgba(232,232,240,.62)",whiteSpace:"pre-line",maxWidth:820,margin:"0 auto"}}>{renderBold(STAR.summary)}</p>
+        </div></SecReveal>
+
+        <SecReveal root={wrapRef}><div>
+          <SecTitle t="SKILLS" c={c}/>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:".9rem 1.8rem",maxWidth:900,margin:"0 auto"}}>
+            {STAR.skills.map(sk=>(<div key={sk.s}>
+              <div style={{display:"flex",justifyContent:"space-between",marginBottom:".3rem"}}>
+                <span style={{fontSize:".8rem",color:"rgba(232,232,240,.8)"}}>{sk.s}</span>
+                <span style={{fontSize:".65rem",color:`${c}aa`,fontFamily:"'JetBrains Mono',monospace"}}>{sk.p}%</span>
+              </div>
+              <div style={{height:3,background:"rgba(255,255,255,.07)",borderRadius:2}}><div style={{height:"100%",width:`${sk.p}%`,background:`linear-gradient(90deg,${c}55,${c})`,borderRadius:2}}/></div>
+            </div>))}
+          </div>
+        </div></SecReveal>
+
+        <SecReveal root={wrapRef}><div>
+          <SecTitle t="EXPERIENCE & EDUCATION" c={c}/>
+          <div style={{maxWidth:760,margin:"0 auto",display:"flex",flexDirection:"column",gap:".1rem"}}>
+            {STAR.timeline.map((it,i)=>(<div key={i} style={{display:"grid",gridTemplateColumns:"88px 1fr",gap:"1.1rem",padding:".85rem 0",borderTop:i===0?"none":"1px solid rgba(255,255,255,.06)"}}>
+              <div style={{fontSize:".7rem",color:c,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".06em",paddingTop:".12rem"}}>{it.y}</div>
+              <div>
+                <div style={{fontSize:".86rem",fontWeight:600,color:"#e8e8f0"}}>{it.l}</div>
+                {it.d&&<div style={{fontSize:".76rem",color:"rgba(232,232,240,.48)",marginTop:".15rem",lineHeight:1.55}}>{it.d}</div>}
+              </div>
+            </div>))}
+          </div>
+        </div></SecReveal>
+
+        <div onClick={()=>go()} style={{textAlign:"center",cursor:"pointer",paddingTop:"2rem"}}>
+          <div style={{width:1,height:"clamp(40px,9vh,90px)",margin:"0 auto 1.2rem",background:`linear-gradient(180deg,transparent,${c}66)`}}/>
+          <div style={{fontSize:".62rem",color:`${c}88`,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".26em",marginBottom:".6rem"}}>ENTER THE INTERACTIVE PORTFOLIO</div>
+          <div style={{fontSize:"1.2rem",color:`${c}77`,animation:"introBlink 2.4s infinite"}}>↓</div>
+        </div>
+      </div>
+      <div style={{position:"absolute",inset:0,pointerEvents:"none",background:"radial-gradient(ellipse at 50% 30%,transparent 45%,rgba(0,0,8,.6) 100%)"}}/>
     </div>
   </>);
 }
@@ -1026,7 +1591,7 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
       getND(e);RC.setFromCamera(M2,camera);const hits=RC.intersectObjects(allTargets);if(!hits.length)return;
       const ud=hits[0].object.userData;
       if(ud.type==="star")cbRefs.current.onStarClick();
-      else if(ud.type==="planet"&&camS.mode==="solar"){enterPlanetMode(ud.id);}
+      else if(ud.type==="planet"){if(camS.mode==="solar")enterPlanetMode(ud.id);else if(camS.planetId===ud.id)cbRefs.current.onEnterPlanet(ud.id);else enterPlanetMode(ud.id);}
       else if(ud.type==="moon"&&camS.mode==="planet"&&camS.planetId===ud.planetId){const pl=PLANETS.find(p=>p.id===ud.planetId);cbRefs.current.onMoonClick(pl.moons.find(m=>m.id===ud.id));}
     };
     const onKD=e=>{if(e.key==="Escape"||e.key===" ")exit();};
@@ -1064,7 +1629,7 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
       RC.setFromCamera(M2,camera);const hits=RC.intersectObjects(allTargets);if(!hits.length)return;
       const ud=hits[0].object.userData;
       if(ud.type==="star")cbRefs.current.onStarClick();
-      else if(ud.type==="planet"&&camS.mode==="solar"){enterPlanetMode(ud.id);}
+      else if(ud.type==="planet"){if(camS.mode==="solar")enterPlanetMode(ud.id);else if(camS.planetId===ud.id)cbRefs.current.onEnterPlanet(ud.id);else enterPlanetMode(ud.id);}
       else if(ud.type==="moon"&&camS.mode==="planet"&&camS.planetId===ud.planetId){const pl=PLANETS.find(p=>p.id===ud.planetId);cbRefs.current.onMoonClick(pl.moons.find(m=>m.id===ud.id));}
     };
     cv.addEventListener("mousedown",onMD);cv.addEventListener("mousemove",onMM);cv.addEventListener("mouseup",onMU);cv.addEventListener("wheel",onW);cv.addEventListener("touchstart",onTS,{passive:true});cv.addEventListener("touchmove",onTM,{passive:false});cv.addEventListener("touchend",onTE);window.addEventListener("keydown",onKD);window.addEventListener("resize",onR);cv.style.cursor="grab";
@@ -1117,11 +1682,7 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
   },[]);
   return(<div style={{position:"relative",width:"100%",height:"100%"}}>
     <canvas ref={cvRef} style={{position:"absolute",inset:0,width:"100%",height:"100%",touchAction:"none"}}/>
-    {ALL_ITEMS.map(item=>(<div key={item.id} ref={el=>{labRefs.current[item.id]=el;}} style={{position:"absolute",pointerEvents:"none",fontFamily:"'Space Grotesk',sans-serif",transition:"opacity .2s,transform .2s",userSelect:"none"}}><div style={{fontSize:item.type==="moon"?".65rem":".73rem",fontWeight:600,color:"#e8e8f0",whiteSpace:"nowrap",background:"rgba(5,5,14,.78)",backdropFilter:"blur(6px)",padding:item.type==="moon"?".15rem .42rem":".2rem .58rem",borderRadius:"5px",border:`1px solid ${item.hex}33`,textShadow:`0 0 12px ${item.hex}`}}>{item.icon} {item.label}</div></div>))}
-    <div style={{position:"absolute",top:"1.5rem",left:"1.5rem",fontFamily:"'Space Grotesk',sans-serif",userSelect:"none"}}>
-      <div style={{fontSize:"1.05rem",fontWeight:700,color:"rgba(255,248,240,.92)",letterSpacing:".04em",textShadow:`0 0 24px ${STAR.hex}22`}}>Jordi</div>
-      <div style={{fontSize:".57rem",color:`${STAR.hex}88`,letterSpacing:".1em",marginTop:".2rem",fontFamily:"'JetBrains Mono',monospace"}}>Building worlds and tools, one system at a time.</div>
-    </div>
+    {ALL_ITEMS.map(item=>(<div key={item.id} ref={el=>{labRefs.current[item.id]=el;}} style={{position:"absolute",pointerEvents:"none",fontFamily:"'Space Grotesk',sans-serif",transition:"opacity .2s,transform .2s",userSelect:"none"}}><div style={{fontSize:item.type==="moon"?".65rem":".73rem",fontWeight:600,color:"#e8e8f0",whiteSpace:"nowrap",background:"rgba(5,5,14,.78)",backdropFilter:"blur(6px)",padding:item.type==="moon"?".15rem .42rem":".2rem .58rem",borderRadius:"5px",border:`1px solid ${item.hex}33`,textShadow:`0 0 12px ${item.hex}`}}>{item.label}</div></div>))}
     <div ref={hintRef} style={{position:"absolute",bottom:"1.5rem",left:"1.5rem",fontFamily:"'JetBrains Mono',monospace",fontSize:".57rem",color:`${STAR.hex}44`,letterSpacing:".12em",userSelect:"none"}}/>
     <div style={{position:"absolute",inset:0,pointerEvents:"none",background:"radial-gradient(ellipse at center,transparent 40%,rgba(0,0,8,.5) 100%)"}}/>
   </div>);
@@ -1137,6 +1698,7 @@ export default function Portfolio(){
   const[showNavHint,setShowNavHint]=useState(false);
   const lang="en";
   const[quickNavOpen,setQuickNavOpen]=useState(false);
+  const[starTab,setStarTab]=useState("about");
   useEffect(()=>{
     if(!document.getElementById("pf-css")){const el=document.createElement("style");el.id="pf-css";el.textContent=CSS;document.head.appendChild(el);}
     const chk=()=>setIsMobile(window.innerHeight>window.innerWidth);chk();window.addEventListener("resize",chk);window.addEventListener("orientationchange",chk);
@@ -1144,22 +1706,28 @@ export default function Portfolio(){
   },[]);
   const onStarClick=useCallback(()=>setPanelData({type:"star"}),[]);
   const onMoonClick=useCallback(proj=>setPanelData({type:"project",project:proj}),[]);
-  const onEnterPlanet=useCallback(id=>{setActivePlanetId(id);setPanelData(null);setWarp(true);setTimeout(()=>setWarp(false),280);},[]);
+  const[navFilter,setNavFilter]=useState("all");
+  const[jumpAll,setJumpAll]=useState(false);
+  const onEnterPlanet=useCallback(id=>{setActivePlanetId(id);setPanelData(null);setWarp(true);setTimeout(()=>setWarp(false),280);setTimeout(()=>{setNavFilter(id);setQuickNavOpen(true);},750);},[]);
   const onExitPlanet=useCallback(()=>{setActivePlanetId(null);setPanelData(null);},[]);
   const onHoverMoon=useCallback((data,x,y)=>setHovMoon({data,x,y}),[]);
-  if(intro)return <IntroScreen onEnter={()=>{setIntro(false);setShowNavHint(true);}}/>;
   if(isMobile)return <Mobile/>;
   return(<LangContext.Provider value={lang}><div style={{width:"100%",height:"100vh",background:"#000008",overflow:"hidden",position:"relative"}}>
     <SolarScene onStarClick={onStarClick} onMoonClick={onMoonClick} onEnterPlanet={onEnterPlanet} onExitPlanet={onExitPlanet} onHoverMoon={onHoverMoon}/>
-    <button className="qn-toggle" onClick={()=>setQuickNavOpen(o=>!o)} style={{position:"fixed",top:"1.5rem",right:"1.5rem",background:"rgba(7,7,17,.85)",border:`1px solid ${STAR.hex}66`,borderRadius:"8px",padding:".45rem .7rem",color:STAR.hex,cursor:"pointer",fontSize:".85rem",zIndex:200,display:"flex",alignItems:"center",gap:".4rem",fontFamily:"'JetBrains Mono',monospace"}}>☰ <span style={{fontSize:".62rem",letterSpacing:".08em"}}>PROJECTS</span></button>
-    <QuickNav open={quickNavOpen} onClose={()=>setQuickNavOpen(false)} onSelectProject={m=>{setPanelData({type:"project",project:m});setQuickNavOpen(false);}}/>
+    {intro&&<IntroScreen onOpenProject={m=>{setIntro(false);setPanelData({type:"project",project:m});}} onEnter={dest=>{setIntro(false);if(dest==="contact"){setStarTab("contact");setPanelData({type:"star"});}else if(dest==="projects"){setNavFilter("all");setJumpAll(true);setQuickNavOpen(true);}else setShowNavHint(true);}}/>}
+    {!intro&&<>
+    <Header onHome={()=>{setPanelData(null);setQuickNavOpen(false);setIntro(true);}} onAbout={()=>{setStarTab("about");setPanelData({type:"star"});}} onProjects={()=>{setNavFilter("all");setJumpAll(false);setQuickNavOpen(o=>!o);}} onContact={()=>{setStarTab("contact");setPanelData({type:"star"});}}/>
+    <QuickNav open={quickNavOpen} jumpToAll={jumpAll} filter={navFilter} onFilterChange={setNavFilter} onClose={()=>setQuickNavOpen(false)} onSelectProject={m=>{setPanelData({type:"project",project:m});setQuickNavOpen(false);}}/>
+    <PlanetNav onSelect={id=>{setNavFilter(id);setJumpAll(false);setQuickNavOpen(true);}}/>
     {showNavHint&&<NavHint onDone={()=>setShowNavHint(false)}/>}
     {activePlanetId&&<HUD planetId={activePlanetId}/>}
-    {panelData?.type==="star"&&<StarPanel onClose={()=>setPanelData(null)}/>}
-    {panelData?.type==="project"&&<ProjectPanel project={panelData.project} onClose={()=>setPanelData(null)}/>}
+    {panelData?.type==="star"&&<StarPanel initialTab={starTab} onClose={()=>setPanelData(null)}/>}
+    {panelData?.type==="project"&&(panelData.project.categories?.some(c=>!c.isOverview)
+      ? <CaseStudy project={panelData.project} onClose={()=>setPanelData(null)}/>
+      : <ProjectPanel project={panelData.project} onClose={()=>setPanelData(null)}/>)}
     {hovMoon.data&&!panelData&&<MoonTooltip moon={hovMoon.data} x={hovMoon.x} y={hovMoon.y}/>}
     {warp&&<div style={{position:"fixed",inset:0,zIndex:300,pointerEvents:"none",background:"radial-gradient(ellipse at center,rgba(180,220,255,.14) 0%,rgba(100,160,255,.06) 45%,transparent 70%)",animation:"warpIn .28s ease-out forwards"}}/>}
     <StatusBar/>
-
+    </>}
   </div></LangContext.Provider>);
 }
