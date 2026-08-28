@@ -488,6 +488,8 @@ const CSS=`
 @keyframes orbSpin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 @keyframes twinkle{0%,100%{opacity:.25}50%{opacity:.7}}
 @keyframes secIn{from{opacity:0;transform:translateY(38px)}to{opacity:1;transform:translateY(0)}}
+.bg-ring-a{animation:orbSpin 240s linear infinite}
+.bg-ring-b{animation:orbSpin 330s linear infinite reverse}
 .sec-rv{opacity:0}
 .sec-rv.on{animation:secIn .8s cubic-bezier(.16,1,.3,1) both}
 @media(prefers-reduced-motion:reduce){.sec-rv{opacity:1!important}.sec-rv.on{animation:none!important}}
@@ -764,7 +766,26 @@ function CaseStudy({project,onClose}){
     on();el.addEventListener("scroll",on,{passive:true});
     return()=>el.removeEventListener("scroll",on);
   },[]);
-  const jump=id=>{const el=secRefs.current[id];if(el)el.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"});};
+  const jumpTimer=useRef(null);
+  const jump=id=>{
+    const root=scrollRef.current,el=secRefs.current[id];
+    if(!root||!el)return;
+    if(jumpTimer.current){clearInterval(jumpTimer.current);jumpTimer.current=null;}
+    const targetTop=()=>root.scrollTop+el.getBoundingClientRect().top-root.getBoundingClientRect().top-8;
+    if(reduce){root.scrollTop=targetTop();return;}
+    root.scrollTo({top:targetTop(),behavior:"smooth"});
+    // el layout encara pot creixer mentre carreguen imatges: recalibrem fins que s'estabilitzi
+    let ticks=0,settled=0;
+    jumpTimer.current=setInterval(()=>{
+      ticks++;
+      const want=targetTop(),diff=Math.abs(root.scrollTop-want);
+      if(diff<3){if(++settled>=3){clearInterval(jumpTimer.current);jumpTimer.current=null;}return;}
+      settled=0;
+      if(ticks>6)root.scrollTo({top:want,behavior:"smooth"});
+      if(ticks>28){root.scrollTop=want;clearInterval(jumpTimer.current);jumpTimer.current=null;}
+    },120);
+  };
+  useEffect(()=>()=>{if(jumpTimer.current)clearInterval(jumpTimer.current);},[]);
   return(<div ref={dlgRef} role="dialog" aria-modal="true" aria-label={project.label} tabIndex={-1} style={{position:"fixed",inset:0,zIndex:260,background:"rgba(5,5,13,.99)",fontFamily:TK.sans,display:"flex",flexDirection:"column",animation:"modalIn .4s cubic-bezier(.16,1,.3,1) both",outline:"none"}}>
     <div style={{flexShrink:0,background:"linear-gradient(180deg,rgba(5,5,13,.98),rgba(5,5,13,.9))",backdropFilter:"blur(16px)",borderBottom:"1px solid rgba(255,255,255,.07)"}}>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:"1rem",padding:"1rem clamp(1.2rem,4vw,3rem) .7rem",maxWidth:1500,margin:"0 auto",width:"100%",boxSizing:"border-box"}}>
@@ -856,11 +877,12 @@ function CaseStudy({project,onClose}){
 
 function SmartImg({im,c,onClick}){
   const[loaded,setLoaded]=useState(false);
-  return(<div onClick={onClick} style={{position:"relative",width:"100%",borderRadius:TK.r.md,overflow:"hidden",border:`1px solid ${c}${TK.op.soft}`,background:im.bg||"rgba(10,10,18,.6)",cursor:"zoom-in",display:"flex",alignItems:"center",justifyContent:"center",maxHeight:"78vh",minHeight:loaded?0:180}}>
+  const[ar,setAr]=useState(null);
+  return(<div onClick={onClick} style={{position:"relative",width:"100%",borderRadius:TK.r.md,overflow:"hidden",border:`1px solid ${c}${TK.op.soft}`,background:im.bg||"rgba(10,10,18,.6)",cursor:"zoom-in",display:"flex",alignItems:"center",justifyContent:"center",maxHeight:"78vh",aspectRatio:ar||"16/9"}}>
     {!loaded&&<div style={{position:"absolute",inset:0,display:"flex",alignItems:"center",justifyContent:"center"}}>
       <div style={{fontSize:TK.fs.xs,color:`${c}66`,fontFamily:TK.mono,letterSpacing:".2em",animation:"introBlink 1.4s infinite"}}>LOADING</div>
     </div>}
-    <img src={im.src} alt={im.label||""} loading="lazy" onLoad={()=>setLoaded(true)} onError={()=>setLoaded(true)} style={{width:"100%",height:"auto",maxHeight:"78vh",objectFit:"contain",display:"block",opacity:loaded?1:0,transition:"opacity .45s ease"}}/>
+    <img src={im.src} alt={im.label||""} loading="lazy" onLoad={e=>{const n=e.currentTarget;if(n.naturalWidth&&n.naturalHeight)setAr(`${n.naturalWidth} / ${n.naturalHeight}`);setLoaded(true);}} onError={()=>setLoaded(true)} style={{width:"100%",height:"auto",maxHeight:"78vh",objectFit:"contain",display:"block",opacity:loaded?1:0,transition:"opacity .45s ease"}}/>
   </div>);
 }
 
@@ -1098,14 +1120,14 @@ function SpaceBg({c,fixed}){
     const reduce=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     const[r,g,b]=hexToRgb(c);
     let w=0,h=0,cells=[],raf=0,t=0;
-    const R=26;                         // radi de l'hexagon
-    const HW=Math.sqrt(3)*R, VH=1.5*R;  // amplada i pas vertical
+    const R=26;
+    const HW=Math.sqrt(3)*R, VH=1.5*R;
     const build=()=>{
-      w=cv.width=cv.offsetWidth*Math.min(devicePixelRatio,2);
-      h=cv.height=cv.offsetHeight*Math.min(devicePixelRatio,2);
       const s=Math.min(devicePixelRatio,2);
+      w=cv.width=Math.max(1,cv.offsetWidth*s);
+      h=cv.height=Math.max(1,cv.offsetHeight*s);
       cells=[];
-      const cols=Math.ceil(w/(HW*s))+2, rows=Math.ceil(h/(VH*s))+2;
+      const cols=Math.ceil((w/s)/HW)+2, rows=Math.ceil((h/s)/VH)+2;
       for(let row=-1;row<rows;row++)for(let col=-1;col<cols;col++){
         const x=col*HW+(row%2?HW/2:0), y=row*VH;
         cells.push({x,y,seed:Math.random()*Math.PI*2,amp:.35+Math.random()*.65,lit:Math.random()<.05});
@@ -1147,10 +1169,13 @@ function SpaceBg({c,fixed}){
     build();
     if(reduce)draw();else raf=requestAnimationFrame(loop);
     window.addEventListener("resize",onR);
-    return()=>{cancelAnimationFrame(raf);window.removeEventListener("resize",onR);};
+    const ro=typeof ResizeObserver!=="undefined"?new ResizeObserver(onR):null;
+    if(ro)ro.observe(cv);
+    return()=>{cancelAnimationFrame(raf);window.removeEventListener("resize",onR);ro?.disconnect();};
   },[c]);
-  return(<div style={{position:fixed?"fixed":"absolute",inset:0,pointerEvents:"none",overflow:"hidden",zIndex:0}}>
-    <div style={{position:"absolute",inset:0,background:`radial-gradient(ellipse at 50% 25%,${c}12,transparent 55%),radial-gradient(ellipse at 15% 80%,rgba(90,70,190,.10),transparent 55%),#04040c`}}/>
+  const mask="linear-gradient(180deg,transparent 0%,#000 12%,#000 88%,transparent 100%)";
+  return(<div style={{position:fixed?"fixed":"absolute",inset:0,pointerEvents:"none",overflow:"hidden",zIndex:0,maskImage:mask,WebkitMaskImage:mask}}>
+    <div style={{position:"absolute",inset:0,background:`radial-gradient(ellipse at 50% 25%,${c}12,transparent 55%),radial-gradient(ellipse at 15% 80%,rgba(90,70,190,.10),transparent 55%)`}}/>
     <canvas ref={cvRef} style={{position:"absolute",inset:0,width:"100%",height:"100%"}}/>
     <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse at 50% 40%,transparent 20%,rgba(2,2,8,.8) 100%)"}}/>
   </div>);
@@ -1438,9 +1463,8 @@ function IntroScreen({onEnter,onOpenProject}){
   return(<>
     <style>{`@keyframes introUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}@keyframes introIn{from{opacity:0}to{opacity:1}}@keyframes introBlink{0%,100%{opacity:.14}50%{opacity:.44}}`}</style>
     <div ref={wrapRef} className="qn-scroll" style={{position:"fixed",inset:0,zIndex:500,background:"rgba(0,0,8,.93)",backdropFilter:"blur(3px)",overflowY:"auto",userSelect:"none",fontFamily:"'Space Grotesk',sans-serif",opacity:fading?0:1-ep*.55,transform:fading?"translateY(-100%)":`translateY(${-ep*PX.panelShift}%)`,transition:fading?"opacity .75s ease,transform .85s cubic-bezier(.7,0,.3,1)":"none",willChange:ep>0?"transform,opacity":"auto"}}>
-      <SpaceBg c={c} fixed/>
       <div style={{position:"relative",zIndex:1,maxWidth:1180,margin:"0 auto",padding:"0 clamp(1.3rem,4vw,2.5rem) 3.5rem",display:"flex",flexDirection:"column",gap:"clamp(3rem,8vh,5rem)"}}>
-      <div style={{minHeight:"100vh",display:"flex",flexDirection:"column",justifyContent:"center",gap:"clamp(2rem,5vh,3.5rem)",paddingTop:"clamp(3.5rem,7vh,5rem)",paddingBottom:"clamp(1.5rem,4vh,3rem)"}}>
+      <div style={{position:"relative",minHeight:"100vh",display:"flex",flexDirection:"column",justifyContent:"center",gap:"clamp(2rem,5vh,3.5rem)",paddingTop:"clamp(3.5rem,7vh,5rem)",paddingBottom:"clamp(1.5rem,4vh,3rem)"}}><SpaceBg c={c}/><div style={{position:"relative",zIndex:1,display:"flex",flexDirection:"column",gap:"clamp(2rem,5vh,3.5rem)"}}>
         <div style={{display:"grid",gridTemplateColumns:"minmax(180px,250px) 1fr",gap:"clamp(1.8rem,4vw,3rem)",alignItems:"center",maxWidth:940,margin:"0 auto",width:"100%"}}>
           <div style={{position:"relative",...heroStyle(PX.photoShift)}}>
             <div style={{position:"absolute",inset:"-18%",borderRadius:"50%",background:`radial-gradient(ellipse,${c}22 0%,transparent 68%)`,filter:"blur(6px)",pointerEvents:"none",animation:"introIn 1.2s both"}}/>
@@ -1472,10 +1496,10 @@ function IntroScreen({onEnter,onOpenProject}){
             </div>))}
           </div>
         </div>
-      </div>
+      </div></div>
 
-        <SecReveal root={wrapRef}><div style={{display:"grid",gridTemplateColumns:"minmax(260px,.85fr) 1.15fr",gap:"clamp(3.5rem,8vw,7rem)",alignItems:"center"}} className="feat-grid">
-          <div>
+        <SecReveal root={wrapRef}><div style={{position:"relative",display:"grid",gridTemplateColumns:"minmax(260px,.85fr) 1.15fr",gap:"clamp(3.5rem,8vw,7rem)",alignItems:"center",padding:"3rem 0"}} className="feat-grid"><SpaceBg c={c}/>
+          <div style={{position:"relative",zIndex:1}}>
             <h2 style={{fontSize:"clamp(1.5rem,3vw,2.1rem)",fontWeight:700,color:"#e8e8f0",margin:"0 0 1rem",lineHeight:1.2}}>Featured <span style={{color:c}}>projects</span></h2>
             <p style={{fontSize:".88rem",color:TK.tx.mid,lineHeight:1.75,margin:"0 0 1.8rem",maxWidth:420}}>A selection of the projects that best represent my work across game development, technical art and intelligent systems.</p>
             <div style={{display:"flex",gap:".6rem",flexWrap:"wrap"}}>
@@ -1484,23 +1508,23 @@ function IntroScreen({onEnter,onOpenProject}){
               <button onClick={()=>go("contact")} className="pf-btn" style={{padding:".75rem 1.5rem",background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.14)",borderRadius:"100px",color:TK.tx.mid,cursor:"pointer",fontSize:".82rem",fontWeight:600,fontFamily:TK.sans}}>Contact</button>
             </div>
           </div>
-          <FeaturedCarousel onOpen={onOpenProject}/>
+          <div style={{position:"relative",zIndex:1}}><FeaturedCarousel onOpen={onOpenProject}/></div>
         </div></SecReveal>
 
-        <SecReveal root={wrapRef}><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:"1rem",maxWidth:940,margin:"0 auto",width:"100%"}}>
+        <SecReveal root={wrapRef}><div style={{position:"relative",padding:"2rem 0"}}><SpaceBg c={c}/><div style={{position:"relative",zIndex:1,display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:"1rem",maxWidth:940,margin:"0 auto",width:"100%"}}>
           {[["140+","Production assets"],["3+","Years in game dev"],["3,000+","Hours in Blender"],["High Honors","Final degree project"]].map(([n,l],mi)=>(
             <div key={l} style={{textAlign:"center",padding:"1rem .6rem",background:"rgba(255,255,255,.025)",border:"1px solid rgba(255,255,255,.07)",borderRadius:TK.r.md,animation:"none"}}>
               <div style={{fontSize:"clamp(1.1rem,2.2vw,1.5rem)",fontWeight:700,color:c,marginBottom:".25rem",textShadow:`0 0 20px ${c}44`}}>{n}</div>
               <div style={{fontSize:".64rem",color:TK.tx.lo,fontFamily:TK.mono,letterSpacing:".1em",lineHeight:1.4}}>{l.toUpperCase()}</div>
             </div>))}
-        </div></SecReveal>
+        </div></div></SecReveal>
 
-        <SecReveal root={wrapRef}><div>
+        <SecReveal root={wrapRef}><div style={{position:"relative",padding:"2.5rem 0"}}><SpaceBg c={c}/><div style={{position:"relative",zIndex:1}}>
           <SecTitle t="ABOUT ME" c={c}/>
           <p style={{fontSize:".88rem",lineHeight:1.8,color:"rgba(232,232,240,.62)",whiteSpace:"pre-line",maxWidth:820,margin:"0 auto"}}>{renderBold(STAR.summary)}</p>
-        </div></SecReveal>
+        </div></div></SecReveal>
 
-        <SecReveal root={wrapRef}><div>
+        <SecReveal root={wrapRef}><div style={{position:"relative",padding:"2.5rem 0"}}><SpaceBg c={c}/><div style={{position:"relative",zIndex:1}}>
           <SecTitle t="SKILLS" c={c}/>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:".9rem 1.8rem",maxWidth:900,margin:"0 auto"}}>
             {STAR.skills.map(sk=>(<div key={sk.s}>
@@ -1511,9 +1535,9 @@ function IntroScreen({onEnter,onOpenProject}){
               <div style={{height:3,background:"rgba(255,255,255,.07)",borderRadius:2}}><div style={{height:"100%",width:`${sk.p}%`,background:`linear-gradient(90deg,${c}55,${c})`,borderRadius:2}}/></div>
             </div>))}
           </div>
-        </div></SecReveal>
+        </div></div></SecReveal>
 
-        <SecReveal root={wrapRef}><div>
+        <SecReveal root={wrapRef}><div style={{position:"relative",padding:"2.5rem 0"}}><SpaceBg c={c}/><div style={{position:"relative",zIndex:1}}>
           <SecTitle t="EXPERIENCE & EDUCATION" c={c}/>
           <div style={{maxWidth:760,margin:"0 auto",display:"flex",flexDirection:"column",gap:".1rem"}}>
             {STAR.timeline.map((it,i)=>(<div key={i} style={{display:"grid",gridTemplateColumns:"88px 1fr",gap:"1.1rem",padding:".85rem 0",borderTop:i===0?"none":"1px solid rgba(255,255,255,.06)"}}>
@@ -1524,7 +1548,7 @@ function IntroScreen({onEnter,onOpenProject}){
               </div>
             </div>))}
           </div>
-        </div></SecReveal>
+        </div></div></SecReveal>
 
         <div onClick={()=>go()} style={{textAlign:"center",cursor:"pointer",paddingTop:"2rem"}}>
           <div style={{width:1,height:"clamp(40px,9vh,90px)",margin:"0 auto 1.2rem",background:`linear-gradient(180deg,transparent,${c}66)`}}/>
