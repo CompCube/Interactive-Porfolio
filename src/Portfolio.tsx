@@ -235,6 +235,93 @@ skills:[{s:"Unity / C#",p:88},{s:"Blender / 3D Art",p:86},{s:"Shader Graph / VFX
 langs:[{l:"Catalan",lv:"Native"},{l:"Spanish",lv:"Native"},{l:"English",lv:"C1"},{l:"Italian",lv:"B1"},{l:"German",lv:"B1 (learning)"}],
 timeline:[{y:"Q4 2026",l:"Steam release",d:"Planned launch of Hollow End."},{y:"2025",l:"Graduated in Game Design & Development",d:"Final Degree Project awarded High Honors."},{y:"2024",l:"Began developing Hollow End",d:"A solo photorealistic horror game in Unity HDRP."},{y:"2024",l:"Joined DXC Technology",d:"ServiceNow Software Developer."},{y:"2020",l:"Switched to Game Design & Development",d:"University of Girona."},{y:"2019",l:"Started Computer Engineering",d:""},{y:"2019",l:"Graduated High School",d:""}]};
 
+const CP_CATEGORIES=[
+  {id:"introduction",label:"Introduction",icon:"🧩",hex:"#4fd8e8",
+   subcategories:[
+     {id:"what-is-it",label:"What Is CareerPilot AI?",imgs:[
+       {label:"Main Page",src:gh("ai-projects/01-mainpage.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)",caption:"**From job description to interview-ready.**\n\nApplying to a job is rarely just about having a good resume. The difficult part is understanding what the company is actually asking for, whether your experience provides real evidence for it, and how to communicate that evidence without inventing anything.\n\nCareerPilot AI turns that process into an interactive workflow.\n\nA user can: **Analyze → Understand → Tailor → Finalize → Prepare**\n\nThe system analyzes the job description and resume, identifies the strongest and weakest areas, asks targeted questions when information is missing, generates a tailored resume, and uses that application to prepare for an interview."},
+     ]},
+     {id:"why-this-project",label:"Why This Project?",caption:"Seeing that the job market increasingly looks like a **Hunger Games parody**, applying for a job is rarely just about having a good resume anymore.\n\nBefore a recruiter even sees a resume, it may have already gone through an **ATS** or **AI-powered screening system**, so a resume doesn't just have to look good to a human, it has to be **readable by a machine too**.",more:"**Keywords, skills, ATS structure** and **relevance** matter more than ever, so applying started feeling like a loop: read the job description → understand what they're looking for → identify the ideal candidate → extract the key skills and requirements → figure out how to defend each one with real experience → tailor the resume → apply → network → repeat.\n\nAt one point, this loop was taking **4–6 hours a day** just to submit a handful of applications. *Claude* and *ChatGPT* helped, but every new conversation meant **losing context** and re-explaining the same background, and the **output quality was inconsistent**: sometimes genuinely great, sometimes generic.\n\nSo I built **CareerPilot AI** to **automate and optimize** the process I was already doing every day: an agent that already knows my background, doesn't need the same prompts rewritten every time, and can just be handed a job description."},
+   ]},
+  {id:"application-flow",label:"Application Flow",icon:"🧭",hex:"#3ec2e0",
+   text:"Each stage hands a validated, structured output to the next, so the conversation stays predictable even though the underlying model is not.",
+   subcategories:[
+     {id:"start",label:"01 — Start an Application",imgs:[
+       {label:"Start an Application",src:gh("ai-projects/01-mainpage.png"),bg:"radial-gradient(ellipse at 45% 55%,#081820,#040c10)",caption:"The user can start an application by providing a job description and resume, or by reusing information from their user profile. After signing in through *Google OAuth*, the backend verifies the user's identity and issues its own `JWT` (JSON Web Token) for authenticated requests.\n\nUsers can save a **base resume** to their profile and reuse it across applications, or **load the resume from a previous application** instead of uploading everything again. Nothing has to be typed or uploaded twice, letting users **iterate without repeatedly re-uploading** the same documents."},
+     ]},
+     {id:"case-file",label:"02 — Build the Case File",imgs:[
+       {label:"Case File",src:gh("ai-projects/02-case-file.png"),bg:"radial-gradient(ellipse at 55% 45%,#0a1c20,#050e10)",caption:"Because the workflow involves several distinct and complex tasks, it's split into **multiple specialized agents**, each responsible for a specific part of the process. The first is the **Analyzer agent**, which breaks the job description down into its individual requirements and **identifies the skills and signals** that matter most for the role.\n\nIts output is **structured and validated** by the backend before being passed to the next agent, keeping the overall workflow **predictable** despite the probabilistic nature of the underlying LLM."},
+     ]},
+     {id:"analyze",label:"03 — Analyze the Fit",imgs:[
+       {label:"Analysis",src:gh("ai-projects/03-analysis.png"),bg:"radial-gradient(ellipse at 50% 60%,#081a1c,#040e10)",caption:"The Analyzer agent compares each job requirement against the candidate's resume, identifying **evidence**, **gaps** and **priority skills**, then gives a **match score from 0 to 100**. Its results are returned as **structured outputs**, validated by the backend, and passed to the Tailor as part of the **agent orchestration**. Context is explicitly passed between stages, giving the application control over **state management** rather than relying on shared agent memory.\n\nFor offers the user already knows they're a strong fit for, CareerPilot also provides the option to **skip the analysis** and tailor the resume directly, making the workflow faster for applications that don't need further evaluation."},
+     ]},
+     {id:"tailor",label:"04 — Tailor the Resume",imgs:[
+       {label:"Tailor Resume",src:gh("ai-projects/04-tailor-resume.png"),bg:"radial-gradient(ellipse at 40% 50%,#0c1e22,#061012)",caption:"This is where CareerPilot becomes **conversational**. Rather than asking the model to rewrite the entire resume in one pass, the Tailor agent works through a **multi-phase process**: Interrogate → Deepen → Assemble → Review.\n\nIt asks about requirements the resume doesn't sufficiently cover, letting the user provide **additional evidence** before the final version is written. The backend **owns the conversation state** and decides what phase comes next, and it distinguishes between a user's **answer and a question**, so the agent can respond to clarifications naturally instead of forcing a rigid sequence of prompts. After tailoring, each generated bullet follows an **XYZ-style structure**, connecting the user's action with the technical context and a measurable result where evidence exists."},
+     ]},
+     {id:"ready",label:"05 — Ready to Apply",imgs:[
+       {label:"Ready",src:gh("ai-projects/05-ready.png"),bg:"radial-gradient(ellipse at 60% 40%,#0a1a1e,#04100e)",caption:"Once the required information has been collected, CareerPilot **assembles the final resume section by section**, preserving the candidate's real experience while naturally incorporating **relevant keywords** from the job description. The result is an **ATS-ready resume** that can be reviewed and copied directly into the application."},
+     ]},
+     {id:"interview",label:"06 — Prepare for the Interview",imgs:[
+       {label:"Interview",src:null,bg:"radial-gradient(ellipse at 50% 50%,#091c1e,#04100e)",caption:"The application can **reuse the context of a completed application** to launch an interview session for that specific role. Instead of starting another conversation from scratch, the **Interview agent** receives the relevant application context and runs a **structured mock interview** based on the position and candidate.",compare:{
+         left:{label:"Interview Session",imgs:[
+           {label:"Interview",src:gh("ai-projects/06-interview-01.png"),bg:"radial-gradient(ellipse at 50% 50%,#091c1e,#04100e)"},
+         ]},
+         right:{label:"Interview Feedback",imgs:[
+           {label:"Interview",src:gh("ai-projects/06-interview-02.png"),bg:"radial-gradient(ellipse at 45% 45%,#0b1e20,#051210)"},
+         ]},
+       }},
+     ]},
+   ]},
+  {id:"accounts-memory",label:"Accounts, History & Memory",icon:"🗂️",hex:"#33b8de",
+   lead:"Persistent accounts and a Memory Agent let CareerPilot build on a user's previous work instead of starting over on every application.",
+   text:"CareerPilot AI includes persistent user accounts and application history, allowing users to build on previous work instead of starting from scratch every time they apply to a new role.",
+   subcategories:[
+     {id:"oauth-data",label:"Authentication & Data Isolation",imgs:[
+       {label:"Authentication & Data Isolation",src:null,bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)",caption:"Users authenticate through *Google OAuth*, while *PostgreSQL* stores their data across separate `users`, `user_profiles`, and `applications` tables. The authentication layer is also used to enforce **data isolation**, ensuring that an authenticated user can only access their own profile and applications.",compare:{
+         left:{label:"Profile Information",imgs:[
+           {label:"Profile",src:gh("ai-projects/07-profile.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)"},
+         ]},
+         right:{label:"Database Schema",imgs:[
+           {label:"Database Schema",src:gh("ai-projects/09-careerpilot-db-schema.png"),bg:"radial-gradient(ellipse at 55% 45%,#0a1c20,#050e10)"},
+         ]},
+       }},
+     ]},
+     {id:"memory-agent",label:"Memory Agent",caption:"After each application that includes a tailored resume (not just an analysis), a dedicated **Memory Agent** updates a concise profile summary stored in the database: the candidate's real background, which **competencies** they can defend with evidence, and how they tend to phrase it.\n\nWhen a later application shares a competency the memory already covers, the **Interrogate** phase can skip re-asking it, citing what it already knows instead. This turns the agent from a **stateless tool** into a system that **gets to know the user over time**."},
+     {id:"application-history",label:"Application History",imgs:[
+       {label:"Application History",src:null,bg:"radial-gradient(ellipse at 45% 55%,#081820,#040c10)",caption:"Each application can be reopened later, preserving the **job description**, **resume version**, **analysis**, and **tailoring process** so users can continue where they left off.",compare:{
+         left:{label:"Application List",imgs:[
+           {label:"Application History",src:gh("ai-projects/08-applications-01.png"),bg:"radial-gradient(ellipse at 45% 55%,#081820,#040c10)"},
+         ]},
+         right:{label:"Application Detail",imgs:[
+           {label:"Application Detail",src:gh("ai-projects/08-applications-02.png"),bg:"radial-gradient(ellipse at 55% 45%,#0a1c20,#050e10)"},
+         ]},
+       }},
+     ]},
+   ]},
+  {id:"engineering",label:"Engineering the AI System",icon:"⚙️",hex:"#29aed4",
+   lead:"Not just what CareerPilot does — how it's built.",
+   text:"CareerPilot uses several **specialized AI stages** instead of one large prompt. The orchestration logic is implemented directly in *Python* rather than relying on *LangChain* or *LangGraph*, which keeps the **state machine explicit** and makes each transition **predictable and testable**.",
+   subcategories:[
+     {id:"agent-orchestration",label:"Agent Orchestration",caption:"**Analyzer** — Single-pass, not conversational. Parses the job description into ranked requirements, compares each against the resume with cited evidence (match / partial / gap), and computes a weighted fit score.\n\n**Resume Tailor** — Conversational, 4-phase (Extract → Interrogate → Deepen → Assemble), or a fast path that skips straight to Assemble. Asks about requirements the resume doesn't clearly cover, then writes the resume section by section. Never invents a metric or skill.\n\n**Interview** — Runs a fixed 5-question mock interview (recruiter / technical / behavioural / mixed). The model generates each question's content; the turn count is controlled by application code, not the model.\n\n**Memory** — Single-shot, runs in the background after a completed Tailor session. Rewrites an evolving profile summary, which the Tailor's Interrogate phase consults to skip re-asking about competencies it already has evidence for.\n\nWhy not an agent framework? For this application, the workflow is finite and well-defined. Introducing LangChain or LangGraph would add abstraction without solving a problem the application actually has."},
+     {id:"evaluation",label:"Evaluation Before Shipping",caption:"LLM applications are **probabilistic**, so a feature working once is not enough. CareerPilot includes an evaluation suite with **7 golden test cases** designed to check whether generated outputs follow the expected behavior and constraints, covering **structured output validity**, **requirement analysis**, **resume evidence**, **missing information**, **conversation state**, **expected agent behavior** and **safety constraints**."},
+     {id:"security",label:"Security & Reliability",caption:"The LLM is treated as untrusted input.\n\n**Rate limiting** — requests are limited per IP to prevent abuse and uncontrolled API usage.\n\n**Prompt injection protection** — user-controlled text is treated as potentially adversarial; instructions embedded inside job descriptions or resumes are not allowed to override the application's system instructions.\n\n**Schema validation** — model responses are validated before application logic consumes them.\n\n**CORS** — the API restricts which origins are allowed to make browser requests.\n\n**Authentication** — *Google OAuth* is verified server-side before issuing the application's own `JWT`.\n\n**Data isolation** — applications are scoped to their authenticated user, preventing one account from accessing another user's saved applications."},
+     {id:"deployment",label:"Deployment & Infrastructure",imgs:[
+       {label:"Production Architecture",src:gh("ai-projects/10-careerpilot-architecture.png"),bg:"radial-gradient(ellipse at 50% 45%,#081a1c,#040e10)",caption:"A **mocked test suite** (32 tests, zero API cost) runs automatically on every push via *GitHub Actions*. A separate, **manually-triggered workflow** runs the real-API evaluation suite on demand, since it costs real credit and shouldn't run on every commit."},
+     ]},
+   ]},
+  {id:"technical-decisions",label:"Technical Decisions",icon:"🧠",hex:"#22a4ca",
+   lead:"Knowing when not to add a piece of infrastructure is as much a decision as choosing one.",
+   subcategories:[
+     {id:"why-no-vector-db",label:"Why No Vector Database?",caption:"CareerPilot doesn't currently require **semantic retrieval** across a large knowledge base. The relevant context is already provided by the user's resume, job description and current application state. Introducing **embeddings** and a **vector database** would add infrastructure without solving a problem the application actually has, so the architecture stays **proportional to the problem**.\n\n**No RAG** doesn't mean **no AI engineering**."},
+     {id:"why-postgresql",label:"Why PostgreSQL?",caption:"Once CareerPilot gained authentication and persistent applications, **relational data** became useful. The application has a clear relationship — `User` → `Profile` → `Applications` — and *PostgreSQL* provides straightforward persistence and **user-level data isolation** without introducing unnecessary infrastructure."},
+     {id:"why-no-langchain",label:"Why No LangChain / LangGraph?",caption:"The agent workflow is **small enough to model explicitly**. Writing the state machine directly in *Python* makes the orchestration easier to understand, test and debug: **less abstraction, more control**."},
+     {id:"why-claude-haiku",label:"Why Claude Haiku?",caption:"The Tailor workflow can involve **many model interactions**. A smaller, faster model provides a better **cost/latency trade-off** for this particular workflow, while keeping the model **configurable rather than hard-coded**."},
+   ]},
+  {id:"what-i-learned",label:"What I Learned",icon:"🎓",hex:"#1BC2E3",
+   lead:"Building CareerPilot taught me that shipping AI is not just calling an API.",
+   text:"**Design agent workflows** — build multi-step conversations where application code owns state and transitions.\n\n**Evaluate LLM behaviour** — create repeatable tests instead of relying on manually checking a few successful outputs.\n\n**Constrain model output** — use schemas, validation and retries to make probabilistic model responses usable by deterministic application code.\n\n**Build AI features securely** — handle prompt injection, authentication, CORS, rate limiting and user data isolation.\n\n**Ship full-stack AI systems** — connect React, TypeScript, FastAPI, PostgreSQL, OAuth, Claude and cloud deployment into a production application.\n\n**Make architectural trade-offs** — know when not to add RAG, vector databases, agent frameworks or additional infrastructure."},
+];
+
 const PLANETS=[
   {id:"props",label:"Props",icon:"🧱",hex:"#C79CD9",orbitRadius:8,orbitSpeed:.006,startAngle:3.5,radius:.62,desc:"Game-ready prop kits.",moons:[
     {id:"subway-props-kit",label:"Subway Props Kit",icon:"📦",orbitRadius:1.7,orbitSpeed:.014,startAngle:2.5,inclination:-.24,radius:.24,hex:"#d99f88",
@@ -428,11 +515,23 @@ const PLANETS=[
       ]},
   ]},
   {id:"ai",label:"AI Projects",icon:"🤖",hex:"#1BC2E3",orbitRadius:54,orbitSpeed:.00065,startAngle:5.8,radius:1.35,orbitTilt:.38,desc:"AI tools and multi-agent systems.",moons:[
-    {id:"careerpilot-ai",label:"CareerPilotAI",icon:"🧩",orbitRadius:2.6,orbitSpeed:.01,startAngle:1.2,inclination:.2,radius:.32,type:"Multi-Agent AI App",status:"In development",
-     desc:"[TEMPLATE — pending real content] A multi-agent app that analyzes job postings, does honest CV tailoring, and simulates interviews using an Analyzer Agent, a Resume Tailor Agent, and an Interview Agent.",
-     tags:["Next.js","TypeScript","Multi-Agent","LLM","Vercel"],
-     imgs:[{label:"CareerPilotAI",src:null,bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)",textPlaceholder:true,caption:"[TEMPLATE] Overview placeholder — real screenshots and copy to be added."}],
-     cta:"View Demo",ctaHref:"https://career-pilot-ai-tan-ten.vercel.app"},
+    {id:"careerpilot-ai",label:"CareerPilot AI",icon:"🧩",orbitRadius:2.6,orbitSpeed:.01,startAngle:1.2,inclination:.2,radius:.32,type:"Multi-Agent AI App",status:"Live Demo",
+     categories:CP_CATEGORIES,
+     desc:"AI multi-agent application for job analysis, resume tailoring and interview preparation.",
+     overview:"CareerPilot AI is an **AI multi-agent application** that **analyzes job descriptions** against a user's resume, **identifies the skills and requirements** the company is looking for, **highlights evidence and gaps**, **tailors the resume**, and **helps prepare for the interview**. It guides users through a multi-step conversation to produce an evidenced and optimized ATS-ready resume rather than simply rewriting it.\n\nBuilt as a hands-on project to start my career in **AI Engineering**, it focuses on the engineering problems behind reliable LLM applications: agent orchestration, structured outputs, evaluation, authentication, persistence, security and deployment.",
+     tags:["Google OAuth","PostgreSQL","Python","FastAPI","React","TypeScript","Claude API","Agent Orchestration","Evaluation Suite","Docker","Vercel","Railway","Rate Limiting","Prompt Injection Protection"],
+     features:["Multi-agent system: Analyzer, Resume Tailor, Interview & Memory agents","Structured, validated LLM outputs passed between agents","Google OAuth authentication with per-user data isolation","Persistent profile memory across applications","7-case evaluation suite run automatically in CI","Prompt-injection protection & per-IP rate limiting"],
+     imgs:[
+       {label:"CareerPilot AI",src:gh("ai-projects/01-mainpage.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)"},
+       {label:"Case File",src:gh("ai-projects/02-case-file.png"),bg:"radial-gradient(ellipse at 45% 55%,#081820,#040c10)"},
+       {label:"Analysis",src:gh("ai-projects/03-analysis.png"),bg:"radial-gradient(ellipse at 55% 45%,#0a1c20,#050e10)"},
+       {label:"Tailor Resume",src:gh("ai-projects/04-tailor-resume.png"),bg:"radial-gradient(ellipse at 50% 60%,#081a1c,#040e10)"},
+       {label:"Ready to Apply",src:gh("ai-projects/05-ready.png"),bg:"radial-gradient(ellipse at 40% 50%,#0c1e22,#061012)"},
+       {label:"Interview Prep",src:gh("ai-projects/06-interview-01.png"),bg:"radial-gradient(ellipse at 60% 40%,#0a1a1e,#04100e)"},
+     ],
+     thumbnail:gh("ai-projects/01-mainpage.png"),
+     cta:"Try CareerPilot AI →",ctaHref:"https://career-pilot-ai-tan-ten.vercel.app",
+     links:[{label:"View on GitHub",href:"https://github.com/CompCube/CareerPilotAI"}]},
   ]},
   {id:"web",label:"Web Dev",icon:"🌐",hex:"#3CC87A",orbitRadius:66,orbitSpeed:.00038,startAngle:2.4,radius:.52,orbitTilt:.64,desc:"Client websites deployed for clubs, stores and hospitality.",moons:[
     {id:"btt-valls",label:"btt-valls.com",icon:"🚵",orbitRadius:2.0,orbitSpeed:.013,startAngle:.8,inclination:.32,radius:.22,hex:"#70d4a0",
@@ -539,7 +638,7 @@ const CSS=`
 .qn-scroll::-webkit-scrollbar-thumb:hover{background:rgba(237,195,43,.5)}
 `;
 
-const renderBold=t=>t?t.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).map((p,i)=>{if(p.startsWith('**')&&p.endsWith('**'))return(<strong key={i} style={{color:"rgba(232,232,240,.98)",fontWeight:600}}>{p.slice(2,-2)}</strong>);if(p.startsWith('*')&&p.endsWith('*'))return(<em key={i} style={{fontStyle:"italic",color:"rgba(232,232,240,.82)"}}>{p.slice(1,-1)}</em>);return p;}):null;
+const renderBold=t=>t?t.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g).map((p,i)=>{if(p.startsWith('**')&&p.endsWith('**'))return(<strong key={i} style={{color:"rgba(232,232,240,.98)",fontWeight:600}}>{p.slice(2,-2)}</strong>);if(p.startsWith('`')&&p.endsWith('`'))return(<code key={i} style={{fontFamily:"'JetBrains Mono',monospace",fontSize:".88em",padding:".08em .4em",background:"rgba(255,255,255,.08)",border:"1px solid rgba(255,255,255,.16)",borderRadius:"4px",color:"rgba(140,230,240,.95)"}}>{p.slice(1,-1)}</code>);if(p.startsWith('*')&&p.endsWith('*'))return(<em key={i} style={{fontStyle:"italic",color:"rgba(232,232,240,.82)"}}>{p.slice(1,-1)}</em>);return p;}):null;
 function Lb({t,c}){return <div style={{fontSize:".6rem",color:c,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".22em",marginBottom:".45rem"}}>{t}</div>;}
 const HowItWorks=({text,c})=>{const t=useT();const[open,setOpen]=useState(false);if(!text)return null;return(<div style={{marginTop:".55rem"}}>
   <button onClick={()=>setOpen(o=>!o)} style={{display:"flex",alignItems:"center",gap:".35rem",padding:".28rem .6rem",fontSize:".62rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".08em",color:c,background:`${c}14`,border:`1px solid ${c}44`,borderRadius:"6px",cursor:"pointer",transition:"all .2s"}}>
@@ -691,6 +790,48 @@ function Gallery({imgs,videoId,c,idx,onIdx,maxH}){
   </div>);
 }
 
+function CoverGallery({imgs,videoId,c,idx,onIdx,big}){
+  if(!imgs?.length)return null;
+  const n=imgs.length;
+  const[failed,setFailed]=useState(()=>new Set());
+  const[lbOpen,setLbOpen]=useState(false);
+  const reduce=typeof window!=="undefined"&&window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  const go=d=>onIdx(i=>(i+d+n)%n);
+  const cardW=big?"clamp(300px,54vw,640px)":"clamp(240px,44vw,480px)";
+  const cur=imgs[idx]||imgs[0];
+  return(<div style={{marginBottom:".75rem"}}>
+    <div style={{position:"relative",height:big?"clamp(280px,46vh,420px)":"clamp(220px,38vh,340px)",display:"flex",alignItems:"center",justifyContent:"center",perspective:"1400px"}}>
+      {imgs.map((im,i)=>{
+        let off=i-idx;if(off>n/2)off-=n;if(off<-n/2)off+=n;
+        const abs=Math.abs(off),center=off===0;
+        const showImg=im.src&&!failed.has(im.src);
+        const activeVid=center?(im.videoId??videoId):null;
+        const style=reduce
+          ?{opacity:center?1:0,pointerEvents:center?"auto":"none",transform:"none"}
+          :{transform:`translateX(${off*CF.sideX}%) scale(${center?1:Math.pow(CF.sideScale,abs)}) rotateY(${-off*CF.sideRot}deg)`,
+            opacity:center?1:abs===1?CF.sideOp:CF.farOp,
+            zIndex:20-abs,
+            pointerEvents:abs>1?"none":"auto",
+            filter:center?"none":`blur(${abs*1.4}px)`};
+        return(<div key={i} onClick={()=>center?(showImg&&setLbOpen(true)):onIdx(i)} style={{position:"absolute",width:cardW,aspectRatio:"16/9",borderRadius:"14px",overflow:"hidden",cursor:center?(showImg?"zoom-in":"default"):"pointer",background:im.bg||"rgba(10,10,18,.65)",border:`1px solid ${c}${center?"44":"28"}`,boxShadow:center?`0 30px 70px rgba(0,0,0,.7),0 0 40px ${c}1f`:"0 16px 40px rgba(0,0,0,.6)",transition:"transform .55s cubic-bezier(.2,.9,.3,1),opacity .45s ease,filter .45s ease,box-shadow .45s ease",...style}}>
+          {activeVid?<iframe src={`https://www.youtube.com/embed/${activeVid}?autoplay=1&mute=1`} title={im.label||"video"} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{width:"100%",height:"100%",border:"none",display:"block"}}/>
+          :showImg?<img src={im.src} alt={im.label||""} onError={()=>setFailed(s=>new Set(s).add(im.src))} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+          :im.textPlaceholder?<div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",padding:"1.2rem",boxSizing:"border-box"}}><p style={{fontSize:".68rem",lineHeight:1.6,color:`${c}77`,fontFamily:TK.mono,whiteSpace:"pre-line",textAlign:"center",margin:0}}>{im.caption}</p></div>
+          :<div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}}><span style={{fontSize:".6rem",color:`${c}66`,fontFamily:TK.mono,letterSpacing:".14em"}}>{(im.label||"IMAGE").toUpperCase()}</span></div>}
+        </div>);
+      })}
+      {n>1&&<>
+        <button onClick={()=>go(-1)} aria-label="Previous image" className="pf-btn" style={{position:"absolute",left:"1%",zIndex:30,width:38,height:38,borderRadius:"50%",background:"rgba(10,10,20,.8)",border:"1px solid rgba(255,255,255,.18)",color:"#e8e8f0",cursor:"pointer",fontSize:"1.2rem",display:"flex",alignItems:"center",justifyContent:"center"}}>‹</button>
+        <button onClick={()=>go(1)} aria-label="Next image" className="pf-btn" style={{position:"absolute",right:"1%",zIndex:30,width:38,height:38,borderRadius:"50%",background:"rgba(10,10,20,.8)",border:"1px solid rgba(255,255,255,.18)",color:"#e8e8f0",cursor:"pointer",fontSize:"1.2rem",display:"flex",alignItems:"center",justifyContent:"center"}}>›</button>
+      </>}
+    </div>
+    {n>1&&<div style={{display:"flex",gap:".45rem",justifyContent:"center",marginTop:"1rem"}}>
+      {imgs.map((_,i)=><button key={i} onClick={()=>onIdx(i)} aria-label={`Go to image ${i+1}`} style={{width:i===idx?22:7,height:7,borderRadius:"100px",background:i===idx?c:"rgba(255,255,255,.22)",border:"none",cursor:"pointer",transition:"all .3s",padding:0}}/>)}
+    </div>}
+    {lbOpen&&cur.src&&<Lightbox imgs={imgs} idx={idx} onIdx={onIdx} onClose={()=>setLbOpen(false)}/>}
+  </div>);
+}
+
 function Modal({c,onClose,children,width}){
   return(<div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,8,.72)",backdropFilter:"blur(8px)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:"clamp(1rem,3vw,2rem)"}}>
     <div onClick={e=>e.stopPropagation()} style={{width:width||"min(1400px,94vw)",maxHeight:"88vh",background:"rgba(7,7,17,.97)",backdropFilter:"blur(28px)",border:`1px solid ${c}30`,borderRadius:"20px",boxShadow:`0 0 80px ${c}18,0 30px 80px rgba(0,0,0,.7)`,overflowY:"auto",scrollbarWidth:"none",fontFamily:"'Space Grotesk',sans-serif",color:"#e8e8f0",animation:"modalIn .35s cubic-bezier(.16,1,.3,1)"}}>{children}</div>
@@ -812,8 +953,8 @@ function CaseStudy({project,onClose}){
       <div style={{position:"absolute",inset:0,pointerEvents:"none",background:`radial-gradient(ellipse at 50% 0%,${pC}16,transparent 55%)`}}/>
       <div style={{position:"relative",zIndex:1,maxWidth:1100,margin:"0 auto",padding:"1.5rem clamp(1.2rem,4vw,3rem) 6rem"}}>
         <section data-secid="overview" ref={el=>{secRefs.current.overview=el;}} style={{scrollMarginTop:"1rem"}}>
-          {ovImgs.length>0&&<Gallery imgs={ovImgs} videoId={project.videoId} c={pC} idx={ovIdx} onIdx={setOvIdx} maxH="56vh"/>}
-          {project.desc&&<p style={{fontSize:"clamp(.9rem,1.4vw,1rem)",lineHeight:1.75,color:"rgba(232,232,240,.72)",margin:"1.4rem 0 0",width:"100%",textAlign:"justify",hyphens:"auto",WebkitHyphens:"auto"}}>{renderBold(project.desc)}</p>}
+          {ovImgs.length>0&&<CoverGallery imgs={ovImgs} videoId={project.videoId} c={pC} idx={ovIdx} onIdx={setOvIdx} big/>}
+          {(project.overview||project.desc)&&<p style={{fontSize:"clamp(.9rem,1.4vw,1rem)",lineHeight:1.75,color:"rgba(232,232,240,.72)",margin:"1.4rem 0 0",width:"100%",whiteSpace:"pre-line",textAlign:"justify",hyphens:"auto",WebkitHyphens:"auto"}}>{renderBold(project.overview||project.desc)}</p>}
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:"1.6rem",marginTop:"2rem"}}>
             {project.features?.length>0&&(<div>
               <Lb t="HIGHLIGHTS" c={pC}/>
@@ -831,6 +972,11 @@ function CaseStudy({project,onClose}){
               {project.launchDate&&<div style={{marginBottom:"1.3rem"}}><Countdown targetDate={project.launchDate} c={pC}/></div>}
               {project.cta&&(()=>{const href=project.ctaHref||"#";const ext=href.startsWith("http");const lp=ext?{href,target:"_blank",rel:"noopener noreferrer"}:{href:"#",onClick:e=>e.preventDefault()};
                 return(<a {...lp} className="pf-btn" style={{display:"block",textAlign:"center",padding:".85rem",background:`${pC}22`,border:`1px solid ${pC}66`,borderRadius:"10px",color:pC,textDecoration:"none",fontSize:".9rem",fontWeight:600,transition:"filter .2s"}}>{project.cta}</a>);})()}
+              {project.links?.length>0&&(<div style={{display:"flex",flexDirection:"column",gap:".55rem",marginTop:project.cta?".55rem":0}}>
+                {project.links.map(l=>{const href=l.href||"#";const ext=href.startsWith("http");const lp=ext?{href,target:"_blank",rel:"noopener noreferrer"}:{href:"#",onClick:e=>e.preventDefault()};
+                  return(<a key={l.label} {...lp} className="pf-btn" style={{display:"block",textAlign:"center",padding:".85rem",background:`${pC}14`,border:`1px solid ${pC}44`,borderRadius:"10px",color:pC,textDecoration:"none",fontSize:".9rem",fontWeight:600,transition:"filter .2s"}}>{l.label}</a>);
+                })}
+              </div>)}
             </div>
           </div>
         </section>
@@ -866,7 +1012,7 @@ function CaseStudy({project,onClose}){
                         <div style={{fontSize:".62rem",color:`${ch}99`,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".16em",marginBottom:".6rem"}}>{(g.label||"").toUpperCase()}</div>
                         <CaseGallery imgs={g.imgs||[]} c={ch} vid={g.videoId}/>
                       </div>))
-                    : <CaseGallery imgs={sub.imgs||[]} c={ch} vid={sub.videoId} fallbackCaption={sub.caption}/>}
+                    : <CaseGallery imgs={sub.imgs||[]} c={ch} vid={sub.videoId} fallbackCaption={sub.caption} fallbackMore={sub.more}/>}
                 </div>
               </div>
             ))}
@@ -900,9 +1046,17 @@ function Reveal({dir,children}){
   return <div ref={ref} className="cs-reveal" style={{opacity:on?1:0,animation:on?`${dir==="l"?"revealL":"revealR"} .7s cubic-bezier(.16,1,.3,1) both`:"none"}}>{children}</div>;
 }
 
-function CaseGallery({imgs,c,vid,fallbackCaption,offset=0}){
+function CaseGallery({imgs,c,vid,fallbackCaption,fallbackMore,offset=0}){
   const[lb,setLb]=useState(-1);
-  if(!imgs?.length)return fallbackCaption?<p style={{fontSize:".84rem",lineHeight:1.75,color:"rgba(232,232,240,.66)",whiteSpace:"pre-line",marginTop:".8rem",width:"100%",textAlign:"justify",hyphens:"auto",WebkitHyphens:"auto"}}>{renderBold(fallbackCaption)}</p>:null;
+  const[moreOpen,setMoreOpen]=useState(false);
+  const pStyle={fontSize:".84rem",lineHeight:1.75,color:"rgba(232,232,240,.66)",whiteSpace:"pre-line",marginTop:".8rem",width:"100%",textAlign:"justify",hyphens:"auto",WebkitHyphens:"auto"};
+  if(!imgs?.length)return fallbackCaption?(<>
+    <p style={pStyle}>{renderBold(fallbackCaption)}</p>
+    {fallbackMore&&(<>
+      {moreOpen&&<p style={{...pStyle,animation:"captionFade .25s ease"}}>{renderBold(fallbackMore)}</p>}
+      <button onClick={()=>setMoreOpen(o=>!o)} style={{background:"none",border:"none",color:`${c}88`,fontSize:".72rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".1em",cursor:"pointer",marginTop:".6rem",padding:0,display:"block"}}>{moreOpen?"↑ Read less":"↓ Read more"}</button>
+    </>)}
+  </>):null;
   const shots=imgs.filter(im=>im.src||im.videoId||im.compare||im.textPlaceholder);
   return(<div style={{marginTop:".9rem",display:"flex",flexDirection:"column",gap:"2.2rem"}}>
     {shots.map((im,i)=>{
@@ -1106,7 +1260,7 @@ const PATTERNS={
 const PATSIZE={games:"22px 22px",environments:"34px 34px",props:"18px 18px",vfx:"100% 100%",tools:"26px 26px",ai:"46px 46px",web:"18px 18px"};
 const patFor=(id,c)=>PATTERNS[id]?{backgroundImage:PATTERNS[id](c),backgroundSize:PATSIZE[id]||"28px 28px"}:{};
 
-const FEATURED_IDS=["hollow-end","magic-barrier","careerpilot-ai","scatter-tool"];
+const FEATURED_IDS=["hollow-end","careerpilot-ai","magic-barrier","scatter-tool"];
 const CF={sideScale:.82,sideX:56,sideRot:26,sideOp:.45,farOp:.12};
 const featuredProjects=()=>FEATURED_IDS.map(id=>{
   for(const p of PLANETS){const m=p.moons.find(x=>x.id===id);if(m)return{...m,catLabel:p.label,catHex:p.hex,catId:p.id};}
