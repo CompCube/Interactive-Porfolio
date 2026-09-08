@@ -323,7 +323,7 @@ const CP_CATEGORIES=[
 ];
 
 const PLANETS=[
-  {id:"props",label:"Props",icon:"🧱",hex:"#C79CD9",orbitRadius:54,orbitSpeed:.006,startAngle:3.5,radius:.62,desc:"Game-ready prop kits.",moons:[
+  {id:"props",label:"Props",icon:"🧱",hex:"#C79CD9",orbitRadius:8,orbitSpeed:.006,startAngle:3.5,radius:.62,desc:"Game-ready prop kits.",moons:[
     {id:"subway-props-kit",label:"Subway Props Kit",icon:"📦",orbitRadius:1.7,orbitSpeed:.014,startAngle:2.5,inclination:-.24,radius:.24,hex:"#d99f88",
       type:"Game-Ready Props",status:"",devPct:null,
       desc:"A collection of **80+ optimized game-ready props** created for **Hollow End** using a **low-poly to high-poly production workflow**, **texture atlases**, and a scalable asset pipeline tailored for large **Unity HDRP** environments. Each prop was designed with both **clean and abandoned variants**, allowing the same asset library to be reused across multiple locations while supporting environmental storytelling and reducing production overhead.",
@@ -514,7 +514,7 @@ const PLANETS=[
         },
       ]},
   ]},
-  {id:"ai",label:"AI Projects",icon:"🤖",hex:"#1BC2E3",orbitRadius:9,orbitSpeed:.00065,startAngle:2.4,radius:1.35,orbitTilt:.38,desc:"AI tools and multi-agent systems.",moons:[
+  {id:"ai",label:"AI Projects",icon:"🤖",hex:"#1BC2E3",orbitRadius:54,orbitSpeed:.00065,startAngle:5.8,radius:1.35,orbitTilt:.38,desc:"AI tools and multi-agent systems.",moons:[
     {id:"careerpilot-ai",label:"CareerPilot AI",icon:"🧩",orbitRadius:2.6,orbitSpeed:.01,startAngle:1.2,inclination:.2,radius:.32,type:"Multi-Agent AI App",status:"Live Demo",
      categories:CP_CATEGORIES,
      desc:"AI multi-agent application for job analysis, resume tailoring and interview preparation.",
