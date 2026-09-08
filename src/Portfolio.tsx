@@ -851,7 +851,7 @@ function Modal({c,onClose,children,width}){
 
 const FORMSPREE_ID=import.meta.env.VITE_FORMSPREE_FORM_ID;
 
-function StarPanel({onClose,initialTab}){
+export function StarPanel({onClose,initialTab}){
   const[tab,setTab]=useState(initialTab||"about");const[msg,setMsg]=useState({n:"",e:"",t:""});
   const[sendState,setSendState]=useState("idle");
   const[bioX,setBioX]=useState(false);
