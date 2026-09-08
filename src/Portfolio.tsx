@@ -1555,21 +1555,6 @@ function HUD({planetId}){
   </div>);
 }
 
-function Mobile(){
-  const[openId,setOpenId]=useState(null);
-  return(<div style={{minHeight:"100vh",background:"#000008",fontFamily:"'Space Grotesk',sans-serif",color:"#e8e8f0",padding:"1.5rem 1rem"}}>
-    <div style={{position:"relative",maxWidth:480,margin:"0 auto"}}>
-      <div style={{textAlign:"center",marginBottom:"2rem",paddingTop:"1rem"}}><h1 style={{fontSize:"1.8rem",fontWeight:700,color:"#fff8f0"}}>Jordi</h1><p style={{color:STAR.hex,fontSize:".75rem",fontFamily:"'JetBrains Mono',monospace",marginTop:".5rem",letterSpacing:".06em"}}>Game Developer · Technical Artist · Barcelona</p></div>
-      {PLANETS.map(p=>{const open=openId===p.id;return(<div key={p.id} style={{marginBottom:".7rem",background:"rgba(8,8,20,.88)",backdropFilter:"blur(16px)",border:`1px solid ${open?p.hex+"66":p.hex+"22"}`,borderRadius:"12px",overflow:"hidden",transition:"all .3s"}}>
-        <div onClick={()=>setOpenId(open?null:p.id)} style={{padding:".9rem 1.1rem",display:"flex",justifyContent:"space-between",alignItems:"center",cursor:"pointer"}}><div style={{display:"flex",gap:".65rem",alignItems:"center"}}><div><div style={{fontWeight:600,fontSize:".9rem"}}>{p.label}</div><div style={{fontSize:".6rem",color:p.hex,fontFamily:"'JetBrains Mono',monospace",marginTop:".1rem"}}>{p.moons.length} project{p.moons.length!==1?"s":""}</div></div></div><span style={{color:p.hex,transition:"transform .3s",transform:open?"rotate(90deg)":"none"}}>›</span></div>
-        {open&&p.moons.map(m=>{const href=m.ctaHref||"";const ext=href.startsWith("http");const linkProps=ext?{href,target:"_blank",rel:"noopener noreferrer"}:{"aria-disabled":true,onClick:e=>e.preventDefault()};
-          return(<div key={m.id} style={{padding:".8rem 1.1rem",borderTop:`1px solid ${p.hex}22`,background:"rgba(0,0,0,.2)"}}><div style={{fontWeight:600,fontSize:".88rem",marginBottom:".4rem"}}>{m.label}</div><p style={{fontSize:".8rem",lineHeight:1.65,color:"rgba(232,232,240,.65)",marginBottom:".7rem"}}>{m.desc}</p>{m.cta&&<a {...linkProps} style={{display:"block",textAlign:"center",padding:".55rem",background:ext?`${m.hex}18`:"rgba(255,255,255,.04)",border:`1px solid ${ext?m.hex+"55":"rgba(255,255,255,.14)"}`,borderRadius:"8px",color:ext?m.hex:"rgba(232,232,240,.4)",textDecoration:"none",fontSize:".82rem",fontWeight:600,cursor:ext?"pointer":"default"}}>{ext?m.cta:`${m.cta} (soon)`}</a>}</div>);})}
-        {open&&p.moons.length===0&&<div style={{padding:".8rem 1.1rem",borderTop:`1px solid ${p.hex}22`,fontSize:".8rem",color:"rgba(232,232,240,.4)",fontFamily:"'JetBrains Mono',monospace"}}>Coming soon</div>}
-      </div>);})}
-    </div>
-  </div>);
-}
-
 function NavHint({onDone}){
   const t=useT();
   const[closing,setClosing]=useState(false);
@@ -1976,7 +1961,6 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
 export default function Portfolio(){
   const[activePlanetId,setActivePlanetId]=useState(null);
   const[panelData,setPanelData]=useState(null);
-  const[isMobile,setIsMobile]=useState(false);
   const[warp,setWarp]=useState(false);
   const[hovMoon,setHovMoon]=useState({data:null,x:0,y:0});
   const[intro,setIntro]=useState(true);
@@ -1986,8 +1970,6 @@ export default function Portfolio(){
   const[starTab,setStarTab]=useState("about");
   useEffect(()=>{
     if(!document.getElementById("pf-css")){const el=document.createElement("style");el.id="pf-css";el.textContent=CSS;document.head.appendChild(el);}
-    const chk=()=>setIsMobile(window.innerHeight>window.innerWidth);chk();window.addEventListener("resize",chk);window.addEventListener("orientationchange",chk);
-    return()=>{window.removeEventListener("resize",chk);window.removeEventListener("orientationchange",chk);};
   },[]);
   const onStarClick=useCallback(()=>setPanelData({type:"star"}),[]);
   const onMoonClick=useCallback(proj=>setPanelData({type:"project",project:proj}),[]);
@@ -1996,7 +1978,6 @@ export default function Portfolio(){
   const onEnterPlanet=useCallback(id=>{setActivePlanetId(id);setPanelData(null);setWarp(true);setTimeout(()=>setWarp(false),280);setTimeout(()=>{setNavFilter(id);setQuickNavOpen(true);},750);},[]);
   const onExitPlanet=useCallback(()=>{setActivePlanetId(null);setPanelData(null);},[]);
   const onHoverMoon=useCallback((data,x,y)=>setHovMoon({data,x,y}),[]);
-  if(isMobile)return <Mobile/>;
   return(<LangContext.Provider value={lang}><div style={{width:"100%",height:"100vh",background:"#000008",overflow:"hidden",position:"relative"}}>
     <div style={{position:"absolute",inset:0,zIndex:0}}><SpaceBg c={STAR.hex}/></div>
     <SolarScene onStarClick={onStarClick} onMoonClick={onMoonClick} onEnterPlanet={onEnterPlanet} onExitPlanet={onExitPlanet} onHoverMoon={onHoverMoon}/>
