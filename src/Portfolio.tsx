@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback, createContext, useContext } from "react";
+import { useNavigate } from "react-router-dom";
 import * as THREE from "three";
 
 const PVERT=`varying vec3 vP;varying vec3 vN;void main(){vP=normalize(position);vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
@@ -563,7 +564,7 @@ function lightenHex(hex,amt){
 PLANETS.forEach(p=>p.moons.forEach(m=>{m.hex=lightenHex(p.hex,.25);}));
 const ALL_ITEMS=[{id:"star",type:"star",label:"Jordi",icon:"⭐",hex:STAR.hex},...PLANETS.map(p=>({id:p.id,type:"planet",label:p.label,icon:p.icon,hex:p.hex})),...PLANETS.flatMap(p=>p.moons.map(m=>({id:m.id,type:"moon",label:m.label,icon:m.icon,hex:m.hex,planetId:p.id})))];
 
-const TK={
+export const TK={
   fs:{xs:".6rem",sm:".72rem",base:".84rem",md:".95rem",lg:"1.15rem",xl:"1.5rem"},
   r:{sm:"8px",md:"12px",lg:"20px"},
   op:{faint:"14",soft:"28",mid:"55",strong:"88"},
@@ -571,7 +572,7 @@ const TK={
   mono:"'JetBrains Mono',monospace",
   sans:"'Space Grotesk',sans-serif",
 };
-const CSS=`
+export const CSS=`
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
 @keyframes progFill{from{width:0}to{}}
@@ -649,7 +650,7 @@ const CSS=`
 .qn-scroll::-webkit-scrollbar-thumb:hover{background:rgba(237,195,43,.5)}
 `;
 
-const renderBold=t=>t?t.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g).map((p,i)=>{if(p.startsWith('**')&&p.endsWith('**'))return(<strong key={i} style={{color:"rgba(232,232,240,.98)",fontWeight:600}}>{p.slice(2,-2)}</strong>);if(p.startsWith('`')&&p.endsWith('`'))return(<code key={i} style={{fontFamily:"'JetBrains Mono',monospace",fontSize:".88em",padding:".08em .4em",background:"rgba(255,255,255,.08)",border:"1px solid rgba(255,255,255,.16)",borderRadius:"4px",color:"rgba(140,230,240,.95)"}}>{p.slice(1,-1)}</code>);if(p.startsWith('*')&&p.endsWith('*'))return(<em key={i} style={{fontStyle:"italic",color:"rgba(232,232,240,.82)"}}>{p.slice(1,-1)}</em>);return p;}):null;
+export const renderBold=t=>t?t.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g).map((p,i)=>{if(p.startsWith('**')&&p.endsWith('**'))return(<strong key={i} style={{color:"rgba(232,232,240,.98)",fontWeight:600}}>{p.slice(2,-2)}</strong>);if(p.startsWith('`')&&p.endsWith('`'))return(<code key={i} style={{fontFamily:"'JetBrains Mono',monospace",fontSize:".88em",padding:".08em .4em",background:"rgba(255,255,255,.08)",border:"1px solid rgba(255,255,255,.16)",borderRadius:"4px",color:"rgba(140,230,240,.95)"}}>{p.slice(1,-1)}</code>);if(p.startsWith('*')&&p.endsWith('*'))return(<em key={i} style={{fontStyle:"italic",color:"rgba(232,232,240,.82)"}}>{p.slice(1,-1)}</em>);return p;}):null;
 function Lb({t,c}){return <div style={{fontSize:".6rem",color:c,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".22em",marginBottom:".45rem"}}>{t}</div>;}
 const HowItWorks=({text,c})=>{const t=useT();const[open,setOpen]=useState(false);if(!text)return null;return(<div style={{marginTop:".55rem"}}>
   <button onClick={()=>setOpen(o=>!o)} style={{display:"flex",alignItems:"center",gap:".35rem",padding:".28rem .6rem",fontSize:".62rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".08em",color:c,background:`${c}14`,border:`1px solid ${c}44`,borderRadius:"6px",cursor:"pointer",transition:"all .2s"}}>
@@ -1302,7 +1303,7 @@ const featuredProjects=()=>FEATURED_IDS.map(id=>{
 
 function hexToRgb(h){const n=parseInt(h.slice(1),16);return[(n>>16)&255,(n>>8)&255,n&255];}
 
-function SpaceBg({c,fixed}){
+export function SpaceBg({c,fixed}){
   const cvRef=useRef(null);
   useEffect(()=>{
     const cv=cvRef.current;if(!cv)return;
@@ -1371,7 +1372,7 @@ function SpaceBg({c,fixed}){
   </div>);
 }
 
-function FeaturedCarousel({onOpen,big}){
+export function FeaturedCarousel({onOpen,big}){
   const items=featuredProjects();
   const[idx,setIdx]=useState(0);
   const reduce=typeof window!=="undefined"&&window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
@@ -1579,7 +1580,7 @@ function NavHint({onDone}){
     </div>
   </div>);
 }
-function SecReveal({children,root}){
+export function SecReveal({children,root}){
   const ref=useRef(null);
   const[on,setOn]=useState(false);
   useEffect(()=>{
@@ -1590,161 +1591,12 @@ function SecReveal({children,root}){
   return <div ref={ref} className={`sec-rv${on?" on":""}`}>{children}</div>;
 }
 
-function SecTitle({t,c}){
+export function SecTitle({t,c}){
   return(<div style={{display:"flex",alignItems:"center",gap:"1rem",marginBottom:"1.5rem",justifyContent:"center"}}>
     <div style={{flex:1,maxWidth:120,height:1,background:`linear-gradient(90deg,transparent,${c}44)`}}/>
     <div style={{fontSize:".64rem",color:"rgba(232,232,240,.45)",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".32em",whiteSpace:"nowrap"}}>{t}</div>
     <div style={{flex:1,maxWidth:120,height:1,background:`linear-gradient(90deg,${c}44,transparent)`}}/>
   </div>);
-}
-
-const PX={
-  heroExitVh:.62,      // fracció del viewport en què el hero acaba de desapareixer
-  photoShift:150,      // px que puja la foto al llarg de la sortida
-  textShift:78,        // px que puja el text (mes lent = sensacio de profunditat)
-  heroScale:.10,       // quant s'encongeix el hero (0.10 = fins al 90%)
-  heroBlur:5,          // px de desenfocament maxim
-  panelExitVh:.22,     // fracció del viewport final en què el panell comença a sortir
-  panelShift:14,       // % d'alçada que puja el panell durant la sortida lligada al scroll
-};
-const clamp01=v=>Number.isNaN(v)?0:v<0?0:v>1?1:v;
-
-function IntroScreen({onEnter,onOpenProject}){
-  const c=STAR.hex;
-  const wrapRef=useRef(null);
-  const[fading,setFading]=useState(false);
-  const[sp,setSp]=useState(0);   // progres de sortida del hero (0-1)
-  const[ep,setEp]=useState(0);   // progres de sortida del panell (0-1)
-  const reduce=typeof window!=="undefined"&&window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-  const go=useCallback(dest=>{
-    if(fading)return;
-    setFading(true);
-    setTimeout(()=>onEnter(typeof dest==="string"?dest:undefined),820);
-  },[fading,onEnter]);
-  useEffect(()=>{
-    const el=wrapRef.current;if(!el)return;
-    let raf=0;
-    const update=()=>{
-      raf=0;
-      const st=el.scrollTop,vh=el.clientHeight;
-      if(!reduce){
-        setSp(clamp01(st/(vh*PX.heroExitVh)));
-        const rest=el.scrollHeight-vh-st;
-        setEp(clamp01(1-rest/(vh*PX.panelExitVh)));
-      }
-      if(st+vh>=el.scrollHeight-4)go();
-    };
-    const onScroll=()=>{if(!raf)raf=requestAnimationFrame(update);};
-    el.addEventListener("scroll",onScroll,{passive:true});
-    update();
-    return()=>{el.removeEventListener("scroll",onScroll);if(raf)cancelAnimationFrame(raf);};
-  },[go,reduce]);
-  const heroOpacity=1-sp;
-  const heroStyle=shift=>({opacity:heroOpacity,transform:`translateY(${-sp*shift}px) scale(${1-sp*PX.heroScale})`,filter:sp>.02?`blur(${sp*PX.heroBlur}px)`:"none",willChange:sp>0&&sp<1?"transform,opacity":"auto",pointerEvents:heroOpacity<.05?"none":"auto"});
-  const pillars=[
-    {icon:"✦",title:"Intelligent Systems",text:"Design and build end-to-end tools, agents, and workflows powered by Generative AI."},
-    {icon:"✦",title:"Game Development",text:"Design and build games, from gameplay systems and mechanics to complete interactive experiences, with a strong focus on environment art, game design and player experience."},
-    {icon:"✦",title:"Technical Art",text:"Bridge art and engineering with custom tools, shaders, and real-time production pipelines."},
-  ];
-  return(<>
-    <style>{`@keyframes introUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}@keyframes introIn{from{opacity:0}to{opacity:1}}@keyframes introBlink{0%,100%{opacity:.14}50%{opacity:.44}}`}</style>
-    <div ref={wrapRef} className="qn-scroll" style={{position:"fixed",inset:0,zIndex:500,background:"rgba(0,0,8,.93)",backdropFilter:"blur(3px)",overflowY:"auto",userSelect:"none",fontFamily:"'Space Grotesk',sans-serif",opacity:fading?0:1-ep*.55,transform:fading?"translateY(-100%)":`translateY(${-ep*PX.panelShift}%)`,transition:fading?"opacity .75s ease,transform .85s cubic-bezier(.7,0,.3,1)":"none",willChange:ep>0?"transform,opacity":"auto"}}>
-      <div style={{position:"relative",zIndex:1,maxWidth:1180,margin:"0 auto",padding:"0 clamp(1.3rem,4vw,2.5rem) 3.5rem",display:"flex",flexDirection:"column",gap:"clamp(3rem,8vh,5rem)"}}>
-      <div style={{position:"relative",minHeight:"100vh",display:"flex",flexDirection:"column",justifyContent:"center",gap:"clamp(2rem,5vh,3.5rem)",paddingTop:"clamp(3.5rem,7vh,5rem)",paddingBottom:"clamp(1.5rem,4vh,3rem)"}}><SpaceBg c={c}/><div style={{position:"relative",zIndex:1,display:"flex",flexDirection:"column",gap:"clamp(2rem,5vh,3.5rem)"}}>
-        <div className="hero-grid" style={{display:"grid",gridTemplateColumns:"minmax(180px,250px) 1fr",gap:"clamp(1.8rem,4vw,3rem)",alignItems:"center",maxWidth:940,margin:"0 auto",width:"100%"}}>
-          <div className="hero-photo" style={{position:"relative",...heroStyle(PX.photoShift)}}>
-            <div style={{position:"absolute",inset:"-18%",borderRadius:"50%",background:`radial-gradient(ellipse,${c}22 0%,transparent 68%)`,filter:"blur(6px)",pointerEvents:"none",animation:"introIn 1.2s both"}}/>
-            <div style={{position:"relative",width:"100%",aspectRatio:"1/1",borderRadius:"28px",overflow:"hidden",border:`2px solid ${c}55`,boxShadow:`0 0 80px ${c}28,inset 0 0 40px rgba(0,0,0,.3)`,background:`radial-gradient(ellipse at 50% 30%,${c}14,#0a0a12)`,animation:"introIn .8s both"}}>
-              <img src={gh("profile_picture.png")} alt="Jordi Altisèn" style={{width:"100%",height:"100%",objectFit:"cover"}} onError={e=>{e.currentTarget.style.display="none";}}/>
-            </div>
-          </div>
-          <div className="hero-text" style={heroStyle(PX.textShift)}>
-            <div style={{fontSize:".64rem",color:`${c}88`,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".32em",marginBottom:"1rem",animation:"introIn .8s .1s both"}}>PORTFOLIO 2026</div>
-            <h1 style={{fontSize:"clamp(1.7rem,3.4vw,2.5rem)",fontWeight:700,color:"rgba(255,248,240,.96)",lineHeight:1.2,margin:"0 0 1.1rem",perspective:"600px"}}>
-              {["Hi,","I'm"].map((w,i)=><span key={i} className="word" style={{animationDelay:`${.15+i*.08}s`,marginRight:".32em"}}>{w}</span>)}
-              <span className="word" style={{animationDelay:".31s",color:c,textShadow:`0 0 28px ${c}66`}}>Jordi.</span><br/>
-              {["Welcome","to","my","portfolio!"].map((w,i)=><span key={i} className="word" style={{animationDelay:`${.42+i*.07}s`,marginRight:".32em"}}>{w}</span>)}
-            </h1>
-            <p style={{fontSize:"clamp(.85rem,1.3vw,.95rem)",color:"rgba(232,232,240,.62)",lineHeight:1.7,maxWidth:520,margin:"0 0 1.8rem",animation:"introIn .8s .3s both"}}>Game Developer focused on Technical Art, with a passion for building AI-powered systems and interactive experiences.</p>
-            <div className="hero-ctas" style={{display:"flex",gap:".7rem",flexWrap:"wrap",animation:"introIn .8s .45s both"}}>
-              <button onClick={()=>go()} style={{padding:".78rem 1.6rem",background:c,border:"none",borderRadius:"9px",color:"#0a0a12",cursor:"pointer",fontSize:".85rem",fontWeight:700,fontFamily:"'Space Grotesk',sans-serif",boxShadow:`0 0 30px ${c}33`}}>Explore Portfolio</button>
-              <button onClick={()=>go("contact")} style={{padding:".78rem 1.6rem",background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.18)",borderRadius:"9px",color:"#e8e8f0",cursor:"pointer",fontSize:".85rem",fontWeight:600,fontFamily:"'Space Grotesk',sans-serif"}}>Contact</button>
-            </div>
-          </div>
-        </div>
-        <div style={{animation:"introIn 1s .5s both"}}>
-          <div style={{fontSize:".64rem",color:"rgba(232,232,240,.4)",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".32em",textAlign:"center",marginBottom:"1.4rem"}}>WHAT I DO</div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:"1rem"}}>
-            {pillars.map(pl=>(<div key={pl.title} style={{background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.09)",borderRadius:"14px",padding:"1.3rem 1.4rem",backdropFilter:"blur(6px)"}}>
-              <div style={{fontSize:"1.5rem",color:c,marginBottom:".6rem",textShadow:`0 0 16px ${c}44`}}>{pl.icon}</div>
-              <div style={{fontSize:".92rem",fontWeight:700,color:"#e8e8f0",marginBottom:".45rem"}}>{pl.title}</div>
-              <div style={{fontSize:".76rem",color:"rgba(232,232,240,.5)",lineHeight:1.6}}>{pl.text}</div>
-            </div>))}
-          </div>
-        </div>
-      </div></div>
-
-        <SecReveal root={wrapRef}><div style={{position:"relative",display:"grid",gridTemplateColumns:"minmax(260px,.85fr) 1.15fr",gap:"clamp(3.5rem,8vw,7rem)",alignItems:"center",padding:"3rem 0"}} className="feat-grid"><SpaceBg c={c}/>
-          <div style={{position:"relative",zIndex:1}}>
-            <h2 style={{fontSize:"clamp(1.5rem,3vw,2.1rem)",fontWeight:700,color:"#e8e8f0",margin:"0 0 1rem",lineHeight:1.2}}>Featured <span style={{color:c}}>projects</span></h2>
-            <p style={{fontSize:".88rem",color:TK.tx.mid,lineHeight:1.75,margin:"0 0 1.8rem",maxWidth:420}}>A selection of the projects that best represent my work across game development, technical art and intelligent systems.</p>
-            <div style={{display:"flex",gap:".6rem",flexWrap:"wrap"}}>
-              <button onClick={()=>go()} className="pf-btn" style={{padding:".75rem 1.5rem",background:c,border:"none",borderRadius:"100px",color:"#0a0a12",cursor:"pointer",fontSize:".82rem",fontWeight:700,fontFamily:TK.sans,boxShadow:`0 0 30px ${c}33`}}>Explore Portfolio</button>
-              <button onClick={()=>go("projects")} className="pf-btn" style={{padding:".75rem 1.5rem",background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.2)",borderRadius:"100px",color:"#e8e8f0",cursor:"pointer",fontSize:".82rem",fontWeight:600,fontFamily:TK.sans}}>View all projects</button>
-              <button onClick={()=>go("contact")} className="pf-btn" style={{padding:".75rem 1.5rem",background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.14)",borderRadius:"100px",color:TK.tx.mid,cursor:"pointer",fontSize:".82rem",fontWeight:600,fontFamily:TK.sans}}>Contact</button>
-            </div>
-          </div>
-          <div style={{position:"relative",zIndex:1}}><FeaturedCarousel onOpen={onOpenProject}/></div>
-        </div></SecReveal>
-
-        <SecReveal root={wrapRef}><div style={{position:"relative",padding:"2rem 0"}}><SpaceBg c={c}/><div style={{position:"relative",zIndex:1,display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:"1rem",maxWidth:940,margin:"0 auto",width:"100%"}}>
-          {[["140+","Production assets"],["3+","Years in game dev"],["3,000+","Hours in Blender"],["High Honors","Final degree project"]].map(([n,l],mi)=>(
-            <div key={l} style={{textAlign:"center",padding:"1rem .6rem",background:"rgba(255,255,255,.025)",border:"1px solid rgba(255,255,255,.07)",borderRadius:TK.r.md,animation:"none"}}>
-              <div style={{fontSize:"clamp(1.1rem,2.2vw,1.5rem)",fontWeight:700,color:c,marginBottom:".25rem",textShadow:`0 0 20px ${c}44`}}>{n}</div>
-              <div style={{fontSize:".64rem",color:TK.tx.lo,fontFamily:TK.mono,letterSpacing:".1em",lineHeight:1.4}}>{l.toUpperCase()}</div>
-            </div>))}
-        </div></div></SecReveal>
-
-        <SecReveal root={wrapRef}><div style={{position:"relative",padding:"2.5rem 0"}}><SpaceBg c={c}/><div style={{position:"relative",zIndex:1}}>
-          <SecTitle t="ABOUT ME" c={c}/>
-          <p style={{fontSize:".88rem",lineHeight:1.8,color:"rgba(232,232,240,.62)",whiteSpace:"pre-line",maxWidth:820,margin:"0 auto"}}>{renderBold(STAR.summary)}</p>
-        </div></div></SecReveal>
-
-        <SecReveal root={wrapRef}><div style={{position:"relative",padding:"2.5rem 0"}}><SpaceBg c={c}/><div style={{position:"relative",zIndex:1}}>
-          <SecTitle t="SKILLS" c={c}/>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:".9rem 1.8rem",maxWidth:900,margin:"0 auto"}}>
-            {STAR.skills.map(sk=>(<div key={sk.s}>
-              <div style={{display:"flex",justifyContent:"space-between",marginBottom:".3rem"}}>
-                <span style={{fontSize:".8rem",color:"rgba(232,232,240,.8)"}}>{sk.s}</span>
-                <span style={{fontSize:".65rem",color:`${c}aa`,fontFamily:"'JetBrains Mono',monospace"}}>{sk.p}%</span>
-              </div>
-              <div style={{height:3,background:"rgba(255,255,255,.07)",borderRadius:2}}><div style={{height:"100%",width:`${sk.p}%`,background:`linear-gradient(90deg,${c}55,${c})`,borderRadius:2}}/></div>
-            </div>))}
-          </div>
-        </div></div></SecReveal>
-
-        <SecReveal root={wrapRef}><div style={{position:"relative",padding:"2.5rem 0"}}><SpaceBg c={c}/><div style={{position:"relative",zIndex:1}}>
-          <SecTitle t="EXPERIENCE & EDUCATION" c={c}/>
-          <div style={{maxWidth:760,margin:"0 auto",display:"flex",flexDirection:"column",gap:".1rem"}}>
-            {STAR.timeline.map((it,i)=>(<div key={i} style={{display:"grid",gridTemplateColumns:"88px 1fr",gap:"1.1rem",padding:".85rem 0",borderTop:i===0?"none":"1px solid rgba(255,255,255,.06)"}}>
-              <div style={{fontSize:".7rem",color:c,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".06em",paddingTop:".12rem"}}>{it.y}</div>
-              <div>
-                <div style={{fontSize:".86rem",fontWeight:600,color:"#e8e8f0"}}>{it.l}</div>
-                {it.d&&<div style={{fontSize:".76rem",color:"rgba(232,232,240,.48)",marginTop:".15rem",lineHeight:1.55}}>{it.d}</div>}
-              </div>
-            </div>))}
-          </div>
-        </div></div></SecReveal>
-
-        <div onClick={()=>go()} style={{textAlign:"center",cursor:"pointer",paddingTop:"2rem"}}>
-          <div style={{width:1,height:"clamp(40px,9vh,90px)",margin:"0 auto 1.2rem",background:`linear-gradient(180deg,transparent,${c}66)`}}/>
-          <div style={{fontSize:".62rem",color:`${c}88`,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".26em",marginBottom:".6rem"}}>ENTER THE INTERACTIVE PORTFOLIO</div>
-          <div style={{fontSize:"1.2rem",color:`${c}77`,animation:"introBlink 2.4s infinite"}}>↓</div>
-        </div>
-      </div>
-      <div style={{position:"absolute",inset:0,pointerEvents:"none",background:"radial-gradient(ellipse at 50% 30%,transparent 45%,rgba(0,0,8,.6) 100%)"}}/>
-    </div>
-  </>);
 }
 
 function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverMoon}){
@@ -1959,18 +1811,15 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
 }
 
 export default function Portfolio(){
+  const navigate=useNavigate();
   const[activePlanetId,setActivePlanetId]=useState(null);
   const[panelData,setPanelData]=useState(null);
   const[warp,setWarp]=useState(false);
   const[hovMoon,setHovMoon]=useState({data:null,x:0,y:0});
-  const[intro,setIntro]=useState(true);
-  const[showNavHint,setShowNavHint]=useState(false);
+  const[showNavHint,setShowNavHint]=useState(true);
   const lang="en";
   const[quickNavOpen,setQuickNavOpen]=useState(false);
   const[starTab,setStarTab]=useState("about");
-  useEffect(()=>{
-    if(!document.getElementById("pf-css")){const el=document.createElement("style");el.id="pf-css";el.textContent=CSS;document.head.appendChild(el);}
-  },[]);
   const onStarClick=useCallback(()=>setPanelData({type:"star"}),[]);
   const onMoonClick=useCallback(proj=>setPanelData({type:"project",project:proj}),[]);
   const[navFilter,setNavFilter]=useState("all");
@@ -1981,9 +1830,8 @@ export default function Portfolio(){
   return(<LangContext.Provider value={lang}><div style={{width:"100%",height:"100vh",background:"#000008",overflow:"hidden",position:"relative"}}>
     <div style={{position:"absolute",inset:0,zIndex:0}}><SpaceBg c={STAR.hex}/></div>
     <SolarScene onStarClick={onStarClick} onMoonClick={onMoonClick} onEnterPlanet={onEnterPlanet} onExitPlanet={onExitPlanet} onHoverMoon={onHoverMoon}/>
-    {intro&&<IntroScreen onOpenProject={m=>{setIntro(false);setPanelData({type:"project",project:m});}} onEnter={dest=>{setIntro(false);if(dest==="contact"){setStarTab("contact");setPanelData({type:"star"});}else if(dest==="projects"){setNavFilter("all");setJumpAll(true);setQuickNavOpen(true);}else setShowNavHint(true);}}/>}
-    {!intro&&<>
-    <Header onHome={()=>{setPanelData(null);setQuickNavOpen(false);setIntro(true);}} onAbout={()=>{setStarTab("about");setPanelData({type:"star"});}} onProjects={()=>{setNavFilter("all");setJumpAll(false);setQuickNavOpen(o=>!o);}} onContact={()=>{setStarTab("contact");setPanelData({type:"star"});}}/>
+    <>
+    <Header onHome={()=>navigate("/")} onAbout={()=>{setStarTab("about");setPanelData({type:"star"});}} onProjects={()=>{setNavFilter("all");setJumpAll(false);setQuickNavOpen(o=>!o);}} onContact={()=>{setStarTab("contact");setPanelData({type:"star"});}}/>
     <QuickNav open={quickNavOpen} jumpToAll={jumpAll} filter={navFilter} onFilterChange={setNavFilter} onClose={()=>setQuickNavOpen(false)} onSelectProject={m=>{setPanelData({type:"project",project:m});setQuickNavOpen(false);}}/>
     <PlanetNav onSelect={id=>{setNavFilter(id);setJumpAll(false);setQuickNavOpen(true);}}/>
     {showNavHint&&<NavHint onDone={()=>setShowNavHint(false)}/>}
@@ -1995,6 +1843,6 @@ export default function Portfolio(){
     {hovMoon.data&&!panelData&&<MoonTooltip moon={hovMoon.data} x={hovMoon.x} y={hovMoon.y}/>}
     {warp&&<div style={{position:"fixed",inset:0,zIndex:300,pointerEvents:"none",background:"radial-gradient(ellipse at center,rgba(180,220,255,.14) 0%,rgba(100,160,255,.06) 45%,transparent 70%)",animation:"warpIn .28s ease-out forwards"}}/>}
     <StatusBar/>
-    </>}
+    </>
   </div></LangContext.Provider>);
 }
