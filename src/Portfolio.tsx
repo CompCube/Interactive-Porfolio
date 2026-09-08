@@ -1933,14 +1933,6 @@ export default function Portfolio(){
   const[starTab,setStarTab]=useState("about");
   useEffect(()=>{
     if(!document.getElementById("pf-css")){const el=document.createElement("style");el.id="pf-css";el.textContent=CSS;document.head.appendChild(el);}
-    document.title="Jordi Altisèn - Portfolio";
-    const upsertMeta=(attr,key,content)=>{
-      let el=document.querySelector(`meta[${attr}="${key}"]`);
-      if(!el){el=document.createElement("meta");el.setAttribute(attr,key);document.head.appendChild(el);}
-      el.setAttribute("content",content);
-    };
-    upsertMeta("property","og:title","Jordi Altisèn - AI & Game Development");
-    upsertMeta("name","twitter:title","Jordi Altisèn - AI & Game Development");
     const chk=()=>setIsMobile(window.innerHeight>window.innerWidth);chk();window.addEventListener("resize",chk);window.addEventListener("orientationchange",chk);
     return()=>{window.removeEventListener("resize",chk);window.removeEventListener("orientationchange",chk);};
   },[]);
