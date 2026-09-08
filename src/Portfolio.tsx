@@ -838,9 +838,25 @@ function Modal({c,onClose,children,width}){
   </div>);
 }
 
+const FORMSPREE_ID=import.meta.env.VITE_FORMSPREE_FORM_ID;
+
 function StarPanel({onClose,initialTab}){
   const[tab,setTab]=useState(initialTab||"about");const[msg,setMsg]=useState({n:"",e:"",t:""});
+  const[sendState,setSendState]=useState("idle");
   const[bioX,setBioX]=useState(false);
+  const sendMessage=async()=>{
+    if(!msg.n.trim()||!msg.e.trim()||!msg.t.trim()){setSendState("invalid");return;}
+    if(!FORMSPREE_ID){setSendState("unconfigured");return;}
+    setSendState("sending");
+    try{
+      const res=await fetch(`https://formspree.io/f/${FORMSPREE_ID}`,{
+        method:"POST",headers:{"Content-Type":"application/json",Accept:"application/json"},
+        body:JSON.stringify({name:msg.n,email:msg.e,message:msg.t}),
+      });
+      if(!res.ok)throw new Error(String(res.status));
+      setSendState("sent");setMsg({n:"",e:"",t:""});
+    }catch{setSendState("error");}
+  };
   const c=STAR.hex;
   const inp=(ex={})=>({display:"block",width:"100%",padding:".55rem .7rem",marginBottom:".45rem",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",borderRadius:"8px",color:"#e8e8f0",fontSize:".83rem",outline:"none",fontFamily:"'Space Grotesk',sans-serif",...ex});
   const L=({t})=><div style={{fontSize:".6rem",color:c,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".22em",marginBottom:".5rem"}}>{t}</div>;
@@ -877,7 +893,13 @@ function StarPanel({onClose,initialTab}){
         <a href={`https://raw.githubusercontent.com/${GH_USER}/${GH_REPO}/${GH_BRANCH}/src/JordiAltisen_CV.pdf`} download="JordiAltisen_CV.pdf" target="_blank" rel="noopener noreferrer" className="pf-btn" style={{display:"block",textAlign:"center",padding:".72rem",background:`${c}22`,border:`1px solid ${c}66`,borderRadius:"10px",color:c,textDecoration:"none",fontSize:".87rem",fontWeight:600,transition:"filter .2s"}}>Download CV</a>
       </div>
     </div>)}
-    {tab==="contact"&&(<div style={{padding:"0 1.75rem 1.75rem",maxWidth:520,margin:"0 auto"}}><input style={inp()} placeholder="Your name" value={msg.n} onChange={e=>setMsg(m=>({...m,n:e.target.value}))}/><input style={inp()} placeholder="your@email.com" value={msg.e} onChange={e=>setMsg(m=>({...m,e:e.target.value}))}/><textarea style={inp({resize:"vertical",marginBottom:"1rem"})} rows={5} placeholder="Your message" value={msg.t} onChange={e=>setMsg(m=>({...m,t:e.target.value}))}/><button className="pf-btn" onClick={()=>alert("Sent!")} style={{width:"100%",padding:".72rem",background:`${c}22`,border:`1px solid ${c}66`,borderRadius:"10px",color:c,cursor:"pointer",fontSize:".87rem",fontWeight:600,marginBottom:"1.25rem",transition:"filter .2s"}}>Send Message</button><div style={{display:"flex",gap:".5rem",justifyContent:"center"}}>{["GitHub","LinkedIn","Itch.io"].map(l=><a key={l} href="#" onClick={e=>e.preventDefault()} style={{padding:".38rem .9rem",background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.11)",borderRadius:"8px",color:"rgba(232,232,240,.6)",textDecoration:"none",fontSize:".78rem",fontFamily:"'JetBrains Mono',monospace"}}>{l}</a>)}</div></div>)}
+    {tab==="contact"&&(<div style={{padding:"0 1.75rem 1.75rem",maxWidth:520,margin:"0 auto"}}><input style={inp()} placeholder="Your name" value={msg.n} onChange={e=>setMsg(m=>({...m,n:e.target.value}))}/><input style={inp()} placeholder="your@email.com" value={msg.e} onChange={e=>setMsg(m=>({...m,e:e.target.value}))}/><textarea style={inp({resize:"vertical",marginBottom:"1rem"})} rows={5} placeholder="Your message" value={msg.t} onChange={e=>setMsg(m=>({...m,t:e.target.value}))}/>
+      {sendState==="sent"&&<div style={{fontSize:".78rem",color:"#6ee78a",marginBottom:".7rem"}}>Message sent, thanks — I'll get back to you soon.</div>}
+      {sendState==="error"&&<div style={{fontSize:".78rem",color:"#f0806b",marginBottom:".7rem"}}>Something went wrong sending this. Try again, or email me directly.</div>}
+      {sendState==="invalid"&&<div style={{fontSize:".78rem",color:"#f0806b",marginBottom:".7rem"}}>Fill in name, email and message first.</div>}
+      {sendState==="unconfigured"&&<div style={{fontSize:".78rem",color:"#f0806b",marginBottom:".7rem"}}>Contact form isn't wired up yet — email me directly via the links below.</div>}
+      <button className="pf-btn" onClick={sendMessage} disabled={sendState==="sending"} style={{width:"100%",padding:".72rem",background:`${c}22`,border:`1px solid ${c}66`,borderRadius:"10px",color:c,cursor:sendState==="sending"?"default":"pointer",opacity:sendState==="sending"?.6:1,fontSize:".87rem",fontWeight:600,marginBottom:"1.25rem",transition:"filter .2s"}}>{sendState==="sending"?"Sending…":"Send Message"}</button>
+      <div style={{display:"flex",gap:".5rem",justifyContent:"center"}}>{[{l:"GitHub",href:"https://github.com/CompCube"},{l:"LinkedIn",href:"https://www.linkedin.com/in/jordialtisencortijo/"},{l:"Itch.io",href:"https://jalcogames.itch.io/"}].map(({l,href})=><a key={l} href={href} target="_blank" rel="noopener noreferrer" style={{padding:".38rem .9rem",background:"rgba(255,255,255,.04)",border:"1px solid rgba(255,255,255,.11)",borderRadius:"8px",color:"rgba(232,232,240,.6)",textDecoration:"none",fontSize:".78rem",fontFamily:"'JetBrains Mono',monospace"}}>{l}</a>)}</div></div>)}
   </Modal>);
 }
 
