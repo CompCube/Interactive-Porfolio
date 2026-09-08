@@ -597,6 +597,10 @@ const CSS=`
 @media(prefers-reduced-motion:reduce){.bg-orb,.bg-orb-2{animation:none!important}}
 .feat-grid{grid-template-columns:minmax(260px,.85fr) 1.15fr}
 @media(max-width:860px){.feat-grid{grid-template-columns:1fr!important}}
+.qn-grid{grid-template-columns:repeat(3,1fr)}
+@media(max-width:900px){.qn-grid{grid-template-columns:repeat(2,1fr)!important}}
+@media(max-width:560px){.qn-grid{grid-template-columns:1fr!important}}
+@media(max-width:640px){.hdr-nav-desktop{display:none!important}.hdr-burger{display:flex!important;align-items:center;justify-content:center}.status-bar-chrome,.planet-nav-chrome{display:none!important}}
 @keyframes shimmer{0%{background-position:-180% 0}100%{background-position:180% 0}}
 .qn-item{transition:transform .34s cubic-bezier(.2,.9,.3,1),border-color .28s ease,box-shadow .34s ease!important}
 .qn-item:hover{transform:translateY(-7px)}
@@ -686,7 +690,7 @@ function StatusBar(){
   const projects=PLANETS.flatMap(p=>p.moons).length;
   const cats=PLANETS.filter(p=>p.moons.length>0).length;
   const div=<span style={{width:1,height:10,background:"rgba(255,255,255,.1)",display:"inline-block"}}/>;
-  return(<div style={{position:"fixed",bottom:"1.5rem",left:"50%",transform:"translateX(-50%)",background:"rgba(7,7,17,.72)",backdropFilter:"blur(12px)",border:"1px solid rgba(255,255,255,.07)",borderRadius:"8px",padding:".3rem 1rem",display:"flex",gap:"1rem",alignItems:"center",fontFamily:"'JetBrains Mono',monospace",fontSize:".57rem",color:"rgba(232,232,240,.35)",letterSpacing:".1em",zIndex:50,pointerEvents:"none",userSelect:"none"}}>
+  return(<div className="status-bar-chrome" style={{position:"fixed",bottom:"1.5rem",left:"50%",transform:"translateX(-50%)",background:"rgba(7,7,17,.72)",backdropFilter:"blur(12px)",border:"1px solid rgba(255,255,255,.07)",borderRadius:"8px",padding:".3rem 1rem",display:"flex",gap:"1rem",alignItems:"center",fontFamily:"'JetBrains Mono',monospace",fontSize:".57rem",color:"rgba(232,232,240,.35)",letterSpacing:".1em",zIndex:50,pointerEvents:"none",userSelect:"none"}}>
     <span>🎮 {cats} categories</span>{div}<span>✦ {projects} projects</span>{div}<span>📍 Barcelona</span>{div}<span>⏱ 4+ yrs</span>
   </div>);
 }
@@ -1406,7 +1410,7 @@ function FeaturedCarousel({onOpen,big}){
 }
 
 function PlanetNav({onSelect}){
-  return(<nav aria-label="Project categories" style={{position:"fixed",left:"1.2rem",bottom:"1.2rem",zIndex:150,display:"flex",flexDirection:"column",gap:".3rem"}}>
+  return(<nav aria-label="Project categories" className="planet-nav-chrome" style={{position:"fixed",left:"1.2rem",bottom:"1.2rem",zIndex:150,display:"flex",flexDirection:"column",gap:".3rem"}}>
     {PLANETS.filter(p=>p.moons.length>0).map(p=>(
       <button key={p.id} onClick={()=>onSelect(p.id)} title={`${p.label} — ${p.moons.length} projects`} style={{display:"flex",alignItems:"center",gap:".5rem",padding:".3rem .6rem",background:"rgba(7,7,17,.6)",border:`1px solid ${p.hex}33`,borderRadius:"100px",color:TK.tx.mid,cursor:"pointer",fontSize:TK.fs.xs,fontFamily:TK.mono,letterSpacing:".08em",transition:"all .2s",backdropFilter:"blur(8px)",opacity:.55}} onFocus={e=>{e.currentTarget.style.opacity="1";}} onBlur={e=>{e.currentTarget.style.opacity=".55";}} onMouseEnter={e=>{e.currentTarget.style.opacity="1";}} onMouseLeave={e=>{e.currentTarget.style.opacity=".55";}}>
         <span style={{width:7,height:7,borderRadius:"50%",background:p.hex,flexShrink:0}}/>{p.label.toUpperCase()}
@@ -1416,16 +1420,24 @@ function PlanetNav({onSelect}){
 
 function Header({onHome,onAbout,onProjects,onContact}){
   const c=STAR.hex;
+  const[menuOpen,setMenuOpen]=useState(false);
   const items=[["Home",onHome],["About me",onAbout],["Projects",onProjects],["Contact",onContact]];
+  const go=fn=>{setMenuOpen(false);fn();};
   return(<div style={{position:"fixed",top:0,left:0,right:0,zIndex:180,background:"linear-gradient(180deg,rgba(5,5,14,.82) 0%,rgba(5,5,14,.55) 65%,transparent 100%)",backdropFilter:"blur(14px)",WebkitBackdropFilter:"blur(14px)",borderBottom:`1px solid ${c}1f`,pointerEvents:"none"}}>
     <div style={{maxWidth:1500,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",gap:"2rem",padding:"1rem clamp(1.5rem,5vw,3.5rem)"}}>
       <div style={{fontFamily:TK.sans,fontWeight:700,fontSize:"1.08rem",color:"#f2f2f7",letterSpacing:".02em",pointerEvents:"auto",textShadow:`0 0 22px ${c}33`,whiteSpace:"nowrap"}}>Jordi Altisèn</div>
-      <nav style={{display:"flex",alignItems:"center",gap:"clamp(.4rem,1.6vw,1.4rem)",pointerEvents:"auto"}}>
+      <nav className="hdr-nav-desktop" style={{display:"flex",alignItems:"center",gap:"clamp(.4rem,1.6vw,1.4rem)",pointerEvents:"auto"}}>
         {items.map(([label,fn])=>(
           <button key={label} onClick={fn} className="pf-btn hdr-link" style={{background:"none",border:"none",borderRadius:"6px",padding:".45rem .3rem",color:"rgba(232,232,240,.78)",cursor:"pointer",fontSize:".84rem",fontFamily:TK.sans,fontWeight:600,letterSpacing:".01em",whiteSpace:"nowrap",position:"relative"}}>{label}</button>
         ))}
       </nav>
+      <button aria-label={menuOpen?"Close menu":"Open menu"} onClick={()=>setMenuOpen(o=>!o)} className="hdr-burger" style={{display:"none",pointerEvents:"auto",background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.16)",borderRadius:"8px",width:38,height:38,color:"#e8e8f0",cursor:"pointer",fontSize:"1.1rem",flexShrink:0}}>{menuOpen?"✕":"☰"}</button>
     </div>
+    {menuOpen&&<nav className="hdr-nav-mobile" style={{pointerEvents:"auto",display:"flex",flexDirection:"column",padding:"0 clamp(1.5rem,5vw,3.5rem) 1rem",background:"rgba(5,5,14,.96)",backdropFilter:"blur(14px)",borderBottom:`1px solid ${c}1f`}}>
+      {items.map(([label,fn])=>(
+        <button key={label} onClick={()=>go(fn)} className="pf-btn" style={{background:"none",border:"none",textAlign:"left",padding:".75rem .2rem",color:"rgba(232,232,240,.85)",cursor:"pointer",fontSize:".92rem",fontFamily:TK.sans,fontWeight:600,borderTop:"1px solid rgba(255,255,255,.06)"}}>{label}</button>
+      ))}
+    </nav>}
   </div>);
 }
 
@@ -1480,7 +1492,7 @@ function QuickNav({open,onClose,onSelectProject,filter,onFilterChange,jumpToAll}
         </div>
       </div>)}
       {active==="all"?(
-        <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"1.2rem"}}>
+        <div className="qn-grid" style={{display:"grid",gap:"1.2rem"}}>
           {cats.flatMap(p=>p.moons.map(m=>({...m,_catHex:p.hex}))).map((m,i)=>{
             const thumb=m.thumbnail||m.imgs?.[0]?.src||m.categories?.[0]?.imgs?.[0]?.src||m.categories?.[0]?.subcategories?.[0]?.imgs?.[0]?.src||null;
             return(<button key={m.id} className="qn-item" onClick={()=>onSelectProject(m)} style={{textAlign:"left",background:"rgba(255,255,255,.025)",border:`1px solid ${m.hex}28`,borderRadius:"14px",overflow:"hidden",cursor:"pointer",display:"flex",flexDirection:"column",padding:0,animation:`cardIn .6s cubic-bezier(.16,1,.3,1) ${Math.min(i*.045,.5)}s both`}}>
@@ -1500,7 +1512,7 @@ function QuickNav({open,onClose,onSelectProject,filter,onFilterChange,jumpToAll}
         </div>
       ):shown.map(p=>(
         <div key={p.id} style={{marginBottom:"2.8rem"}}>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"1.2rem"}}>
+          <div className="qn-grid" style={{display:"grid",gap:"1.2rem"}}>
             {p.moons.map((m,i)=>{
               const thumb=m.thumbnail||m.imgs?.[0]?.src||m.categories?.[0]?.imgs?.[0]?.src||m.categories?.[0]?.subcategories?.[0]?.imgs?.[0]?.src||null;
               return(<button key={m.id} className="qn-item" onClick={()=>onSelectProject(m)} style={{textAlign:"left",background:"rgba(255,255,255,.025)",border:`1px solid ${m.hex}28`,borderRadius:"14px",overflow:"hidden",cursor:"pointer",display:"flex",flexDirection:"column",padding:0,animation:`cardIn .6s cubic-bezier(.16,1,.3,1) ${Math.min(i*.045,.5)}s both`}}>
@@ -1819,8 +1831,17 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
         const mC=new THREE.Color(p.hex).lerp(new THREE.Color(0xffffff),.25);const mMat=new THREE.MeshStandardMaterial({color:mC.clone().multiplyScalar(.72),emissive:mC,emissiveIntensity:.36,roughness:.6,metalness:.08,bumpMap:moonBumpTex,bumpScale:.018});
         const mMesh=new THREE.Mesh(new THREE.SphereGeometry(m.radius,20,20),mMat);mMesh.userData={type:"moon",id:m.id,planetId:p.id};scene.add(mMesh);allTargets.push(mMesh);pMeshes[p.id].mMeshes[m.id]={mesh:mMesh,mat:mMat};});
     });
-    const camS={mode:"solar",planetId:null,solarAngle:.8,solarDist:46,solarDistTarget:46,hAngle:.5,vAngle:.55};
-    camera.position.set(38*Math.sin(.8),38,38*Math.cos(.8));camera.lookAt(0,0,0);
+    // Narrow (portrait) viewports have a much tighter horizontal FOV than the vertical one the
+    // camera is defined by, so the default solarDist crowds the outer orbits off to the side and
+    // stacks their floating labels. Back the camera off just enough that the widest orbit still
+    // fits comfortably in the horizontal frustum.
+    const maxOrbit=Math.max(...PLANETS.map(p=>p.orbitRadius));
+    const hFov=2*Math.atan(Math.tan((55*Math.PI/180)/2)*(W/H));
+    const fitDist=maxOrbit/Math.tan(hFov*.42);
+    const initSolarDist=Math.max(46,Math.min(100,fitDist));
+    const camS={mode:"solar",planetId:null,solarAngle:.8,solarDist:initSolarDist,solarDistTarget:initSolarDist,hAngle:.5,vAngle:.55};
+    const camStart=initSolarDist*(38/46);
+    camera.position.set(camStart*Math.sin(.8),camStart,camStart*Math.cos(.8));camera.lookAt(0,0,0);
     const camLookAt=new THREE.Vector3(0,0,0);
     const RC=new THREE.Raycaster(),M2=new THREE.Vector2();
     let mDown=false,mMoved=false,downX=0,downY=0,lastMX=0,lastMY=0,lastHovMoon=null;
@@ -1926,7 +1947,9 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
         else if(item.type==="planet"){const pm=pMeshes[item.id];pv.copy(pm.mesh.position);pv.y+=PLANETS.find(p=>p.id===item.id).radius+.6;}
         else{const p=PLANETS.find(x=>x.id===item.planetId);const mm=pMeshes[item.planetId].mMeshes[item.id];pv.copy(mm.mesh.position);pv.y+=p.moons.find(m=>m.id===item.id).radius+.2;}
         pv.project(camera);if(pv.z>1){el.style.opacity="0";return;}
-        el.style.left=(pv.x+1)/2*cw+"px";el.style.top=(-pv.y+1)/2*ch+"px";
+        const padX=Math.min(60,cw*.14),padY=Math.min(28,ch*.06);
+        el.style.left=Math.max(padX,Math.min(cw-padX,(pv.x+1)/2*cw))+"px";
+        el.style.top=Math.max(padY,Math.min(ch-padY,(-pv.y+1)/2*ch))+"px";
         const hv=hov.current?.id===item.id,inS=camS.mode==="solar",inP=camS.mode==="planet",apid=camS.planetId;
         const vis=(item.type==="star")||(item.type==="planet"&&(inS||(inP&&item.id===apid)))||(item.type==="moon"&&inP&&item.planetId===apid);
         el.style.opacity=vis?(hv?"1":".75"):"0";el.style.transform=`translate(-50%,-100%) translateY(-4px) scale(${hv?1.08:1})`;});
