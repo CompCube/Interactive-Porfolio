@@ -972,7 +972,7 @@ function CaseStudy({project,onClose}){
         </div>
         <button onClick={onClose} style={{background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.18)",color:"#e8e8f0",width:38,height:38,borderRadius:"50%",cursor:"pointer",fontSize:"1.1rem",flexShrink:0}}>✕</button>
       </div>
-      <div style={{height:2,background:"rgba(255,255,255,.06)"}}><div style={{height:"100%",width:`${prog*100}%`,background:`linear-gradient(90deg,${pC}66,${pC})`,transition:"width .1s linear"}}/></div>
+      <div style={{height:2,background:"rgba(255,255,255,.06)"}}><div style={{height:"100%",width:"100%",transformOrigin:"left",transform:`scaleX(${prog})`,background:`linear-gradient(90deg,${pC}66,${pC})`,transition:"transform .1s linear"}}/></div>
       {ordered.length>0&&(<div className="qn-scroll" style={{display:"flex",gap:".45rem",overflowX:"auto",padding:inOverview?"0 clamp(1.2rem,4vw,3rem)":".9rem clamp(1.2rem,4vw,3rem)",maxWidth:1500,margin:"0 auto",width:"100%",boxSizing:"border-box",maxHeight:inOverview?0:76,opacity:inOverview?0:1,overflowY:"hidden",transition:"all .35s ease",pointerEvents:inOverview?"none":"auto"}}>
         {ordered.map(cat=>{
           const on=activeId===cat.id,ch=cat.hex||pC;
