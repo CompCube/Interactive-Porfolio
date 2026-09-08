@@ -1622,7 +1622,7 @@ const PX={
   panelExitVh:.22,     // fracció del viewport final en què el panell comença a sortir
   panelShift:14,       // % d'alçada que puja el panell durant la sortida lligada al scroll
 };
-const clamp01=v=>v<0?0:v>1?1:v;
+const clamp01=v=>Number.isNaN(v)?0:v<0?0:v>1?1:v;
 
 function IntroScreen({onEnter,onOpenProject}){
   const c=STAR.hex;
