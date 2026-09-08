@@ -597,6 +597,13 @@ const CSS=`
 @media(prefers-reduced-motion:reduce){.bg-orb,.bg-orb-2{animation:none!important}}
 .feat-grid{grid-template-columns:minmax(260px,.85fr) 1.15fr}
 @media(max-width:860px){.feat-grid{grid-template-columns:1fr!important}}
+@media(max-width:700px){
+  .hero-grid{grid-template-columns:1fr!important;justify-items:center}
+  .hero-photo{max-width:220px;margin:0 auto!important}
+  .hero-text{text-align:center}
+  .hero-text p{margin-left:auto!important;margin-right:auto!important}
+  .hero-text .hero-ctas{justify-content:center!important}
+}
 .qn-grid{grid-template-columns:repeat(3,1fr)}
 @media(max-width:900px){.qn-grid{grid-template-columns:repeat(2,1fr)!important}}
 @media(max-width:560px){.qn-grid{grid-template-columns:1fr!important}}
@@ -1659,14 +1666,14 @@ function IntroScreen({onEnter,onOpenProject}){
     <div ref={wrapRef} className="qn-scroll" style={{position:"fixed",inset:0,zIndex:500,background:"rgba(0,0,8,.93)",backdropFilter:"blur(3px)",overflowY:"auto",userSelect:"none",fontFamily:"'Space Grotesk',sans-serif",opacity:fading?0:1-ep*.55,transform:fading?"translateY(-100%)":`translateY(${-ep*PX.panelShift}%)`,transition:fading?"opacity .75s ease,transform .85s cubic-bezier(.7,0,.3,1)":"none",willChange:ep>0?"transform,opacity":"auto"}}>
       <div style={{position:"relative",zIndex:1,maxWidth:1180,margin:"0 auto",padding:"0 clamp(1.3rem,4vw,2.5rem) 3.5rem",display:"flex",flexDirection:"column",gap:"clamp(3rem,8vh,5rem)"}}>
       <div style={{position:"relative",minHeight:"100vh",display:"flex",flexDirection:"column",justifyContent:"center",gap:"clamp(2rem,5vh,3.5rem)",paddingTop:"clamp(3.5rem,7vh,5rem)",paddingBottom:"clamp(1.5rem,4vh,3rem)"}}><SpaceBg c={c}/><div style={{position:"relative",zIndex:1,display:"flex",flexDirection:"column",gap:"clamp(2rem,5vh,3.5rem)"}}>
-        <div style={{display:"grid",gridTemplateColumns:"minmax(180px,250px) 1fr",gap:"clamp(1.8rem,4vw,3rem)",alignItems:"center",maxWidth:940,margin:"0 auto",width:"100%"}}>
-          <div style={{position:"relative",...heroStyle(PX.photoShift)}}>
+        <div className="hero-grid" style={{display:"grid",gridTemplateColumns:"minmax(180px,250px) 1fr",gap:"clamp(1.8rem,4vw,3rem)",alignItems:"center",maxWidth:940,margin:"0 auto",width:"100%"}}>
+          <div className="hero-photo" style={{position:"relative",...heroStyle(PX.photoShift)}}>
             <div style={{position:"absolute",inset:"-18%",borderRadius:"50%",background:`radial-gradient(ellipse,${c}22 0%,transparent 68%)`,filter:"blur(6px)",pointerEvents:"none",animation:"introIn 1.2s both"}}/>
             <div style={{position:"relative",width:"100%",aspectRatio:"1/1",borderRadius:"28px",overflow:"hidden",border:`2px solid ${c}55`,boxShadow:`0 0 80px ${c}28,inset 0 0 40px rgba(0,0,0,.3)`,background:`radial-gradient(ellipse at 50% 30%,${c}14,#0a0a12)`,animation:"introIn .8s both"}}>
               <img src={gh("profile_picture.png")} alt="Jordi Altisèn" style={{width:"100%",height:"100%",objectFit:"cover"}} onError={e=>{e.currentTarget.style.display="none";}}/>
             </div>
           </div>
-          <div style={heroStyle(PX.textShift)}>
+          <div className="hero-text" style={heroStyle(PX.textShift)}>
             <div style={{fontSize:".64rem",color:`${c}88`,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".32em",marginBottom:"1rem",animation:"introIn .8s .1s both"}}>PORTFOLIO 2026</div>
             <h1 style={{fontSize:"clamp(1.7rem,3.4vw,2.5rem)",fontWeight:700,color:"rgba(255,248,240,.96)",lineHeight:1.2,margin:"0 0 1.1rem",perspective:"600px"}}>
               {["Hi,","I'm"].map((w,i)=><span key={i} className="word" style={{animationDelay:`${.15+i*.08}s`,marginRight:".32em"}}>{w}</span>)}
@@ -1674,7 +1681,7 @@ function IntroScreen({onEnter,onOpenProject}){
               {["Welcome","to","my","portfolio!"].map((w,i)=><span key={i} className="word" style={{animationDelay:`${.42+i*.07}s`,marginRight:".32em"}}>{w}</span>)}
             </h1>
             <p style={{fontSize:"clamp(.85rem,1.3vw,.95rem)",color:"rgba(232,232,240,.62)",lineHeight:1.7,maxWidth:520,margin:"0 0 1.8rem",animation:"introIn .8s .3s both"}}>Game Developer focused on Technical Art, with a passion for building AI-powered systems and interactive experiences.</p>
-            <div style={{display:"flex",gap:".7rem",flexWrap:"wrap",animation:"introIn .8s .45s both"}}>
+            <div className="hero-ctas" style={{display:"flex",gap:".7rem",flexWrap:"wrap",animation:"introIn .8s .45s both"}}>
               <button onClick={()=>go()} style={{padding:".78rem 1.6rem",background:c,border:"none",borderRadius:"9px",color:"#0a0a12",cursor:"pointer",fontSize:".85rem",fontWeight:700,fontFamily:"'Space Grotesk',sans-serif",boxShadow:`0 0 30px ${c}33`}}>Explore Portfolio</button>
               <button onClick={()=>go("contact")} style={{padding:".78rem 1.6rem",background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.18)",borderRadius:"9px",color:"#e8e8f0",cursor:"pointer",fontSize:".85rem",fontWeight:600,fontFamily:"'Space Grotesk',sans-serif"}}>Contact</button>
             </div>
