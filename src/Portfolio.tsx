@@ -227,7 +227,7 @@ const HE_CATEGORIES=[
    ]},
 ];
 
-const STAR={hex:"#EDC32B",name:"JORDI",
+export const STAR={hex:"#EDC32B",name:"JORDI",
 summary:"Technical Artist with 2+ years and 2,500+ hours building real-time pipelines, custom editor tools, and optimised shader systems in Unity and Unreal Engine. Solo-developed Hollow End in Unity HDRP, owning the full production pipeline across 140+ assets, reducing material count by 43% through atlas and batching strategies, and shipping 4 custom ShaderGraph systems with zero additional texture overhead. Experienced in profiling, draw call optimisation, LOD setup, and memory management.",
 bio:"Hi, I'm Jordi, a **Game Developer and Technical Artist** from Barcelona.\n\nI began studying Computer Engineering, but after my first year I realized I was more interested in **creating interactive experiences** than building abstract software. That led me to pursue a degree in **Game Design and Development** at the University of Girona, where I developed a multidisciplinary background spanning programming, game design, 3D art, level design, and technical implementation.",
 bioExtended:"Hi, I'm Jordi, a **Game Developer and Technical Artist** from Barcelona.\n\nI began studying Computer Engineering, but after my first year I realized I was more interested in **creating interactive experiences** than building abstract software. That led me to pursue a degree in **Game Design and Development** at the University of Girona, where I developed a multidisciplinary background spanning programming, game design, 3D art, level design, and technical implementation.\n\nDuring my studies, I discovered that what I enjoyed most was the **intersection between art and technology**. A Riot Games talk on Technical Art helped me put a name to the role I had naturally gravitated toward: **bridging artists and programmers to create visually ambitious experiences that remain efficient and scalable**.\n\nSince then, I've focused on building that skill set through **Unity (HDRP), Blender, Substance 3D Painter, and C#**, combining artistic workflows with technical problem-solving. My final degree project, **Hollow End**, brought those disciplines together in a solo-developed photorealistic horror game, where I designed modular environment pipelines, created custom editor tools, VFXs, and owned the project from concept to implementation, earning **High Honors** in 2025.\n\nOutside game development, I enjoy exploring disciplines that push me to think differently, whether it's web development, AI, languages, or music. I believe that curiosity translates directly into my work, helping me approach problems from different perspectives and continuously improve my workflows.\n\nI'm now looking to join a team as a **Technical Artist**, where I can contribute to building better tools, pipelines, and real-time experiences while continuing to grow alongside experienced developers.",
@@ -322,7 +322,7 @@ const CP_CATEGORIES=[
    text:"**Design agent workflows** — build multi-step conversations where application code owns state and transitions.\n\n**Evaluate LLM behaviour** — create repeatable tests instead of relying on manually checking a few successful outputs.\n\n**Constrain model output** — use schemas, validation and retries to make probabilistic model responses usable by deterministic application code.\n\n**Build AI features securely** — handle prompt injection, authentication, CORS, rate limiting and user data isolation.\n\n**Ship full-stack AI systems** — connect React, TypeScript, FastAPI, PostgreSQL, OAuth, Claude and cloud deployment into a production application.\n\n**Make architectural trade-offs** — know when not to add RAG, vector databases, agent frameworks or additional infrastructure."},
 ];
 
-const PLANETS=[
+export const PLANETS=[
   {id:"props",label:"Props",icon:"🧱",hex:"#C79CD9",orbitRadius:8,orbitSpeed:.006,startAngle:3.5,radius:.62,desc:"Game-ready prop kits.",moons:[
     {id:"subway-props-kit",label:"Subway Props Kit",icon:"📦",orbitRadius:1.7,orbitSpeed:.014,startAngle:2.5,inclination:-.24,radius:.24,hex:"#d99f88",
       type:"Game-Ready Props",status:"",devPct:null,
@@ -914,7 +914,7 @@ function StarPanel({onClose,initialTab}){
   </Modal>);
 }
 
-function CaseStudy({project,onClose}){
+export function CaseStudy({project,onClose}){
   const pC=project.hex;
   const cats=(project.categories||[]).filter(c=>!c.isOverview);
   const ordered=[...cats.filter(c=>c.id!=="results"),...cats.filter(c=>c.id==="results")];
@@ -1448,7 +1448,7 @@ function Header({onHome,onAbout,onProjects,onContact}){
   </div>);
 }
 
-function QuickNav({open,onClose,onSelectProject,filter,onFilterChange,jumpToAll}){
+export function QuickNav({open,onClose,onSelectProject,filter,onFilterChange,jumpToAll}){
   const[visible,setVisible]=useState(open);
   const[closing,setClosing]=useState(false);
   const dlgRef=useDialog(onClose);
