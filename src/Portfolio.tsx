@@ -1035,7 +1035,7 @@ function CaseStudy({project,onClose}){
             </div></Reveal>
             {cat.lead&&<p style={{fontSize:"clamp(.95rem,1.5vw,1.08rem)",fontWeight:600,lineHeight:1.6,color:"rgba(255,255,255,.92)",margin:"0 0 1.1rem",maxWidth:820}}>{renderBold(cat.lead)}</p>}
             {cat.text&&<p style={{fontSize:".88rem",lineHeight:1.8,color:"rgba(232,232,240,.66)",whiteSpace:"pre-line",margin:"0 0 1.8rem",width:"100%",textAlign:"justify",hyphens:"auto",WebkitHyphens:"auto"}}>{renderBold(cat.text)}</p>}
-            {cat.imgs?.length>0&&<CaseGallery imgs={cat.imgs} c={ch}/>}
+            {cat.imgs?.length>0&&<CaseGallery imgs={cat.imgs} c={ch} vid={cat.videoId}/>}
             {cat.subcategories?.map(sub=>(
               <div key={sub.id} style={{marginTop:"2.6rem",paddingLeft:"clamp(0px,1.5vw,18px)",borderLeft:`2px solid ${ch}22`}}>
                 <h3 style={{fontSize:"clamp(1rem,1.8vw,1.15rem)",fontWeight:600,color:"rgba(232,232,240,.9)",margin:"0 0 .3rem",paddingLeft:"1rem"}}>{sub.label}</h3>
@@ -1090,7 +1090,8 @@ function CaseGallery({imgs,c,vid,fallbackCaption,fallbackMore,offset=0}){
       <button onClick={()=>setMoreOpen(o=>!o)} style={{background:"none",border:"none",color:`${c}88`,fontSize:".72rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".1em",cursor:"pointer",marginTop:".6rem",padding:0,display:"block"}}>{moreOpen?"↑ Read less":"↓ Read more"}</button>
     </>)}
   </>):null;
-  const shots=imgs.filter(im=>im.src||im.videoId||vid||im.compare||im.textPlaceholder);
+  const vidAt=vid?imgs.findIndex(im=>!im.videoId&&!im.compare):-1;
+  const shots=imgs.map((im,i)=>i===vidAt?{...im,videoId:vid}:im).filter(im=>im.src||im.videoId||im.compare||im.textPlaceholder);
   return(<div style={{marginTop:".9rem",display:"flex",flexDirection:"column",gap:"2.2rem"}}>
     {shots.map((im,i)=>{
       const dir=(i+offset)%2===0?"l":"r";
@@ -1104,9 +1105,9 @@ function CaseGallery({imgs,c,vid,fallbackCaption,fallbackMore,offset=0}){
                   <CaseGallery imgs={cd.imgs||[]} c={c} offset={side==="right"?1:0}/>
                 </div>);})}
             </div>
-          : im.videoId||vid
+          : im.videoId
             ? <div style={{width:"100%",aspectRatio:"16/9",borderRadius:"12px",overflow:"hidden",border:`1px solid ${c}28`}}>
-                <iframe src={`https://www.youtube.com/embed/${im.videoId||vid}`} title={im.label||"video"} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{width:"100%",height:"100%",border:"none",display:"block"}}/>
+                <iframe src={`https://www.youtube.com/embed/${im.videoId}`} title={im.label||"video"} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{width:"100%",height:"100%",border:"none",display:"block"}}/>
               </div>
             : im.src
               ? <SmartImg im={im} c={c} onClick={()=>setLb(i)}/>
