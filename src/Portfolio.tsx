@@ -114,7 +114,7 @@ const HE_CATEGORIES=[
      ]},
      {id:"environment-art",label:"Environment",groups:[
        {label:"Trim Sheets",imgs:[
-         {label:"Working Methodology",src:gh("games/hollow-end/game-art/environment-art/01-working-methodology.png"),bg:bgEnv,caption:"A custom production pipeline was defined to build a photorealistic environment with limited resources while maximizing modular reuse: **references → concept sketches → color palette → trim sheets → modular kit → texturing → export**. Material planning and modular design were developed together from the start to reduce repetition and avoid costly rework later in production."},
+         {label:"Working Methodology",src:gh("games/hollow-end/game-art/environment-art/01-working-metodology.png"),bg:bgEnv,caption:"A custom production pipeline was defined to build a photorealistic environment with limited resources while maximizing modular reuse: **references → concept sketches → color palette → trim sheets → modular kit → texturing → export**. Material planning and modular design were developed together from the start to reduce repetition and avoid costly rework later in production."},
          {label:"Trim Sheets — Backroom (First Attempt)",src:gh("games/hollow-end/game-art/environment-art/01-first-backrooms.png"),bg:"radial-gradient(ellipse at 50% 50%,#0e1a08,#061004)",caption:"Five 4096px trim sheets were created for the Backroom's walls, floors, and ceilings. Multiple iterations were explored to balance repetition, readability, and material variation while maintaining a coherent visual identity."},
          {label:"Trim Sheets — Backroom (Final)",src:gh("games/hollow-end/game-art/environment-art/01-l2-trimsheets.png"),bg:"radial-gradient(ellipse at 50% 50%,#0e1a08,#061004)",caption:"Five 4096px trim sheets were created for the Backroom's walls, floors, and ceilings. Multiple iterations were explored to balance repetition, readability, and material variation while maintaining a coherent visual identity."},
          {label:"Trim Sheets — Abandoned Zone (First Attempt)",src:gh("games/hollow-end/game-art/environment-art/02-first-abandoned.png"),bg:"radial-gradient(ellipse at 45% 55%,#1a1608,#0e0c04)",caption:"Starting from the same base textures, four progressively degraded material variants were created to represent different stages of wear and decay. Mixing these variations throughout the environment increases visual diversity while preserving a consistent architectural language."},
@@ -1090,7 +1090,7 @@ function CaseGallery({imgs,c,vid,fallbackCaption,fallbackMore,offset=0}){
       <button onClick={()=>setMoreOpen(o=>!o)} style={{background:"none",border:"none",color:`${c}88`,fontSize:".72rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".1em",cursor:"pointer",marginTop:".6rem",padding:0,display:"block"}}>{moreOpen?"↑ Read less":"↓ Read more"}</button>
     </>)}
   </>):null;
-  const shots=imgs.filter(im=>im.src||im.videoId||im.compare||im.textPlaceholder);
+  const shots=imgs.filter(im=>im.src||im.videoId||vid||im.compare||im.textPlaceholder);
   return(<div style={{marginTop:".9rem",display:"flex",flexDirection:"column",gap:"2.2rem"}}>
     {shots.map((im,i)=>{
       const dir=(i+offset)%2===0?"l":"r";
