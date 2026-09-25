@@ -986,7 +986,7 @@ function CaseStudy({project,onClose}){
       <div style={{position:"absolute",inset:0,pointerEvents:"none",background:`radial-gradient(ellipse at 50% 0%,${pC}16,transparent 55%)`}}/>
       <div style={{position:"relative",zIndex:1,maxWidth:1100,margin:"0 auto",padding:"1.5rem clamp(1.2rem,4vw,3rem) 6rem"}}>
         <section data-secid="overview" ref={el=>{secRefs.current.overview=el;}} style={{scrollMarginTop:"1rem"}}>
-          {ovImgs.length>0&&<CoverGallery imgs={ovImgs} videoId={project.videoId} c={pC} idx={ovIdx} onIdx={setOvIdx} big/>}
+          {ovImgs.length>0&&<CoverGallery imgs={ovImgs} videoId={project.videoId??(project.imgs?.length?null:project.categories?.[0]?.videoId)} c={pC} idx={ovIdx} onIdx={setOvIdx} big/>}
           {(project.overview||project.desc)&&<p style={{fontSize:"clamp(.9rem,1.4vw,1rem)",lineHeight:1.75,color:"rgba(232,232,240,.72)",margin:"1.4rem 0 0",width:"100%",whiteSpace:"pre-line",textAlign:"justify",hyphens:"auto",WebkitHyphens:"auto"}}>{renderBold(project.overview||project.desc)}</p>}
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:"1.6rem",marginTop:"2rem"}}>
             {project.features?.length>0&&(<div>
