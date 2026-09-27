@@ -1682,7 +1682,7 @@ export function FeaturedCarousel({onOpen,big}){
           ? {opacity:center?1:0,pointerEvents:center?"auto":"none",transform:"none"}
           : {transform:`translateX(${off*CF.sideX}%) scale(${center?1:Math.pow(CF.sideScale,abs)*(hovered?1.08:1)}) rotateY(${-off*CF.sideRot}deg) translateY(${hovered?-8:0}px)`,
              opacity:center?1:hovered?.85:abs===1?CF.sideOp:CF.farOp,
-             zIndex:hovered?25:20-abs,
+             zIndex:20-abs,
              pointerEvents:abs>1?"none":"auto",
              filter:center?"none":`blur(${hovered?0:abs*1.4}px)`};
         return(<button key={m.id} onClick={()=>center?onOpen(m):setIdx(i)} onMouseEnter={()=>setHoverIdx(i)} onMouseLeave={()=>setHoverIdx(h=>h===i?null:h)} aria-label={center?`Open ${m.label}`:`Show ${m.label}`} style={{position:"absolute",width:cardW,textAlign:"left",background:"rgba(12,12,22,.96)",border:`1px solid ${m.catHex}${hovered?"88":"44"}`,borderRadius:"18px",overflow:"hidden",cursor:"pointer",padding:0,boxShadow:center?`0 30px 70px rgba(0,0,0,.7),0 0 40px ${m.catHex}1f`:hovered?`0 20px 50px rgba(0,0,0,.65),0 0 30px ${m.catHex}2a`:"0 16px 40px rgba(0,0,0,.6)",transition:"transform .4s cubic-bezier(.2,.9,.3,1),opacity .35s ease,filter .35s ease,box-shadow .35s ease,border-color .35s ease",...style}}>
