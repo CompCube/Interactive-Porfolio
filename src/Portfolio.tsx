@@ -2095,7 +2095,6 @@ export default function Portfolio(){
   const[showNavHint,setShowNavHint]=useState(true);
   const lang="en";
   const[quickNavOpen,setQuickNavOpen]=useState(false);
-  const[starTab,setStarTab]=useState("about");
   const onStarClick=useCallback(()=>setPanelData({type:"star"}),[]);
   const onMoonClick=useCallback(proj=>setPanelData({type:"project",project:proj}),[]);
   const[navFilter,setNavFilter]=useState("all");
@@ -2107,12 +2106,12 @@ export default function Portfolio(){
     <div style={{position:"absolute",inset:0,zIndex:0}}><SpaceBg c={STAR.hex}/></div>
     <SolarScene onStarClick={onStarClick} onMoonClick={onMoonClick} onEnterPlanet={onEnterPlanet} onExitPlanet={onExitPlanet} onHoverMoon={onHoverMoon}/>
     <>
-    <Header onHome={()=>navigate("/")} onAbout={()=>{setStarTab("about");setPanelData({type:"star"});}} onProjects={()=>{setNavFilter("all");setJumpAll(false);setQuickNavOpen(o=>!o);}} onContact={()=>{setStarTab("contact");setPanelData({type:"star"});}}/>
+    <Header onHome={()=>navigate("/")} onAbout={()=>navigate("/about")} onProjects={()=>{setNavFilter("all");setJumpAll(false);setQuickNavOpen(o=>!o);}} onContact={()=>navigate("/contact")}/>
     <QuickNav open={quickNavOpen} jumpToAll={jumpAll} filter={navFilter} onFilterChange={setNavFilter} onClose={()=>setQuickNavOpen(false)} onSelectProject={m=>{setPanelData({type:"project",project:m});setQuickNavOpen(false);}}/>
     <PlanetNav onSelect={id=>{setNavFilter(id);setJumpAll(false);setQuickNavOpen(true);}}/>
     {showNavHint&&<NavHint onDone={()=>setShowNavHint(false)}/>}
     {activePlanetId&&<HUD planetId={activePlanetId}/>}
-    {panelData?.type==="star"&&<StarPanel initialTab={starTab} onClose={()=>setPanelData(null)}/>}
+    {panelData?.type==="star"&&<StarPanel initialTab="about" onClose={()=>setPanelData(null)}/>}
     {panelData?.type==="project"&&(panelData.project.categories?.some(c=>!c.isOverview)
       ? <CaseStudy project={panelData.project} onClose={()=>setPanelData(null)}/>
       : <ProjectPanel project={panelData.project} onClose={()=>setPanelData(null)}/>)}
