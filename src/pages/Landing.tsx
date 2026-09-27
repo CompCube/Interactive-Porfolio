@@ -419,7 +419,7 @@ export default function Landing() {
             <div style={{ position: "relative", zIndex: 1 }}>
               <SecTitle t="SKILLS" c={c} />
               <div style={{ maxWidth: 1120, margin: "0 auto" }}>
-                <TechGrid compact />
+                <TechGrid />
               </div>
             </div>
           </div>
