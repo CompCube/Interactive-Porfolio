@@ -845,9 +845,9 @@ function CoverGallery({imgs,videoId,c,idx,onIdx,big}){
   </div>);
 }
 
-function Modal({c,onClose,children,width,backdropAlpha=.72}){
+function Modal({c,onClose,children,width,backdropAlpha=.72,cardAlpha=.97}){
   return(<div onClick={onClose} style={{position:"fixed",inset:0,background:`rgba(0,0,8,${backdropAlpha})`,backdropFilter:"blur(8px)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:"clamp(1rem,3vw,2rem)"}}>
-    <div onClick={e=>e.stopPropagation()} style={{width:width||"min(1400px,94vw)",maxHeight:"88vh",background:"rgba(7,7,17,.97)",backdropFilter:"blur(28px)",border:`1px solid ${c}30`,borderRadius:"20px",boxShadow:`0 0 80px ${c}18,0 30px 80px rgba(0,0,0,.7)`,overflowY:"auto",scrollbarWidth:"none",fontFamily:"'Space Grotesk',sans-serif",color:"#e8e8f0",animation:"modalIn .35s cubic-bezier(.16,1,.3,1)"}}>{children}</div>
+    <div onClick={e=>e.stopPropagation()} style={{width:width||"min(1400px,94vw)",maxHeight:"88vh",background:`rgba(7,7,17,${cardAlpha})`,backdropFilter:"blur(28px)",border:`1px solid ${c}30`,borderRadius:"20px",boxShadow:`0 0 80px ${c}18,0 30px 80px rgba(0,0,0,.7)`,overflowY:"auto",scrollbarWidth:"none",fontFamily:"'Space Grotesk',sans-serif",color:"#e8e8f0",animation:"modalIn .35s cubic-bezier(.16,1,.3,1)"}}>{children}</div>
   </div>);
 }
 
@@ -861,12 +861,14 @@ const TECH_GROUPS=[
   {label:"Technical Art & Games",items:[
     {n:"Unity",src:DEVI("unity/unity-original"),inv:true},
     {n:"C#",src:DEVI("csharp/csharp-original")},
+    {n:"C++",src:DEVI("cplusplus/cplusplus-original")},
     {n:"Shader Graph",mono:"SG",col:"#4fd8e8"},
     {n:"VFX Graph",mono:"VFX",col:"#c07ce8"},
     {n:"HDRP / URP",mono:"RP",col:"#8fb8ff"},
     {n:"Blender",src:DEVI("blender/blender-original")},
     {n:"Houdini",src:SIMPLE("houdini","FF4713")},
     {n:"Substance 3D Painter",mono:"Pt",col:"#ff5a7a"},
+    {n:"Photoshop",src:DEVI("photoshop/photoshop-plain")},
     {n:"Unreal Engine",src:DEVI("unrealengine/unrealengine-original"),inv:true},
   ]},
   {label:"Software, Data & AI",items:[
@@ -1062,7 +1064,7 @@ export function StarPanel({onClose,initialTab,standalone}){
   const c=STAR.hex;
   const inp=(ex={})=>({display:"block",width:"100%",padding:".55rem .7rem",marginBottom:".45rem",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",borderRadius:"8px",color:"#e8e8f0",fontSize:".83rem",outline:"none",fontFamily:"'Space Grotesk',sans-serif",...ex});
   const L=({t})=><div style={{fontSize:".6rem",color:c,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".22em",marginBottom:".5rem"}}>{t}</div>;
-  return(<Modal c={c} onClose={onClose} backdropAlpha={standalone?.18:.72}>
+  return(<Modal c={c} onClose={onClose} backdropAlpha={standalone?.18:.72} cardAlpha={standalone?.62:.97}>
     <div style={{padding:"1.75rem 1.75rem 0"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"1rem"}}>
         <div style={{display:"flex",alignItems:"center",gap:"1rem"}}>
@@ -1562,7 +1564,7 @@ vec3 nebula(vec2 p,float t){
   vec3 col=mix(games,ai,smoothstep(0.25,0.7,n1));
   col=mix(col,gold,smoothstep(0.55,0.95,n2)*0.6);
   float density=smoothstep(0.15,0.85,n);
-  return col*density*0.56;
+  return col*density*0.65;
 }
 float starsStatic(vec2 p){
   vec2 gp=p*70.0*1.11;
@@ -1573,7 +1575,7 @@ float starsStatic(vec2 p){
   float d=length(gf);
   float core=smoothstep(0.15,0.0,d);
   float twBase=0.5+1.47*hash(gi+7.0);
-  float tw=(1.0-0.37)+0.37*(0.5+0.5*sin(uTime*twBase+hash(gi+1.0)*6.2831));
+  float tw=(1.0-0.6)+0.6*(0.5+0.5*sin(uTime*twBase+hash(gi+1.0)*6.2831));
   return size*core*tw;
 }
 float zoomLayer(vec2 p,float phase){
