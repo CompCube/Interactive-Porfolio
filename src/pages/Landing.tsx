@@ -98,9 +98,10 @@ export default function Landing() {
               className="hero-grid"
               style={{
                 display: "grid",
-                gridTemplateColumns: "minmax(180px,250px) 1fr",
+                gridTemplateColumns: "minmax(180px,250px) minmax(300px,520px)",
                 gap: "clamp(1.8rem,4vw,3rem)",
                 alignItems: "center",
+                justifyContent: "center",
                 maxWidth: 940,
                 margin: "0 auto",
                 width: "100%",
