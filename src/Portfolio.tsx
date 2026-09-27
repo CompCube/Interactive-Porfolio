@@ -1654,25 +1654,38 @@ export function NebulaBg({fixed}){
 export function FeaturedCarousel({onOpen,big}){
   const items=featuredProjects();
   const[idx,setIdx]=useState(0);
+  const[hoverIdx,setHoverIdx]=useState(null);
+  const wheelLock=useRef(false);
   const reduce=typeof window!=="undefined"&&window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
   if(!items.length)return null;
   const n=items.length;
   const go=d=>setIdx(i=>(i+d+n)%n);
+  const onWheel=e=>{
+    if(reduce)return;
+    const d=Math.abs(e.deltaY)>=Math.abs(e.deltaX)?e.deltaY:e.deltaX;
+    if(Math.abs(d)<8)return;
+    e.preventDefault();
+    if(wheelLock.current)return;
+    wheelLock.current=true;
+    go(d>0?1:-1);
+    setTimeout(()=>{wheelLock.current=false;},420);
+  };
   const cardW=big?"clamp(280px,42vw,460px)":"clamp(234px,30.6vw,342px)";
   return(<div style={{position:"relative",width:"100%"}}>
-    <div style={{position:"relative",height:big?"clamp(430px,58vh,540px)":"clamp(351px,45vh,423px)",display:"flex",alignItems:"center",justifyContent:"center",perspective:"1400px",overflow:"hidden"}}>
+    <div onWheel={onWheel} style={{position:"relative",height:big?"clamp(430px,58vh,540px)":"clamp(351px,45vh,423px)",display:"flex",alignItems:"center",justifyContent:"center",perspective:"1400px",overflow:"hidden"}}>
       {items.map((m,i)=>{
         let off=i-idx;if(off>n/2)off-=n;if(off<-n/2)off+=n;
         const abs=Math.abs(off),center=off===0;
+        const hovered=!center&&hoverIdx===i&&abs===1;
         const thumb=m.thumbnail||m.imgs?.[0]?.src||m.categories?.[0]?.imgs?.[0]?.src||m.categories?.[0]?.subcategories?.[0]?.imgs?.[0]?.src||null;
         const style=reduce
           ? {opacity:center?1:0,pointerEvents:center?"auto":"none",transform:"none"}
-          : {transform:`translateX(${off*CF.sideX}%) scale(${center?1:Math.pow(CF.sideScale,abs)}) rotateY(${-off*CF.sideRot}deg)`,
-             opacity:center?1:abs===1?CF.sideOp:CF.farOp,
-             zIndex:20-abs,
+          : {transform:`translateX(${off*CF.sideX}%) scale(${center?1:Math.pow(CF.sideScale,abs)*(hovered?1.08:1)}) rotateY(${-off*CF.sideRot}deg) translateY(${hovered?-8:0}px)`,
+             opacity:center?1:hovered?.85:abs===1?CF.sideOp:CF.farOp,
+             zIndex:hovered?25:20-abs,
              pointerEvents:abs>1?"none":"auto",
-             filter:center?"none":`blur(${abs*1.4}px)`};
-        return(<button key={m.id} onClick={()=>center?onOpen(m):setIdx(i)} aria-label={center?`Open ${m.label}`:`Show ${m.label}`} style={{position:"absolute",width:cardW,textAlign:"left",background:"rgba(12,12,22,.96)",border:`1px solid ${m.catHex}44`,borderRadius:"18px",overflow:"hidden",cursor:"pointer",padding:0,boxShadow:center?`0 30px 70px rgba(0,0,0,.7),0 0 40px ${m.catHex}1f`:"0 16px 40px rgba(0,0,0,.6)",transition:"transform .55s cubic-bezier(.2,.9,.3,1),opacity .45s ease,filter .45s ease,box-shadow .45s ease",...style}}>
+             filter:center?"none":`blur(${hovered?0:abs*1.4}px)`};
+        return(<button key={m.id} onClick={()=>center?onOpen(m):setIdx(i)} onMouseEnter={()=>setHoverIdx(i)} onMouseLeave={()=>setHoverIdx(h=>h===i?null:h)} aria-label={center?`Open ${m.label}`:`Show ${m.label}`} style={{position:"absolute",width:cardW,textAlign:"left",background:"rgba(12,12,22,.96)",border:`1px solid ${m.catHex}${hovered?"88":"44"}`,borderRadius:"18px",overflow:"hidden",cursor:"pointer",padding:0,boxShadow:center?`0 30px 70px rgba(0,0,0,.7),0 0 40px ${m.catHex}1f`:hovered?`0 20px 50px rgba(0,0,0,.65),0 0 30px ${m.catHex}2a`:"0 16px 40px rgba(0,0,0,.6)",transition:"transform .4s cubic-bezier(.2,.9,.3,1),opacity .35s ease,filter .35s ease,box-shadow .35s ease,border-color .35s ease",...style}}>
           <div style={{height:4,background:`linear-gradient(90deg,${m.catHex},${m.catHex}55)`}}/>
           <div style={{width:"100%",aspectRatio:"16/10",background:"rgba(255,255,255,.04)",overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center"}}>
             {thumb?<img src={thumb} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>:<span style={{fontSize:"2.2rem"}}>{m.icon}</span>}
