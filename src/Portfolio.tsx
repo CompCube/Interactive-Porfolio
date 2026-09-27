@@ -575,6 +575,7 @@ export const TK={
 export const CSS=`
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
+html,body{overflow-x:hidden;max-width:100%}
 @keyframes progFill{from{width:0}to{}}
 @keyframes modalIn{from{opacity:0;transform:scale(.93) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
 @keyframes modalOut{from{opacity:1;transform:scale(1) translateY(0)}to{opacity:0;transform:scale(.96) translateY(8px)}}
@@ -1381,7 +1382,7 @@ export function FeaturedCarousel({onOpen,big}){
   const go=d=>setIdx(i=>(i+d+n)%n);
   const cardW=big?"clamp(280px,42vw,460px)":"clamp(234px,30.6vw,342px)";
   return(<div style={{position:"relative",width:"100%"}}>
-    <div style={{position:"relative",height:big?"clamp(430px,58vh,540px)":"clamp(351px,45vh,423px)",display:"flex",alignItems:"center",justifyContent:"center",perspective:"1400px"}}>
+    <div style={{position:"relative",height:big?"clamp(430px,58vh,540px)":"clamp(351px,45vh,423px)",display:"flex",alignItems:"center",justifyContent:"center",perspective:"1400px",overflow:"hidden"}}>
       {items.map((m,i)=>{
         let off=i-idx;if(off>n/2)off-=n;if(off<-n/2)off+=n;
         const abs=Math.abs(off),center=off===0;
