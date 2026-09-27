@@ -608,6 +608,8 @@ export const CSS=`
 .qn-grid{grid-template-columns:repeat(3,1fr)}
 @media(max-width:900px){.qn-grid{grid-template-columns:repeat(2,1fr)!important}}
 @media(max-width:560px){.qn-grid{grid-template-columns:1fr!important}}
+@media(max-width:860px){.about-info-grid{grid-template-columns:repeat(2,1fr)!important}}
+@media(max-width:560px){.about-info-grid{grid-template-columns:1fr!important}}
 @media(max-width:640px){.hdr-nav-desktop{display:none!important}.hdr-burger{display:flex!important;align-items:center;justify-content:center}.status-bar-chrome,.planet-nav-chrome{display:none!important}}
 @keyframes shimmer{0%{background-position:-180% 0}100%{background-position:180% 0}}
 .qn-item{transition:transform .34s cubic-bezier(.2,.9,.3,1),border-color .28s ease,box-shadow .34s ease!important}
@@ -989,8 +991,8 @@ export function AboutTab({c,onContact}){
   const[bioX,setBioX]=useState(false);
   const cv=`https://raw.githubusercontent.com/${GH_USER}/${GH_REPO}/${GH_BRANCH}/src/JordiAltisen_CV.pdf`;
   const info=[
-    {icon:"user",t:"Jordi Altisèn Cortijo",d:"Technical Artist and Software Engineer with a background in Game Design and Development."},
-    {icon:"pin",t:"Barcelona, Spain",d:"Based in Barcelona, where I build Hollow End and my other projects."},
+    {icon:"user",t:"Jordi Altisèn Cortijo",d:"Game Developer focused on Technical Art that also loves creating Intelligent & interactive systems."},
+    {icon:"pin",t:"Barcelona / Salzburg",d:"Based in Barcelona, where I build Hollow End and my other projects."},
     {icon:"langs",t:"Languages",d:STAR.langs.map(({l,lv})=>`${l} (${lv})`).join(" · ")},
     {icon:"sparkles",t:"What I do",d:"I bridge art and engineering: real-time pipelines, shaders, editor tools and optimisation in Unity, plus full-stack and AI products."},
   ];
@@ -1010,7 +1012,7 @@ export function AboutTab({c,onContact}){
       </div>
     </div>
 
-    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(100%,300px),1fr))",gap:"1rem",marginTop:"2.2rem"}}>
+    <div className="about-info-grid" style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:"1rem",marginTop:"2.2rem"}}>
       {info.map(it=>(<div key={it.t} style={aboutCard}>
         <div style={{display:"flex",alignItems:"center",gap:".8rem",marginBottom:".7rem"}}><IcoBox n={it.icon} c={c}/><span style={{fontSize:"1.05rem",fontWeight:700,color:"#f0f0f6"}}>{it.t}</span></div>
         <p style={{fontSize:".85rem",lineHeight:1.65,color:"rgba(232,232,240,.66)",margin:0}}>{it.d}</p>
