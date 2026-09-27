@@ -945,7 +945,7 @@ function TechGrid(){
     {TECH_GROUPS.map(g=>(<div key={g.label}>
       <div style={{fontSize:".62rem",color:"rgba(232,232,240,.45)",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".2em",marginBottom:".7rem",textAlign:"center"}}>{g.label.toUpperCase()}</div>
       <div style={{display:"flex",flexWrap:"wrap",justifyContent:"center",gap:".7rem"}}>
-        {g.items.map(it=>(<div key={it.n} className="pf-tech" title={it.n} style={{width:"clamp(88px,25vw,108px)",boxSizing:"border-box",background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.08)",borderRadius:14,padding:"1rem .4rem .8rem",display:"flex",flexDirection:"column",alignItems:"center",gap:".6rem",textAlign:"center"}}>
+        {g.items.map(it=>(<div key={it.n} className="pf-tech" title={it.n} style={{width:"clamp(84px,7.6vw,104px)",boxSizing:"border-box",background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.08)",borderRadius:14,padding:"1rem .4rem .8rem",display:"flex",flexDirection:"column",alignItems:"center",gap:".6rem",textAlign:"center"}}>
           {it.src
             ?<img src={it.src} alt="" loading="lazy" width={40} height={40} style={{width:40,height:40,objectFit:"contain",filter:it.inv?"invert(1) brightness(1.6)":"none"}}/>
             :<div style={{width:40,height:40,borderRadius:9,background:`${it.col}1c`,border:`1.5px solid ${it.col}88`,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'JetBrains Mono',monospace",fontWeight:700,fontSize:it.mono.length>2?".7rem":".95rem",color:it.col}}>{it.mono}</div>}
@@ -1884,7 +1884,7 @@ function IntroScreen({onEnter,onOpenProject}){
 
         <SecReveal root={wrapRef}><div style={{position:"relative",padding:"2.5rem 0"}}><SpaceBg c={c}/><div style={{position:"relative",zIndex:1}}>
           <SecTitle t="SKILLS" c={c}/>
-          <div style={{maxWidth:1000,margin:"0 auto"}}><TechGrid/></div>
+          <div style={{maxWidth:1120,margin:"0 auto"}}><TechGrid/></div>
         </div></div></SecReveal>
 
         <SecReveal root={wrapRef}><div style={{position:"relative",padding:"2.5rem 0"}}><SpaceBg c={c}/><div style={{position:"relative",zIndex:1}}>
