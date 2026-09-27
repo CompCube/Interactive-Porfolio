@@ -141,7 +141,7 @@ export default function Landing() {
                   />
                 </div>
               </div>
-              <div className="hero-text" style={{ opacity: 1, textAlign: "center" }}>
+              <div className="hero-text" style={{ opacity: 1 }}>
                 <div
                   style={{
                     fontSize: ".64rem",
@@ -195,7 +195,7 @@ export default function Landing() {
                     color: "rgba(232,232,240,.62)",
                     lineHeight: 1.7,
                     maxWidth: 520,
-                    margin: "0 auto 1.8rem",
+                    margin: "0 0 1.8rem",
                     animation: "introIn .8s .3s both",
                   }}
                 >
@@ -204,7 +204,7 @@ export default function Landing() {
                 </p>
                 <div
                   className="hero-ctas"
-                  style={{ display: "flex", gap: ".7rem", flexWrap: "wrap", justifyContent: "center", animation: "introIn .8s .45s both" }}
+                  style={{ display: "flex", gap: ".7rem", flexWrap: "wrap", animation: "introIn .8s .45s both" }}
                 >
                   <button
                     onClick={() => navigate("/explore")}
@@ -418,7 +418,7 @@ export default function Landing() {
             <div style={{ position: "relative", zIndex: 1 }}>
               <SecTitle t="SKILLS" c={c} />
               <div style={{ maxWidth: 1120, margin: "0 auto" }}>
-                <TechGrid />
+                <TechGrid compact />
               </div>
             </div>
           </div>

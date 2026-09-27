@@ -861,7 +861,6 @@ const TECH_GROUPS=[
   {label:"Technical Art & Games",items:[
     {n:"Unity",src:DEVI("unity/unity-original"),inv:true},
     {n:"C#",src:DEVI("csharp/csharp-original")},
-    {n:"C++",src:DEVI("cplusplus/cplusplus-original")},
     {n:"Shader Graph",mono:"SG",col:"#4fd8e8"},
     {n:"VFX Graph",mono:"VFX",col:"#c07ce8"},
     {n:"HDRP / URP",mono:"RP",col:"#8fb8ff"},
@@ -873,6 +872,7 @@ const TECH_GROUPS=[
   ]},
   {label:"Software, Data & AI",items:[
     {n:"Python",src:DEVI("python/python-original")},
+    {n:"C++",src:DEVI("cplusplus/cplusplus-original")},
     {n:"FastAPI",src:DEVI("fastapi/fastapi-original")},
     {n:"PostgreSQL",src:DEVI("postgresql/postgresql-original")},
     {n:"ServiceNow",mono:"now",col:"#62d84e"},
@@ -943,12 +943,12 @@ function AboutHeading({t,sub=null}){return(<div style={{marginBottom:"1.4rem"}}>
   <h3 style={{fontSize:"clamp(1.3rem,2.6vw,1.75rem)",fontWeight:700,color:"#f0f0f6",margin:0}}>{t}</h3>
   {sub&&<p style={{fontSize:".92rem",lineHeight:1.6,color:"rgba(232,232,240,.6)",margin:".55rem 0 0",maxWidth:640}}>{sub}</p>}
 </div>);}
-export function TechGrid(){
+export function TechGrid({compact}={}){
   return(<div style={{display:"flex",flexDirection:"column",gap:"1.4rem"}}>
     {TECH_GROUPS.map(g=>(<div key={g.label}>
       <div style={{fontSize:".62rem",color:"rgba(232,232,240,.45)",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".2em",marginBottom:".7rem",textAlign:"center"}}>{g.label.toUpperCase()}</div>
       <div style={{display:"flex",flexWrap:"wrap",justifyContent:"center",gap:".7rem"}}>
-        {g.items.map(it=>(<div key={it.n} className="pf-tech" title={it.n} style={{width:"clamp(84px,7.6vw,104px)",boxSizing:"border-box",background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.08)",borderRadius:14,padding:"1rem .4rem .8rem",display:"flex",flexDirection:"column",alignItems:"center",gap:".6rem",textAlign:"center"}}>
+        {g.items.map(it=>(<div key={it.n} className="pf-tech" title={it.n} style={{width:compact?"clamp(68px,6vw,86px)":"clamp(84px,7.6vw,104px)",boxSizing:"border-box",background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.08)",borderRadius:14,padding:"1rem .4rem .8rem",display:"flex",flexDirection:"column",alignItems:"center",gap:".6rem",textAlign:"center"}}>
           {it.src
             ?<img src={it.src} alt="" loading="lazy" width={40} height={40} style={{width:40,height:40,objectFit:"contain",filter:it.inv?"invert(1) brightness(1.6)":"none"}}/>
             :<div style={{width:40,height:40,borderRadius:9,background:`${it.col}1c`,border:`1.5px solid ${it.col}88`,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'JetBrains Mono',monospace",fontWeight:700,fontSize:it.mono.length>2?".7rem":".95rem",color:it.col}}>{it.mono}</div>}
@@ -1064,7 +1064,7 @@ export function StarPanel({onClose,initialTab,standalone}){
   const c=STAR.hex;
   const inp=(ex={})=>({display:"block",width:"100%",padding:".55rem .7rem",marginBottom:".45rem",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",borderRadius:"8px",color:"#e8e8f0",fontSize:".83rem",outline:"none",fontFamily:"'Space Grotesk',sans-serif",...ex});
   const L=({t})=><div style={{fontSize:".6rem",color:c,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".22em",marginBottom:".5rem"}}>{t}</div>;
-  return(<Modal c={c} onClose={onClose} backdropAlpha={standalone?.18:.72} cardAlpha={standalone?.62:.97}>
+  return(<Modal c={c} onClose={onClose} backdropAlpha={standalone?.18:.72} cardAlpha={standalone?.22:.97}>
     <div style={{padding:"1.75rem 1.75rem 0"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"1rem"}}>
         <div style={{display:"flex",alignItems:"center",gap:"1rem"}}>
