@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   STAR,
@@ -16,6 +17,20 @@ import {
 export default function Landing() {
   const navigate = useNavigate();
   const c = STAR.hex;
+  const enteredRef = useRef(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      if (enteredRef.current) return;
+      const atBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4;
+      if (atBottom && window.scrollY > 0) {
+        enteredRef.current = true;
+        navigate("/explore");
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [navigate]);
 
   const pillars = [
     {
