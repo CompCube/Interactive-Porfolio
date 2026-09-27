@@ -1470,8 +1470,9 @@ const PATTERNS={
 const PATSIZE={games:"22px 22px",environments:"34px 34px",props:"18px 18px",vfx:"100% 100%",tools:"26px 26px",ai:"46px 46px",web:"18px 18px"};
 const patFor=(id,c)=>PATTERNS[id]?{backgroundImage:PATTERNS[id](c),backgroundSize:PATSIZE[id]||"28px 28px"}:{};
 
-const FEATURED_IDS=["hollow-end","careerpilot-ai","magic-barrier","scatter-tool"];
-const CF={sideScale:.82,sideX:56,sideRot:26,sideOp:.45,farOp:.34};
+const FEATURED_IDS=["hollow-end","careerpilot-ai","magic-barrier","scatter-tool","waterfall"];
+const ALL_PROJECTS_ORDER=["hollow-end","magic-barrier","careerpilot-ai","subway-modular-kit","waterfall","scatter-tool"];
+const CF={sideScale:.82,sideX:44,sideRot:26,sideOp:.45,farOp:.34};
 const featuredProjects=()=>FEATURED_IDS.map(id=>{
   for(const p of PLANETS){const m=p.moons.find(x=>x.id===id);if(m)return{...m,catLabel:p.label,catHex:p.hex,catId:p.id};}
   return null;
@@ -1670,9 +1671,9 @@ export function FeaturedCarousel({onOpen,big}){
     go(d>0?1:-1);
     setTimeout(()=>{wheelLock.current=false;},420);
   };
-  const cardW=big?"clamp(280px,42vw,460px)":"clamp(234px,30.6vw,342px)";
+  const cardW=big?"clamp(280px,42vw,460px)":"clamp(200px,26vw,300px)";
   return(<div style={{position:"relative",width:"100%"}}>
-    <div onWheel={onWheel} style={{position:"relative",height:big?"clamp(430px,58vh,540px)":"clamp(351px,45vh,423px)",display:"flex",alignItems:"center",justifyContent:"center",perspective:"1400px",overflow:"hidden"}}>
+    <div onWheel={onWheel} style={{position:"relative",height:big?"clamp(430px,58vh,540px)":"clamp(351px,45vh,423px)",margin:"0 -60px",padding:"0 60px",display:"flex",alignItems:"center",justifyContent:"center",perspective:"1400px",overflow:"hidden",boxSizing:"border-box"}}>
       {items.map((m,i)=>{
         let off=i-idx;if(off>n/2)off-=n;if(off<-n/2)off+=n;
         const abs=Math.abs(off),center=off===0;
@@ -1793,7 +1794,13 @@ export function QuickNav({open,onClose,onSelectProject,filter,onFilterChange,jum
       </div>)}
       {active==="all"?(
         <div className="qn-grid" style={{display:"grid",gap:"1.2rem"}}>
-          {cats.flatMap(p=>p.moons.map(m=>({...m,_catHex:p.hex}))).map((m,i)=>{
+          {cats.flatMap(p=>p.moons.map(m=>({...m,_catHex:p.hex}))).sort((a,b)=>{
+            const ai=ALL_PROJECTS_ORDER.indexOf(a.id),bi=ALL_PROJECTS_ORDER.indexOf(b.id);
+            if(ai===-1&&bi===-1)return 0;
+            if(ai===-1)return 1;
+            if(bi===-1)return -1;
+            return ai-bi;
+          }).map((m,i)=>{
             const thumb=m.thumbnail||m.imgs?.[0]?.src||m.categories?.[0]?.imgs?.[0]?.src||m.categories?.[0]?.subcategories?.[0]?.imgs?.[0]?.src||null;
             return(<button key={m.id} className="qn-item" onClick={()=>onSelectProject(m)} style={{textAlign:"left",background:"rgba(255,255,255,.025)",border:`1px solid ${m.hex}28`,borderRadius:"14px",overflow:"hidden",cursor:"pointer",display:"flex",flexDirection:"column",padding:0,animation:`cardIn .6s cubic-bezier(.16,1,.3,1) ${Math.min(i*.045,.5)}s both`}}>
               <div style={{height:4,background:`linear-gradient(90deg,${m.hex},${m.hex}55)`,flexShrink:0}}/>
