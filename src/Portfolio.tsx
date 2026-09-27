@@ -824,6 +824,7 @@ function CoverGallery({imgs,videoId,c,idx,onIdx,big}){
             zIndex:20-abs,
             pointerEvents:abs>1?"none":"auto",
             filter:center?"none":`blur(${abs*1.4}px)`};
+        if(activeVid)style.transform="none"; // mobile Safari can render iframes blank inside 3D-transformed cards
         return(<div key={i} onClick={()=>center?(showImg&&setLbOpen(true)):onIdx(i)} style={{position:"absolute",width:cardW,aspectRatio:"16/9",borderRadius:"14px",overflow:"hidden",cursor:center?(showImg?"zoom-in":"default"):"pointer",background:im.bg||"rgba(10,10,18,.65)",border:`1px solid ${c}${center?"44":"28"}`,boxShadow:center?`0 30px 70px rgba(0,0,0,.7),0 0 40px ${c}1f`:"0 16px 40px rgba(0,0,0,.6)",transition:"transform .55s cubic-bezier(.2,.9,.3,1),opacity .45s ease,filter .45s ease,box-shadow .45s ease",...style}}>
           {activeVid?<iframe src={`https://www.youtube.com/embed/${activeVid}?autoplay=1&mute=1`} title={im.label||"video"} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen style={{width:"100%",height:"100%",border:"none",display:"block"}}/>
           :showImg?<img src={im.src} alt={im.label||""} onError={()=>setFailed(s=>new Set(s).add(im.src))} style={{width:"100%",height:"100%",objectFit:"cover"}}/>
@@ -851,10 +852,196 @@ function Modal({c,onClose,children,width}){
 
 const FORMSPREE_ID=import.meta.env.VITE_FORMSPREE_FORM_ID;
 
+const DEVI=p=>`https://cdn.jsdelivr.net/gh/devicons/devicon@v2.17.0/icons/${p}.svg`;
+const SIMPLE=(slug,color)=>`https://cdn.simpleicons.org/${slug}/${color}`;
+// inv: monochrome dark logos that need inverting on the dark background.
+// mono: tools with no public logo, rendered as a lettered badge.
+const TECH_GROUPS=[
+  {label:"Technical Art & Games",items:[
+    {n:"Unity",src:DEVI("unity/unity-original"),inv:true},
+    {n:"C#",src:DEVI("csharp/csharp-original")},
+    {n:"Shader Graph",mono:"SG",col:"#4fd8e8"},
+    {n:"VFX Graph",mono:"VFX",col:"#c07ce8"},
+    {n:"HDRP / URP",mono:"RP",col:"#8fb8ff"},
+    {n:"Blender",src:DEVI("blender/blender-original")},
+    {n:"Substance 3D Painter",mono:"Pt",col:"#ff5a7a"},
+    {n:"Unreal Engine",src:DEVI("unrealengine/unrealengine-original"),inv:true},
+  ]},
+  {label:"Software, Data & AI",items:[
+    {n:"Python",src:DEVI("python/python-original")},
+    {n:"FastAPI",src:DEVI("fastapi/fastapi-original")},
+    {n:"PostgreSQL",src:DEVI("postgresql/postgresql-original")},
+    {n:"ServiceNow",mono:"now",col:"#62d84e"},
+    {n:"Claude API",src:SIMPLE("claude","D97757")},
+    {n:"Docker",src:DEVI("docker/docker-original")},
+    {n:"Git",src:DEVI("git/git-original")},
+    {n:"GitHub",src:DEVI("github/github-original"),inv:true},
+  ]},
+  {label:"Web",items:[
+    {n:"TypeScript",src:DEVI("typescript/typescript-original")},
+    {n:"JavaScript",src:DEVI("javascript/javascript-original")},
+    {n:"React",src:DEVI("react/react-original")},
+    {n:"Three.js",src:DEVI("threejs/threejs-original"),inv:true},
+    {n:"HTML",src:DEVI("html5/html5-original")},
+    {n:"CSS",src:DEVI("css3/css3-original")},
+    {n:"PHP",src:DEVI("php/php-original")},
+    {n:"WordPress",src:DEVI("wordpress/wordpress-plain"),inv:true},
+  ]},
+];
+const EDUCATION=[
+  {when:"2020 – 2025",title:"Bachelor's Degree in Game Design and Development",org:"Universitat de Girona (UdG)",
+   text:"A multidisciplinary degree spanning **programming**, **game design**, **3D art**, **level design** and **technical implementation**. Final Degree Project (*Hollow End*) awarded **High Honors**."},
+];
+const EXPERIENCE=[
+  {when:"2024 – Present",title:"Technical Artist",org:"Self-employed",sub:"Hollow End · Photorealistic 3D exploration game · Unity HDRP · Steam release October 2026",
+   points:[
+    "**Art Pipelines & Workflows:** Designed a complete **real-time production pipeline** covering **140+ production-ready assets**, with modular workflows, naming conventions, export processes and in-engine implementation built for scalable content creation.",
+    "**Shaders & Materials:** Developed **4 custom Shader Graph systems** and **PBR materials** for interactive effects, stained glass, retro screens, outlines and environmental storytelling, reusable across the project at minimal rendering cost.",
+    "**Performance Optimization & Profiling:** Reduced material count by **43%** using **14 texture atlases** and **9 trim sheets**, and optimized **500+ lights** through **occlusion culling**, **Light Probes**, **LODs**, batching and **GPU/CPU profiling**.",
+    "**Tools & Workflow Automation:** Built **custom editor tools** and modular systems that automate repetitive tasks and standardize asset organization across the whole development pipeline.",
+   ]},
+  {when:"2024 – 2026",title:"Software Engineer",org:"TeamNow",
+   points:[
+    "**Business Requirements to Software:** Worked directly with business users to understand their processes, then designed and built a **ServiceNow** application from the ground up for **AEMET**, covering **ITSM**/**CMDB** workflows, asset proposal, Configuration Item creation and custom forms.",
+    "**Automation & API Integration:** Developed client scripts, business rules and **REST API**-based integrations between **ServiceNow** instances and external systems, automating manual processes and translating complex stakeholder requirements into working software.",
+    "**Full Development Cycle in Agile Teams:** Took enterprise modules through analysis, design, build, testing and deployment for clients including **Banco Santander**, **La Caixa**, **Europastry** and **Sorigué**, maintaining reliable relational configuration data across **CMDB**, **ITSM**, **CSM** and **ITOM**.",
+    "**Database Administration:** Administered and maintained the **relational databases** behind client ServiceNow instances, managing **CMDB** tables and relationships, data imports and clean-ups to keep configuration data accurate and consistent across environments.",
+   ]},
+  {when:"2023 – 2025",title:"Web Developer",org:"Freelance",
+   points:[
+    "**End-to-End Web Delivery:** Built and deployed **3** full production websites, handling development, **deployment** and client requirements end to end: tirambarcostadaurada.com, btt-valls.com and edujuguetes.com.",
+   ]},
+];
+const WORKFLOW=[
+  {icon:"image",t:"Reference first",d:"I collect references and pin down the constraints before building anything. For Hollow End that meant 300+ photos across Berlin's U-Bahn stations."},
+  {icon:"gauge",t:"Set a budget",d:"I define performance budgets for materials, draw calls and lights up front, so art decisions are made inside them instead of fixed afterwards."},
+  {icon:"blocks",t:"Build modular",d:"Modular kits, trim sheets and shared atlases keep assets reusable, consistent and cheap, and make large environments fast to assemble."},
+  {icon:"activity",t:"Profile & iterate",d:"I profile on GPU and CPU, fix the biggest cost first, and iterate. Optimisation is part of the pipeline, not a final pass."},
+];
+const ICONS={
+  user:<><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></>,
+  pin:<><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></>,
+  langs:<><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></>,
+  sparkles:<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>,
+  cap:<><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></>,
+  briefcase:<><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></>,
+  image:<><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></>,
+  gauge:<><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></>,
+  blocks:<><rect width="7" height="7" x="14" y="3" rx="1"/><path d="M10 21V8a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-5a1 1 0 0 0-1-1H3"/></>,
+  activity:<path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/>,
+};
+function Ico({n,c,s=20}){return(<svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{ICONS[n]}</svg>);}
+function IcoBox({n,c}){return(<div style={{width:38,height:38,flexShrink:0,borderRadius:10,background:`${c}14`,border:`1px solid ${c}30`,display:"flex",alignItems:"center",justifyContent:"center"}}><Ico n={n} c={c}/></div>);}
+const aboutCard={background:"linear-gradient(160deg,rgba(255,255,255,.045),rgba(255,255,255,.015))",border:"1px solid rgba(255,255,255,.09)",borderRadius:16,padding:"1.3rem 1.4rem"};
+function AboutHeading({t,sub=null}){return(<div style={{marginBottom:"1.4rem"}}>
+  <h3 style={{fontSize:"clamp(1.3rem,2.6vw,1.75rem)",fontWeight:700,color:"#f0f0f6",margin:0}}>{t}</h3>
+  {sub&&<p style={{fontSize:".92rem",lineHeight:1.6,color:"rgba(232,232,240,.6)",margin:".55rem 0 0",maxWidth:640}}>{sub}</p>}
+</div>);}
+function TechGrid(){
+  return(<div style={{display:"flex",flexDirection:"column",gap:"1.4rem"}}>
+    {TECH_GROUPS.map(g=>(<div key={g.label}>
+      <div style={{fontSize:".62rem",color:"rgba(232,232,240,.45)",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".2em",marginBottom:".7rem"}}>{g.label.toUpperCase()}</div>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(96px,1fr))",gap:".7rem"}}>
+        {g.items.map(it=>(<div key={it.n} className="pf-tech" title={it.n} style={{background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.08)",borderRadius:14,padding:"1rem .4rem .8rem",display:"flex",flexDirection:"column",alignItems:"center",gap:".6rem",textAlign:"center"}}>
+          {it.src
+            ?<img src={it.src} alt="" loading="lazy" width={40} height={40} style={{width:40,height:40,objectFit:"contain",filter:it.inv?"invert(1) brightness(1.6)":"none"}}/>
+            :<div style={{width:40,height:40,borderRadius:9,background:`${it.col}1c`,border:`1.5px solid ${it.col}88`,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'JetBrains Mono',monospace",fontWeight:700,fontSize:it.mono.length>2?".7rem":".95rem",color:it.col}}>{it.mono}</div>}
+          <span style={{fontSize:".72rem",lineHeight:1.3,color:"rgba(232,232,240,.78)"}}>{it.n}</span>
+        </div>))}
+      </div>
+    </div>))}
+  </div>);
+}
+function TimelineCol({icon,label,items,c}){
+  return(<div>
+    <div style={{display:"flex",alignItems:"center",gap:".7rem",marginBottom:"1.1rem"}}><Ico n={icon} c={c}/><span style={{fontSize:".74rem",color:c,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".26em"}}>{label}</span></div>
+    <div style={{position:"relative",paddingLeft:"1.4rem"}}>
+      <div style={{position:"absolute",left:4,top:6,bottom:6,width:1.5,background:`linear-gradient(180deg,${c}88,${c}18)`}}/>
+      {items.map((it,i)=>(<div key={i} style={{position:"relative",marginBottom:i<items.length-1?"1.1rem":0}}>
+        <div style={{position:"absolute",left:"-1.4rem",top:"1.35rem",width:10,height:10,borderRadius:"50%",background:c,boxShadow:`0 0 10px ${c}`}}/>
+        <div style={aboutCard}>
+          <div style={{display:"flex",alignItems:"center",gap:".45rem",fontSize:".66rem",color:"rgba(232,232,240,.6)",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".16em",marginBottom:".55rem"}}><Ico n={icon} c="rgba(232,232,240,.6)" s={13}/>{it.when.toUpperCase()}</div>
+          <div style={{fontSize:"1.02rem",fontWeight:700,color:"#f0f0f6",lineHeight:1.35}}>{it.title}</div>
+          <div style={{fontSize:".76rem",color:c,marginTop:".25rem"}}>{it.org}</div>
+          {it.sub&&<div style={{fontSize:".74rem",fontStyle:"italic",color:"rgba(232,232,240,.5)",marginTop:".3rem",lineHeight:1.5}}>{it.sub}</div>}
+          {it.text&&<p style={{fontSize:".82rem",lineHeight:1.7,color:"rgba(232,232,240,.68)",margin:".75rem 0 0"}}>{renderBold(it.text)}</p>}
+          {it.points&&<ul style={{margin:".75rem 0 0",paddingLeft:"1.05rem",display:"flex",flexDirection:"column",gap:".5rem"}}>
+            {it.points.map((p,j)=><li key={j} style={{fontSize:".8rem",lineHeight:1.65,color:"rgba(232,232,240,.68)"}}>{renderBold(p)}</li>)}
+          </ul>}
+        </div>
+      </div>))}
+    </div>
+  </div>);
+}
+function ExperienceGrid({c}){
+  return(<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(100%,360px),1fr))",gap:"2rem",alignItems:"start"}}>
+    <TimelineCol icon="cap" label="EDUCATION" items={EDUCATION} c={c}/>
+    <TimelineCol icon="briefcase" label="PROFESSIONAL EXPERIENCE" items={EXPERIENCE} c={c}/>
+  </div>);
+}
+function AboutTab({c,onContact}){
+  const[bioX,setBioX]=useState(false);
+  const cv=`https://raw.githubusercontent.com/${GH_USER}/${GH_REPO}/${GH_BRANCH}/src/JordiAltisen_CV.pdf`;
+  const info=[
+    {icon:"user",t:"Jordi Altisèn Cortijo",d:"Technical Artist and Software Engineer with a background in Game Design and Development."},
+    {icon:"pin",t:"Barcelona, Spain",d:"Based in Barcelona, where I build Hollow End and my other projects."},
+    {icon:"langs",t:"Languages",d:STAR.langs.map(({l,lv})=>`${l} (${lv})`).join(" · ")},
+    {icon:"sparkles",t:"What I do",d:"I bridge art and engineering: real-time pipelines, shaders, editor tools and optimisation in Unity, plus full-stack and AI products."},
+  ];
+  const sec={marginTop:"3.2rem"};
+  return(<div style={{padding:"0 clamp(1rem,3vw,2.5rem) 2.5rem"}}>
+    <div style={{display:"flex",flexWrap:"wrap-reverse",alignItems:"center",gap:"2rem"}}>
+      <div style={{flex:"1 1 360px"}}>
+        <h2 style={{fontSize:"clamp(1.9rem,4.6vw,3.2rem)",fontWeight:700,lineHeight:1.08,margin:0,color:"#f4f4f8",letterSpacing:"-.01em"}}>Where <span style={{color:c}}>art</span> meets <span style={{color:c}}>engineering</span></h2>
+        <p style={{fontSize:"clamp(.92rem,1.4vw,1.05rem)",lineHeight:1.65,color:"rgba(232,232,240,.68)",margin:"1.1rem 0 1.5rem",maxWidth:600}}>A bit of context on who I am, where I come from and how I work, inside and outside the engine.</p>
+        <div style={{display:"flex",flexWrap:"wrap",gap:".7rem"}}>
+          <a href={cv} download="JordiAltisen_CV.pdf" target="_blank" rel="noopener noreferrer" className="pf-btn" style={{padding:".75rem 1.5rem",background:c,borderRadius:"100px",color:"#0a0a12",textDecoration:"none",fontSize:".85rem",fontWeight:700,boxShadow:`0 0 30px ${c}33`}}>Download CV</a>
+          <button onClick={onContact} className="pf-btn" style={{padding:".75rem 1.5rem",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.2)",borderRadius:"100px",color:"#e8e8f0",cursor:"pointer",fontSize:".85rem",fontWeight:600,fontFamily:"inherit"}}>Contact me</button>
+        </div>
+      </div>
+      <div style={{flex:"0 1 280px",maxWidth:"min(280px,72vw)",width:"100%",margin:"0 auto",aspectRatio:"1/1",borderRadius:20,overflow:"hidden",border:`1px solid ${c}44`,boxShadow:`0 20px 60px rgba(0,0,0,.6),0 0 40px ${c}18`,background:`radial-gradient(ellipse at 50% 30%,${c}12,#0a0a12)`}}>
+        <img src={gh("profile_picture.png")} alt="Jordi Altisèn" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} onError={e=>{e.currentTarget.style.display="none";}}/>
+      </div>
+    </div>
+
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(100%,300px),1fr))",gap:"1rem",marginTop:"2.2rem"}}>
+      {info.map(it=>(<div key={it.t} style={aboutCard}>
+        <div style={{display:"flex",alignItems:"center",gap:".8rem",marginBottom:".7rem"}}><IcoBox n={it.icon} c={c}/><span style={{fontSize:"1.05rem",fontWeight:700,color:"#f0f0f6"}}>{it.t}</span></div>
+        <p style={{fontSize:".85rem",lineHeight:1.65,color:"rgba(232,232,240,.66)",margin:0}}>{it.d}</p>
+      </div>))}
+    </div>
+
+    <div style={sec}>
+      <AboutHeading t="Technologies & tools" sub="A quick look at the engines, languages and tools I work with day to day."/>
+      <TechGrid/>
+    </div>
+
+    <div style={sec}>
+      <AboutHeading t="Education & experience" sub="From game development to enterprise software: the path that shaped how I build."/>
+      <ExperienceGrid c={c}/>
+    </div>
+
+    <div style={sec}>
+      <AboutHeading t="Beyond the engine"/>
+      <p style={{fontSize:".92rem",lineHeight:1.8,color:"rgba(232,232,240,.72)",whiteSpace:"pre-line",margin:0,maxWidth:860}}>{renderBold(bioX?STAR.bioExtended:STAR.bio)}</p>
+      <button onClick={()=>setBioX(b=>!b)} style={{background:"none",border:"none",color:`${c}aa`,fontSize:".7rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".1em",cursor:"pointer",marginTop:".8rem",padding:0}}>{bioX?"↑ Read less":"↓ Read more"}</button>
+    </div>
+
+    <div style={sec}>
+      <AboutHeading t="How I think & work" sub="My way of planning, building and optimising."/>
+      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(100%,230px),1fr))",gap:"1rem"}}>
+        {WORKFLOW.map(w=>(<div key={w.t} style={aboutCard}>
+          <div style={{display:"flex",alignItems:"center",gap:".8rem",marginBottom:".7rem"}}><IcoBox n={w.icon} c={c}/><span style={{fontSize:"1rem",fontWeight:700,color:"#f0f0f6"}}>{w.t}</span></div>
+          <p style={{fontSize:".83rem",lineHeight:1.65,color:"rgba(232,232,240,.64)",margin:0}}>{w.d}</p>
+        </div>))}
+      </div>
+    </div>
+  </div>);
+}
+
 function StarPanel({onClose,initialTab}){
   const[tab,setTab]=useState(initialTab||"about");const[msg,setMsg]=useState({n:"",e:"",t:""});
   const[sendState,setSendState]=useState("idle");
-  const[bioX,setBioX]=useState(false);
   const sendMessage=async()=>{
     if(!msg.n.trim()||!msg.e.trim()||!msg.t.trim()){setSendState("invalid");return;}
     if(!FORMSPREE_ID){setSendState("unconfigured");return;}
@@ -883,27 +1070,7 @@ function StarPanel({onClose,initialTab}){
       <div style={{display:"flex",gap:".4rem",marginBottom:"1rem"}}>{["about","contact"].map(t=><button key={t} className="pf-tab" onClick={()=>setTab(t)} style={{padding:".32rem .8rem",background:tab===t?`${c}22`:"transparent",border:`1px solid ${tab===t?c+"66":"rgba(255,255,255,.1)"}`,borderRadius:"6px",color:tab===t?c:"rgba(232,232,240,.4)",cursor:"pointer",fontSize:".72rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".1em",transition:"all .2s"}}>{t.toUpperCase()}</button>)}</div>
       <div style={{height:1,background:`linear-gradient(90deg,${c}55,transparent)`,marginBottom:"1.25rem"}}/>
     </div>
-    {tab==="about"&&(<div style={{padding:"0 1.75rem 1.75rem",display:"grid",gridTemplateColumns:"1fr 1fr",gap:"2rem"}}>
-      <div>
-        <div style={{width:"100%",maxWidth:210,aspectRatio:"1/1",borderRadius:"20px",overflow:"hidden",border:`2px solid ${c}44`,boxShadow:`0 0 40px ${c}18`,background:`radial-gradient(ellipse at 50% 30%,${c}12,#0a0a12)`,marginBottom:"1.3rem"}}>
-          <img src={gh("profile_picture.png")} alt="Jordi Altisèn" style={{width:"100%",height:"100%",objectFit:"cover"}} onError={e=>{e.currentTarget.style.display="none";}}/>
-        </div>
-        <L t="PROFESSIONAL SUMMARY"/>
-        <p style={{fontSize:".85rem",lineHeight:1.7,color:"rgba(232,232,240,.85)",marginBottom:"1.3rem",padding:".8rem .9rem",background:`${c}0c`,border:`1px solid ${c}28`,borderRadius:"10px"}}>{STAR.summary}</p>
-        <L t="BIO"/>
-        <p style={{fontSize:".87rem",lineHeight:1.72,color:"rgba(232,232,240,.75)",whiteSpace:"pre-line",marginBottom:".5rem"}}>{renderBold(bioX?STAR.bioExtended:STAR.bio)}</p>
-        <button onClick={()=>setBioX(b=>!b)} style={{background:"none",border:"none",color:`${c}66`,fontSize:".68rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".1em",cursor:"pointer",marginBottom:"1.25rem",padding:0,display:"block"}}>{bioX?"↑ Read less":"↓ Read more"}</button>
-        <L t="TIMELINE"/>
-        {STAR.timeline.map((it,i)=>(<div key={i} style={{display:"flex",gap:".65rem",position:"relative",paddingBottom:i<STAR.timeline.length-1?".75rem":"0"}}>{i<STAR.timeline.length-1&&<div style={{position:"absolute",left:"2.2rem",top:"1.3rem",width:1,bottom:0,background:`${c}22`}}/>}<span style={{fontSize:".62rem",color:c,fontFamily:"'JetBrains Mono',monospace",minWidth:"2.5rem",paddingTop:".2rem",fontWeight:700}}>{it.y}</span><div><div style={{fontSize:".82rem",fontWeight:600,color:"rgba(232,232,240,.9)"}}>{it.l}</div><div style={{fontSize:".72rem",color:"rgba(232,232,240,.42)",marginTop:".08rem"}}>{it.d}</div></div></div>))}
-      </div>
-      <div>
-        <L t="SKILLS"/>
-        <div style={{marginBottom:"1.25rem"}}>{STAR.skills.map(({s,p})=>(<div key={s} style={{marginBottom:".45rem"}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:"3px"}}><span style={{fontSize:".77rem",color:"rgba(232,232,240,.8)"}}>{s}</span><span style={{fontSize:".62rem",color:`${c}99`,fontFamily:"'JetBrains Mono',monospace"}}>{p}%</span></div><div style={{height:2.5,background:"rgba(255,255,255,.06)",borderRadius:2}}><div style={{height:"100%",width:`${p}%`,background:`linear-gradient(90deg,${c}88,${c})`,borderRadius:2,animation:"progFill .9s ease"}}/></div></div>))}</div>
-        <L t="LANGUAGES"/>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:".35rem",marginBottom:"1.5rem"}}>{STAR.langs.map(({l,lv})=>(<div key={l} style={{display:"flex",justifyContent:"space-between",padding:".28rem .5rem",background:"rgba(255,255,255,.025)",borderRadius:"6px"}}><span style={{fontSize:".8rem",color:"rgba(232,232,240,.75)"}}>{l}</span><span style={{fontSize:".68rem",color:c,fontFamily:"'JetBrains Mono',monospace"}}>{lv}</span></div>))}</div>
-        <a href={`https://raw.githubusercontent.com/${GH_USER}/${GH_REPO}/${GH_BRANCH}/src/JordiAltisen_CV.pdf`} download="JordiAltisen_CV.pdf" target="_blank" rel="noopener noreferrer" className="pf-btn" style={{display:"block",textAlign:"center",padding:".72rem",background:`${c}22`,border:`1px solid ${c}66`,borderRadius:"10px",color:c,textDecoration:"none",fontSize:".87rem",fontWeight:600,transition:"filter .2s"}}>Download CV</a>
-      </div>
-    </div>)}
+    {tab==="about"&&<AboutTab c={c} onContact={()=>setTab("contact")}/>}
     {tab==="contact"&&(<div style={{padding:"0 1.75rem 1.75rem",maxWidth:520,margin:"0 auto"}}><input style={inp()} placeholder="Your name" value={msg.n} onChange={e=>setMsg(m=>({...m,n:e.target.value}))}/><input style={inp()} placeholder="your@email.com" value={msg.e} onChange={e=>setMsg(m=>({...m,e:e.target.value}))}/><textarea style={inp({resize:"vertical",marginBottom:"1rem"})} rows={5} placeholder="Your message" value={msg.t} onChange={e=>setMsg(m=>({...m,t:e.target.value}))}/>
       {sendState==="sent"&&<div style={{fontSize:".78rem",color:"#6ee78a",marginBottom:".7rem"}}>Message sent, thanks — I'll get back to you soon.</div>}
       {sendState==="error"&&<div style={{fontSize:".78rem",color:"#f0806b",marginBottom:".7rem"}}>Something went wrong sending this. Try again, or email me directly.</div>}
@@ -916,7 +1083,8 @@ function StarPanel({onClose,initialTab}){
 
 function CaseStudy({project,onClose}){
   const pC=project.hex;
-  const cats=(project.categories||[]).filter(c=>!c.isOverview);
+  const heroVid=project.videoId??(project.imgs?.length?null:project.categories?.[0]?.videoId);
+  const cats=(project.categories||[]).filter(c=>!c.isOverview&&!(heroVid&&c.videoId===heroVid));
   const ordered=[...cats.filter(c=>c.id!=="results"),...cats.filter(c=>c.id==="results")];
   const[activeId,setActiveId]=useState("overview");
   const[ovIdx,setOvIdx]=useState(0);
@@ -986,7 +1154,7 @@ function CaseStudy({project,onClose}){
       <div style={{position:"absolute",inset:0,pointerEvents:"none",background:`radial-gradient(ellipse at 50% 0%,${pC}16,transparent 55%)`}}/>
       <div style={{position:"relative",zIndex:1,maxWidth:1100,margin:"0 auto",padding:"1.5rem clamp(1.2rem,4vw,3rem) 6rem"}}>
         <section data-secid="overview" ref={el=>{secRefs.current.overview=el;}} style={{scrollMarginTop:"1rem"}}>
-          {ovImgs.length>0&&<CoverGallery imgs={ovImgs} videoId={project.videoId??(project.imgs?.length?null:project.categories?.[0]?.videoId)} c={pC} idx={ovIdx} onIdx={setOvIdx} big/>}
+          {ovImgs.length>0&&<CoverGallery imgs={ovImgs} videoId={heroVid} c={pC} idx={ovIdx} onIdx={setOvIdx} big/>}
           {(project.overview||project.desc)&&<p style={{fontSize:"clamp(.9rem,1.4vw,1rem)",lineHeight:1.75,color:"rgba(232,232,240,.72)",margin:"1.4rem 0 0",width:"100%",whiteSpace:"pre-line",textAlign:"justify",hyphens:"auto",WebkitHyphens:"auto"}}>{renderBold(project.overview||project.desc)}</p>}
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:"1.6rem",marginTop:"2rem"}}>
             {project.features?.length>0&&(<div>
@@ -1713,28 +1881,12 @@ function IntroScreen({onEnter,onOpenProject}){
 
         <SecReveal root={wrapRef}><div style={{position:"relative",padding:"2.5rem 0"}}><SpaceBg c={c}/><div style={{position:"relative",zIndex:1}}>
           <SecTitle t="SKILLS" c={c}/>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:".9rem 1.8rem",maxWidth:900,margin:"0 auto"}}>
-            {STAR.skills.map(sk=>(<div key={sk.s}>
-              <div style={{display:"flex",justifyContent:"space-between",marginBottom:".3rem"}}>
-                <span style={{fontSize:".8rem",color:"rgba(232,232,240,.8)"}}>{sk.s}</span>
-                <span style={{fontSize:".65rem",color:`${c}aa`,fontFamily:"'JetBrains Mono',monospace"}}>{sk.p}%</span>
-              </div>
-              <div style={{height:3,background:"rgba(255,255,255,.07)",borderRadius:2}}><div style={{height:"100%",width:`${sk.p}%`,background:`linear-gradient(90deg,${c}55,${c})`,borderRadius:2}}/></div>
-            </div>))}
-          </div>
+          <div style={{maxWidth:1000,margin:"0 auto"}}><TechGrid/></div>
         </div></div></SecReveal>
 
         <SecReveal root={wrapRef}><div style={{position:"relative",padding:"2.5rem 0"}}><SpaceBg c={c}/><div style={{position:"relative",zIndex:1}}>
           <SecTitle t="EXPERIENCE & EDUCATION" c={c}/>
-          <div style={{maxWidth:760,margin:"0 auto",display:"flex",flexDirection:"column",gap:".1rem"}}>
-            {STAR.timeline.map((it,i)=>(<div key={i} style={{display:"grid",gridTemplateColumns:"88px 1fr",gap:"1.1rem",padding:".85rem 0",borderTop:i===0?"none":"1px solid rgba(255,255,255,.06)"}}>
-              <div style={{fontSize:".7rem",color:c,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".06em",paddingTop:".12rem"}}>{it.y}</div>
-              <div>
-                <div style={{fontSize:".86rem",fontWeight:600,color:"#e8e8f0"}}>{it.l}</div>
-                {it.d&&<div style={{fontSize:".76rem",color:"rgba(232,232,240,.48)",marginTop:".15rem",lineHeight:1.55}}>{it.d}</div>}
-              </div>
-            </div>))}
-          </div>
+          <div style={{maxWidth:1100,margin:"0 auto"}}><ExperienceGrid c={c}/></div>
         </div></div></SecReveal>
 
         <div onClick={()=>go()} style={{textAlign:"center",cursor:"pointer",paddingTop:"2rem"}}>
