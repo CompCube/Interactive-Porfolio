@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import {
   STAR,
   TK,
-  SpaceBg,
+  NebulaBg,
   SecReveal,
   SecTitle,
   FeaturedCarousel,
@@ -67,7 +67,7 @@ export default function Landing() {
             paddingBottom: "clamp(1.5rem,4vh,3rem)",
           }}
         >
-          <SpaceBg c={c} />
+          <NebulaBg />
           <div
             style={{
               position: "relative",
@@ -291,7 +291,7 @@ export default function Landing() {
             }}
             className="feat-grid"
           >
-            <SpaceBg c={c} />
+            <NebulaBg />
             <div style={{ position: "relative", zIndex: 1 }}>
               <h2 style={{ fontSize: "clamp(1.5rem,3vw,2.1rem)", fontWeight: 700, color: "#e8e8f0", margin: "0 0 1rem", lineHeight: 1.2 }}>
                 Featured <span style={{ color: c }}>projects</span>
@@ -346,7 +346,7 @@ export default function Landing() {
 
         <SecReveal>
           <div style={{ position: "relative", padding: "2rem 0" }}>
-            <SpaceBg c={c} />
+            <NebulaBg />
             <div
               style={{
                 position: "relative",
@@ -389,7 +389,7 @@ export default function Landing() {
 
         <SecReveal>
           <div style={{ position: "relative", padding: "2.5rem 0" }}>
-            <SpaceBg c={c} />
+            <NebulaBg />
             <div style={{ position: "relative", zIndex: 1 }}>
               <SecTitle t="ABOUT ME" c={c} />
               <p style={{ fontSize: ".88rem", lineHeight: 1.8, color: "rgba(232,232,240,.62)", whiteSpace: "pre-line", maxWidth: 820, margin: "0 auto" }}>
@@ -401,7 +401,7 @@ export default function Landing() {
 
         <SecReveal>
           <div style={{ position: "relative", padding: "2.5rem 0" }}>
-            <SpaceBg c={c} />
+            <NebulaBg />
             <div style={{ position: "relative", zIndex: 1 }}>
               <SecTitle t="SKILLS" c={c} />
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: ".9rem 1.8rem", maxWidth: 900, margin: "0 auto" }}>
@@ -423,7 +423,7 @@ export default function Landing() {
 
         <SecReveal>
           <div style={{ position: "relative", padding: "2.5rem 0" }}>
-            <SpaceBg c={c} />
+            <NebulaBg />
             <div style={{ position: "relative", zIndex: 1 }}>
               <SecTitle t="EXPERIENCE & EDUCATION" c={c} />
               <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", flexDirection: "column", gap: ".1rem" }}>

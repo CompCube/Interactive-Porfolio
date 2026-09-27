@@ -1372,6 +1372,108 @@ export function SpaceBg({c,fixed}){
   </div>);
 }
 
+const NEB_VS=`attribute vec2 aPos;void main(){gl_Position=vec4(aPos,0.0,1.0);}`;
+const NEB_FS=`precision highp float;
+uniform vec2 uRes;uniform float uTime;
+float hash(vec2 p){p=fract(p*vec2(123.34,456.21));p+=dot(p,p+45.32);return fract(p.x*p.y);}
+float noise(vec2 p){vec2 i=floor(p),f=fract(p);float a=hash(i),b=hash(i+vec2(1.0,0.0)),c=hash(i+vec2(0.0,1.0)),d=hash(i+vec2(1.0,1.0));vec2 u=f*f*(3.0-2.0*f);return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}
+mat2 rot(float a){float s=sin(a),c=cos(a);return mat2(c,-s,s,c);}
+float fbm(vec2 p){float v=0.0,amp=0.5;for(int i=0;i<5;i++){v+=amp*noise(p);p=rot(0.5)*p*2.02;amp*=0.5;}return v;}
+vec3 nebula(vec2 p,float t){
+  vec2 q=p*1.6+vec2(0.0,t*0.06);
+  float n1=fbm(q);
+  float n2=fbm(q*1.7+9.2-t*0.04);
+  float n=fbm(vec2(n1,n2)*1.3+p*0.6);
+  vec3 games=vec3(0.349,0.267,0.651);
+  vec3 ai=vec3(0.106,0.761,0.890);
+  vec3 gold=vec3(0.929,0.765,0.165);
+  vec3 col=mix(games,ai,smoothstep(0.25,0.7,n1));
+  col=mix(col,gold,smoothstep(0.55,0.95,n2)*0.6);
+  float density=smoothstep(0.15,0.85,n);
+  return col*density*0.88;
+}
+float starsStatic(vec2 p){
+  vec2 gp=p*70.0*1.09;
+  vec2 gi=floor(gp);
+  vec2 gf=fract(gp)-0.5;
+  float rr=hash(gi);
+  float size=smoothstep(0.965,0.999,rr)*0.97;
+  float d=length(gf);
+  float core=smoothstep(0.15,0.0,d);
+  float twBase=0.5+0.8*hash(gi+7.0);
+  float tw=(1.0-0.39)+0.39*(0.5+0.5*sin(uTime*twBase+hash(gi+1.0)*6.2831));
+  return size*core*tw;
+}
+float zoomLayer(vec2 p,float phase){
+  float t=fract(uTime*0.63*0.05+phase);
+  float scale=mix(1.0,2.49,t);
+  vec2 gp=p*scale*46.0;
+  vec2 gi=floor(gp);
+  vec2 gf=fract(gp)-0.5;
+  float rr=hash(gi+3.1);
+  float size=smoothstep(0.975,0.999,rr)*0.97*mix(0.6,1.8,t);
+  float d=length(gf);
+  float core=smoothstep(0.15,0.0,d);
+  float fade=smoothstep(0.0,0.18,t)*smoothstep(1.0,0.8,t);
+  float bright=mix(0.7,1.4,t);
+  return size*core*fade*bright;
+}
+void main(){
+  vec2 uv=gl_FragCoord.xy/uRes.xy;
+  vec2 p=(uv-0.5);p.x*=uRes.x/uRes.y;
+  vec3 neb=nebula(p,uTime*0.27);
+  float stat=starsStatic(p);
+  float approach=(zoomLayer(p,0.0)+zoomLayer(p,0.5))*0.57;
+  vec3 starCol=vec3(1.0,0.98,0.92)*(stat+approach)*1.23;
+  vec3 col=neb+starCol+vec3(0.02,0.02,0.035);
+  gl_FragColor=vec4(col,1.0);
+}`;
+
+export function NebulaBg({fixed}){
+  const cvRef=useRef(null);
+  useEffect(()=>{
+    const cv=cvRef.current;if(!cv)return;
+    const gl=cv.getContext("webgl");if(!gl)return;
+    const reduce=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    const compile=(type,src)=>{const sh=gl.createShader(type);gl.shaderSource(sh,src);gl.compileShader(sh);if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS)){console.error("NebulaBg shader error:",gl.getShaderInfoLog(sh));return null;}return sh;};
+    const vs=compile(gl.VERTEX_SHADER,NEB_VS),fs=compile(gl.FRAGMENT_SHADER,NEB_FS);
+    if(!vs||!fs)return;
+    const prog=gl.createProgram();
+    gl.attachShader(prog,vs);gl.attachShader(prog,fs);gl.linkProgram(prog);
+    if(!gl.getProgramParameter(prog,gl.LINK_STATUS)){console.error("NebulaBg link error:",gl.getProgramInfoLog(prog));return;}
+    gl.useProgram(prog);
+    const buf=gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+    gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+    const aPos=gl.getAttribLocation(prog,"aPos");
+    gl.enableVertexAttribArray(aPos);
+    gl.vertexAttribPointer(aPos,2,gl.FLOAT,false,0,0);
+    const uRes=gl.getUniformLocation(prog,"uRes"),uTime=gl.getUniformLocation(prog,"uTime");
+    let w=0,h=0,raf=0;
+    const resize=()=>{
+      const s=Math.min(devicePixelRatio,2);
+      w=cv.width=Math.max(1,cv.offsetWidth*s);
+      h=cv.height=Math.max(1,cv.offsetHeight*s);
+      gl.viewport(0,0,w,h);
+    };
+    const draw=t=>{gl.uniform2f(uRes,w,h);gl.uniform1f(uTime,t);gl.drawArrays(gl.TRIANGLES,0,3);};
+    const start=performance.now();
+    const loop=()=>{draw((performance.now()-start)/1000);raf=requestAnimationFrame(loop);};
+    resize();
+    if(reduce)draw(0);else raf=requestAnimationFrame(loop);
+    const onR=()=>{resize();if(reduce)draw(0);};
+    window.addEventListener("resize",onR);
+    const ro=typeof ResizeObserver!=="undefined"?new ResizeObserver(onR):null;
+    if(ro)ro.observe(cv);
+    return()=>{cancelAnimationFrame(raf);window.removeEventListener("resize",onR);ro?.disconnect();};
+  },[]);
+  const mask="linear-gradient(180deg,transparent 0%,#000 12%,#000 88%,transparent 100%)";
+  return(<div style={{position:fixed?"fixed":"absolute",inset:0,pointerEvents:"none",overflow:"hidden",zIndex:0,maskImage:mask,WebkitMaskImage:mask}}>
+    <canvas ref={cvRef} style={{position:"absolute",inset:0,width:"100%",height:"100%"}}/>
+    <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse at 50% 40%,transparent 20%,rgba(2,2,8,.8) 100%)"}}/>
+  </div>);
+}
+
 export function FeaturedCarousel({onOpen,big}){
   const items=featuredProjects();
   const[idx,setIdx]=useState(0);
