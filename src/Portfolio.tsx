@@ -890,6 +890,8 @@ const TECH_GROUPS=[
   ]},
 ];
 const EDUCATION=[
+  {when:"2025 – Present",title:"Master's Degree in Real-Time Art and Visual Effects",org:"FH Salzburg (Salzburg University of Applied Sciences)",
+   text:"Currently studying a master's focused on **real-time art** and **visual effects** for games and interactive media."},
   {when:"2020 – 2025",title:"Bachelor's Degree in Game Design and Development",org:"Universitat de Girona (UdG)",
    text:"A multidisciplinary degree spanning **programming**, **game design**, **3D art**, **level design** and **technical implementation**. Final Degree Project (*Hollow End*) awarded **High Honors**."},
 ];
