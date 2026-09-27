@@ -1,7 +1,12 @@
 import { useNavigate } from "react-router-dom";
-import { StarPanel } from "../Portfolio";
+import { StarPanel, NebulaBg } from "../Portfolio";
 
 export default function Contact() {
   const navigate = useNavigate();
-  return <StarPanel initialTab="contact" onClose={() => navigate("/")} />;
+  return (
+    <>
+      <NebulaBg fixed />
+      <StarPanel initialTab="contact" onClose={() => navigate("/")} standalone />
+    </>
+  );
 }

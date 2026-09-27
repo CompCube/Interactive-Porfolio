@@ -845,8 +845,8 @@ function CoverGallery({imgs,videoId,c,idx,onIdx,big}){
   </div>);
 }
 
-function Modal({c,onClose,children,width}){
-  return(<div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,8,.72)",backdropFilter:"blur(8px)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:"clamp(1rem,3vw,2rem)"}}>
+function Modal({c,onClose,children,width,backdropAlpha=.72}){
+  return(<div onClick={onClose} style={{position:"fixed",inset:0,background:`rgba(0,0,8,${backdropAlpha})`,backdropFilter:"blur(8px)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:"clamp(1rem,3vw,2rem)"}}>
     <div onClick={e=>e.stopPropagation()} style={{width:width||"min(1400px,94vw)",maxHeight:"88vh",background:"rgba(7,7,17,.97)",backdropFilter:"blur(28px)",border:`1px solid ${c}30`,borderRadius:"20px",boxShadow:`0 0 80px ${c}18,0 30px 80px rgba(0,0,0,.7)`,overflowY:"auto",scrollbarWidth:"none",fontFamily:"'Space Grotesk',sans-serif",color:"#e8e8f0",animation:"modalIn .35s cubic-bezier(.16,1,.3,1)"}}>{children}</div>
   </div>);
 }
@@ -1043,7 +1043,7 @@ function AboutTab({c,onContact}){
   </div>);
 }
 
-export function StarPanel({onClose,initialTab}){
+export function StarPanel({onClose,initialTab,standalone}){
   const[tab,setTab]=useState(initialTab||"about");const[msg,setMsg]=useState({n:"",e:"",t:""});
   const[sendState,setSendState]=useState("idle");
   const sendMessage=async()=>{
@@ -1062,7 +1062,7 @@ export function StarPanel({onClose,initialTab}){
   const c=STAR.hex;
   const inp=(ex={})=>({display:"block",width:"100%",padding:".55rem .7rem",marginBottom:".45rem",background:"rgba(255,255,255,.05)",border:"1px solid rgba(255,255,255,.1)",borderRadius:"8px",color:"#e8e8f0",fontSize:".83rem",outline:"none",fontFamily:"'Space Grotesk',sans-serif",...ex});
   const L=({t})=><div style={{fontSize:".6rem",color:c,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".22em",marginBottom:".5rem"}}>{t}</div>;
-  return(<Modal c={c} onClose={onClose}>
+  return(<Modal c={c} onClose={onClose} backdropAlpha={standalone?.18:.72}>
     <div style={{padding:"1.75rem 1.75rem 0"}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:"1rem"}}>
         <div style={{display:"flex",alignItems:"center",gap:"1rem"}}>
@@ -1562,28 +1562,28 @@ vec3 nebula(vec2 p,float t){
   vec3 col=mix(games,ai,smoothstep(0.25,0.7,n1));
   col=mix(col,gold,smoothstep(0.55,0.95,n2)*0.6);
   float density=smoothstep(0.15,0.85,n);
-  return col*density*0.88;
+  return col*density*0.56;
 }
 float starsStatic(vec2 p){
-  vec2 gp=p*70.0*1.09;
+  vec2 gp=p*70.0*1.11;
   vec2 gi=floor(gp);
   vec2 gf=fract(gp)-0.5;
   float rr=hash(gi);
-  float size=smoothstep(0.965,0.999,rr)*0.97;
+  float size=smoothstep(0.965,0.999,rr)*0.86;
   float d=length(gf);
   float core=smoothstep(0.15,0.0,d);
-  float twBase=0.5+0.8*hash(gi+7.0);
-  float tw=(1.0-0.39)+0.39*(0.5+0.5*sin(uTime*twBase+hash(gi+1.0)*6.2831));
+  float twBase=0.5+1.47*hash(gi+7.0);
+  float tw=(1.0-0.37)+0.37*(0.5+0.5*sin(uTime*twBase+hash(gi+1.0)*6.2831));
   return size*core*tw;
 }
 float zoomLayer(vec2 p,float phase){
-  float t=fract(uTime*0.63*0.05+phase);
-  float scale=mix(1.0,2.49,t);
+  float t=fract(uTime*1.57*0.05+phase);
+  float scale=mix(1.0,2.95,t);
   vec2 gp=p*scale*46.0;
   vec2 gi=floor(gp);
   vec2 gf=fract(gp)-0.5;
   float rr=hash(gi+3.1);
-  float size=smoothstep(0.975,0.999,rr)*0.97*mix(0.6,1.8,t);
+  float size=smoothstep(0.975,0.999,rr)*0.86*mix(0.6,1.8,t);
   float d=length(gf);
   float core=smoothstep(0.15,0.0,d);
   float fade=smoothstep(0.0,0.18,t)*smoothstep(1.0,0.8,t);
@@ -1593,10 +1593,10 @@ float zoomLayer(vec2 p,float phase){
 void main(){
   vec2 uv=gl_FragCoord.xy/uRes.xy;
   vec2 p=(uv-0.5);p.x*=uRes.x/uRes.y;
-  vec3 neb=nebula(p,uTime*0.27);
+  vec3 neb=nebula(p,uTime*0.47);
   float stat=starsStatic(p);
-  float approach=(zoomLayer(p,0.0)+zoomLayer(p,0.5))*0.57;
-  vec3 starCol=vec3(1.0,0.98,0.92)*(stat+approach)*1.23;
+  float approach=(zoomLayer(p,0.0)+zoomLayer(p,0.5))*0.69;
+  vec3 starCol=vec3(1.0,0.98,0.92)*(stat+approach)*0.99;
   vec3 col=neb+starCol+vec3(0.02,0.02,0.035);
   gl_FragColor=vec4(col,1.0);
 }`;
