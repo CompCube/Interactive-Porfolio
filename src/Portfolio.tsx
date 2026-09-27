@@ -985,7 +985,7 @@ export function ExperienceGrid({c}){
     <TimelineCol icon="briefcase" label="PROFESSIONAL EXPERIENCE" items={EXPERIENCE} c={c}/>
   </div>);
 }
-function AboutTab({c,onContact}){
+export function AboutTab({c,onContact}){
   const[bioX,setBioX]=useState(false);
   const cv=`https://raw.githubusercontent.com/${GH_USER}/${GH_REPO}/${GH_BRANCH}/src/JordiAltisen_CV.pdf`;
   const info=[
@@ -1702,7 +1702,7 @@ function PlanetNav({onSelect}){
   </nav>);
 }
 
-function Header({onHome,onAbout,onProjects,onContact}){
+export function Header({onHome,onAbout,onProjects,onContact}){
   const c=STAR.hex;
   const[menuOpen,setMenuOpen]=useState(false);
   const items=[["Home",onHome],["About me",onAbout],["Projects",onProjects],["Contact",onContact]];

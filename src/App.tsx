@@ -16,6 +16,11 @@ export default function App() {
       el.textContent = CSS;
       document.head.appendChild(el);
     }
+    // Reloading should start fresh at the top, not wherever the browser last scrolled to.
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+    window.scrollTo(0, 0);
   }, []);
   return (
     <Routes>
