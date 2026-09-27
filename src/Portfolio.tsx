@@ -1642,7 +1642,7 @@ export function NebulaBg({fixed}){
   const mask="linear-gradient(180deg,transparent 0%,#000 12%,#000 88%,transparent 100%)";
   return(<div style={{position:fixed?"fixed":"absolute",inset:0,pointerEvents:"none",overflow:"hidden",zIndex:0,maskImage:mask,WebkitMaskImage:mask}}>
     <canvas ref={cvRef} style={{position:"absolute",inset:0,width:"100%",height:"100%"}}/>
-    <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse at 50% 40%,transparent 20%,rgba(2,2,8,.8) 100%)"}}/>
+    <div style={{position:"absolute",inset:0,background:"radial-gradient(ellipse at 50% 40%,transparent 25%,rgba(2,2,8,.35) 70%,rgba(2,2,8,.65) 130%)"}}/>
   </div>);
 }
 
