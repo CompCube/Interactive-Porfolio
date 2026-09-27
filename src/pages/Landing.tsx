@@ -6,6 +6,8 @@ import {
   SecReveal,
   SecTitle,
   FeaturedCarousel,
+  TechGrid,
+  ExperienceGrid,
   renderBold,
 } from "../Portfolio";
 
@@ -43,6 +45,7 @@ export default function Landing() {
       }}
     >
       <style>{`@keyframes introUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}@keyframes introIn{from{opacity:0}to{opacity:1}}@keyframes introBlink{0%,100%{opacity:.14}50%{opacity:.44}}`}</style>
+      <NebulaBg fixed />
       <div
         style={{
           position: "relative",
@@ -67,7 +70,6 @@ export default function Landing() {
             paddingBottom: "clamp(1.5rem,4vh,3rem)",
           }}
         >
-          <NebulaBg />
           <div
             style={{
               position: "relative",
@@ -291,7 +293,6 @@ export default function Landing() {
             }}
             className="feat-grid"
           >
-            <NebulaBg />
             <div style={{ position: "relative", zIndex: 1 }}>
               <h2 style={{ fontSize: "clamp(1.5rem,3vw,2.1rem)", fontWeight: 700, color: "#e8e8f0", margin: "0 0 1rem", lineHeight: 1.2 }}>
                 Featured <span style={{ color: c }}>projects</span>
@@ -346,7 +347,6 @@ export default function Landing() {
 
         <SecReveal>
           <div style={{ position: "relative", padding: "2rem 0" }}>
-            <NebulaBg />
             <div
               style={{
                 position: "relative",
@@ -389,7 +389,6 @@ export default function Landing() {
 
         <SecReveal>
           <div style={{ position: "relative", padding: "2.5rem 0" }}>
-            <NebulaBg />
             <div style={{ position: "relative", zIndex: 1 }}>
               <SecTitle t="ABOUT ME" c={c} />
               <p style={{ fontSize: ".88rem", lineHeight: 1.8, color: "rgba(232,232,240,.62)", whiteSpace: "pre-line", maxWidth: 820, margin: "0 auto" }}>
@@ -401,21 +400,10 @@ export default function Landing() {
 
         <SecReveal>
           <div style={{ position: "relative", padding: "2.5rem 0" }}>
-            <NebulaBg />
             <div style={{ position: "relative", zIndex: 1 }}>
               <SecTitle t="SKILLS" c={c} />
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))", gap: ".9rem 1.8rem", maxWidth: 900, margin: "0 auto" }}>
-                {STAR.skills.map((sk) => (
-                  <div key={sk.s}>
-                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: ".3rem" }}>
-                      <span style={{ fontSize: ".8rem", color: "rgba(232,232,240,.8)" }}>{sk.s}</span>
-                      <span style={{ fontSize: ".65rem", color: `${c}aa`, fontFamily: "'JetBrains Mono',monospace" }}>{sk.p}%</span>
-                    </div>
-                    <div style={{ height: 3, background: "rgba(255,255,255,.07)", borderRadius: 2 }}>
-                      <div style={{ height: "100%", width: `${sk.p}%`, background: `linear-gradient(90deg,${c}55,${c})`, borderRadius: 2 }} />
-                    </div>
-                  </div>
-                ))}
+              <div style={{ maxWidth: 1120, margin: "0 auto" }}>
+                <TechGrid />
               </div>
             </div>
           </div>
@@ -423,34 +411,10 @@ export default function Landing() {
 
         <SecReveal>
           <div style={{ position: "relative", padding: "2.5rem 0" }}>
-            <NebulaBg />
             <div style={{ position: "relative", zIndex: 1 }}>
               <SecTitle t="EXPERIENCE & EDUCATION" c={c} />
-              <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", flexDirection: "column", gap: ".1rem" }}>
-                {STAR.timeline.map((it, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "88px 1fr",
-                      gap: "1.1rem",
-                      padding: ".85rem 0",
-                      borderTop: i === 0 ? "none" : "1px solid rgba(255,255,255,.06)",
-                    }}
-                  >
-                    <div style={{ fontSize: ".7rem", color: c, fontFamily: "'JetBrains Mono',monospace", letterSpacing: ".06em", paddingTop: ".12rem" }}>
-                      {it.y}
-                    </div>
-                    <div>
-                      <div style={{ fontSize: ".86rem", fontWeight: 600, color: "#e8e8f0" }}>{it.l}</div>
-                      {it.d && (
-                        <div style={{ fontSize: ".76rem", color: "rgba(232,232,240,.48)", marginTop: ".15rem", lineHeight: 1.55 }}>
-                          {it.d}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
+              <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+                <ExperienceGrid c={c} />
               </div>
             </div>
           </div>

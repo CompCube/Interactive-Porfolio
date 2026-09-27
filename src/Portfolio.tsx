@@ -941,7 +941,7 @@ function AboutHeading({t,sub=null}){return(<div style={{marginBottom:"1.4rem"}}>
   <h3 style={{fontSize:"clamp(1.3rem,2.6vw,1.75rem)",fontWeight:700,color:"#f0f0f6",margin:0}}>{t}</h3>
   {sub&&<p style={{fontSize:".92rem",lineHeight:1.6,color:"rgba(232,232,240,.6)",margin:".55rem 0 0",maxWidth:640}}>{sub}</p>}
 </div>);}
-function TechGrid(){
+export function TechGrid(){
   return(<div style={{display:"flex",flexDirection:"column",gap:"1.4rem"}}>
     {TECH_GROUPS.map(g=>(<div key={g.label}>
       <div style={{fontSize:".62rem",color:"rgba(232,232,240,.45)",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".2em",marginBottom:".7rem",textAlign:"center"}}>{g.label.toUpperCase()}</div>
@@ -977,7 +977,7 @@ function TimelineCol({icon,label,items,c}){
     </div>
   </div>);
 }
-function ExperienceGrid({c}){
+export function ExperienceGrid({c}){
   return(<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(100%,360px),1fr))",gap:"2rem",alignItems:"start"}}>
     <TimelineCol icon="cap" label="EDUCATION" items={EDUCATION} c={c}/>
     <TimelineCol icon="briefcase" label="PROFESSIONAL EXPERIENCE" items={EXPERIENCE} c={c}/>
