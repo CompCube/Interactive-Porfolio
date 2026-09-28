@@ -1567,7 +1567,7 @@ vec3 nebula(vec2 p,float t){
   vec3 col=mix(games,ai,smoothstep(0.25,0.7,n1));
   col=mix(col,gold,smoothstep(0.55,0.95,n2)*0.6);
   float density=smoothstep(0.15,0.85,n);
-  return col*density*0.88;
+  return col*density*1.0;
 }
 float starsStatic(vec2 p){
   vec2 gp=p*70.0*1.11;
