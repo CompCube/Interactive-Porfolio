@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   STAR,
@@ -12,12 +12,82 @@ import {
   renderBold,
 } from "../Portfolio";
 
+const BG_IMGS = {
+  // The Hollow End cover already has its title painted in, so no caption title and crop it out behind text.
+  hollow: { src: "/bg/hollow-end.webp", label: "HOLLOW END · UNITY HDRP", title: "", slug: "hollow-end", cropTop: true },
+  subway: { src: "/bg/subway-kit.webp", label: "SUBWAY MODULAR KIT · BLENDER", title: "Subway Modular Kit", slug: "subway-modular-kit", cropTop: false },
+} as const;
+type BgKey = keyof typeof BG_IMGS;
+
+// Poly Haven-style window: the render stays fixed to the viewport while this band scrolls over it.
+function RenderWindow({ k, c, onOpen }: { k: BgKey; c: string; onOpen: (slug: string) => void }) {
+  const im = BG_IMGS[k];
+  const fade = "linear-gradient(180deg,transparent 0%,#000 20%,#000 80%,transparent 100%)";
+  return (
+    <div
+      onClick={() => onOpen(im.slug)}
+      style={{
+        position: "relative",
+        height: "calc(64vh / var(--bz, 1))",
+        width: "calc(100vw / var(--bz, 1))",
+        marginLeft: "calc(50% - 50vw / var(--bz, 1))",
+        clipPath: "inset(0)",
+        cursor: "pointer",
+        maskImage: fade,
+        WebkitMaskImage: fade,
+      }}
+    >
+      <div style={{ position: "fixed", inset: 0, backgroundImage: `url(${im.src})`, backgroundSize: "cover", backgroundPosition: "center", filter: "saturate(.9)" }} />
+      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(0,0,8,.25),rgba(12,6,30,.35)),radial-gradient(ellipse at 50% 50%,transparent 40%,rgba(0,0,8,.7) 100%)" }} />
+      <div style={{ position: "absolute", left: 0, right: 0, bottom: "16%", maxWidth: 1180, margin: "0 auto", padding: "0 clamp(1.3rem,4vw,2.5rem)" }}>
+        <div style={{ fontSize: ".64rem", color: c, fontFamily: "'JetBrains Mono',monospace", letterSpacing: ".3em", marginBottom: ".5rem", textShadow: "0 2px 12px rgba(0,0,0,.8)" }}>{im.label}</div>
+        {im.title && <div style={{ fontSize: "clamp(1.4rem,3vw,2.2rem)", fontWeight: 700, color: "#f4f4f8", textShadow: "0 2px 20px rgba(0,0,0,.8)" }}>{im.title}</div>}
+        <div style={{ fontSize: ".78rem", color: "rgba(232,232,240,.75)", marginTop: ".4rem" }}>View project →</div>
+      </div>
+    </div>
+  );
+}
+
+// Crossfading backdrop: a dim render fades in behind whichever section group is on screen.
+function ScrollBackdrop() {
+  const [active, setActive] = useState<string>("none");
+  useEffect(() => {
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      let cur = "none";
+      document.querySelectorAll<HTMLElement>("[data-bd]").forEach((el) => {
+        if (el.getBoundingClientRect().top < window.innerHeight * 0.5) cur = el.dataset.bd || "none";
+      });
+      setActive(cur);
+    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => { window.removeEventListener("scroll", onScroll); window.removeEventListener("resize", onScroll); cancelAnimationFrame(raf); };
+  }, []);
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none" }}>
+      {(Object.keys(BG_IMGS) as BgKey[]).map((k) => (
+        <div key={k} style={{ position: "absolute", inset: 0, overflow: "hidden", opacity: active === k ? 1 : 0, transition: "opacity 1.2s ease" }}>
+          <div style={{ position: "absolute", inset: 0, backgroundImage: `url(${BG_IMGS[k].src})`, backgroundSize: "cover", backgroundPosition: "center bottom", opacity: 0.32, filter: "blur(1.5px) saturate(.85)", transform: BG_IMGS[k].cropTop ? "scale(1.4)" : "none", transformOrigin: "50% 100%" }} />
+          <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 45%,rgba(0,0,8,.2) 0%,rgba(0,0,8,.6) 100%)" }} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // Static-first landing at "/". No 3D, no Three.js — that lives at /explore.
 // This page is the fast path for a recruiter with 30 seconds.
 export default function Landing() {
   const navigate = useNavigate();
   const c = STAR.hex;
   const enteredRef = useRef(false);
+  // TEMP preview switch: ?bg=windows | ?bg=fade
+  const bgMode = new URLSearchParams(window.location.search).get("bg") || "windows";
+  const openWork = (slug: string) => navigate(`/work/${slug}`);
 
   useEffect(() => {
     const onScroll = () => {
@@ -57,10 +127,12 @@ export default function Landing() {
         minHeight: "100vh",
         background: "#000008",
         fontFamily: "'Space Grotesk', sans-serif",
+        overflowX: "clip",
       }}
     >
       <style>{`@keyframes introUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}@keyframes introIn{from{opacity:0}to{opacity:1}}@keyframes introBlink{0%,100%{opacity:.14}50%{opacity:.44}}`}</style>
       <NebulaBg fixed />
+      {bgMode === "fade" && <ScrollBackdrop />}
       <div
         className="big-scale"
         style={{
@@ -75,6 +147,7 @@ export default function Landing() {
         }}
       >
         <div
+          data-bd="hollow"
           style={{
             position: "relative",
             minHeight: "calc(100vh / var(--bz, 1))",
@@ -298,6 +371,7 @@ export default function Landing() {
           </div>
         </div>
 
+        {bgMode === "windows" && <RenderWindow k="hollow" c={c} onOpen={openWork} />}
         <SecReveal>
           <div
             style={{
@@ -361,6 +435,7 @@ export default function Landing() {
             </div>
           </div>
         </SecReveal>
+        {bgMode === "fade" && <div data-bd="none" />}
 
         <SecReveal>
           <div style={{ position: "relative", padding: "2rem 0" }}>
@@ -415,6 +490,7 @@ export default function Landing() {
           </div>
         </SecReveal>
 
+        {bgMode === "fade" && <div data-bd="subway" />}
         <SecReveal>
           <div style={{ position: "relative", padding: "2.5rem 0" }}>
             <div style={{ position: "relative", zIndex: 1 }}>
@@ -426,6 +502,7 @@ export default function Landing() {
           </div>
         </SecReveal>
 
+        {bgMode === "windows" && <RenderWindow k="subway" c={c} onOpen={openWork} />}
         <SecReveal>
           <div style={{ position: "relative", padding: "2.5rem 0" }}>
             <div style={{ position: "relative", zIndex: 1 }}>
@@ -437,6 +514,7 @@ export default function Landing() {
           </div>
         </SecReveal>
 
+        {bgMode === "fade" && <div data-bd="none" />}
         <div onClick={() => navigate("/explore")} style={{ textAlign: "center", cursor: "pointer", paddingTop: "2rem" }}>
           <div style={{ width: 1, height: "clamp(40px,9vh,90px)", margin: "0 auto 1.2rem", background: `linear-gradient(180deg,transparent,${c}66)` }} />
           <div style={{ fontSize: ".62rem", color: `${c}88`, fontFamily: "'JetBrains Mono',monospace", letterSpacing: ".26em", marginBottom: ".6rem" }}>
