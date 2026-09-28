@@ -1673,7 +1673,7 @@ export function FeaturedCarousel({onOpen,big}){
   };
   const cardW=big?"clamp(280px,42vw,460px)":"clamp(200px,26vw,300px)";
   return(<div style={{position:"relative",width:"100%"}}>
-    <div onWheel={onWheel} style={{position:"relative",height:big?"clamp(430px,58vh,540px)":"clamp(351px,45vh,423px)",margin:"0 -60px",padding:"0 60px",display:"flex",alignItems:"center",justifyContent:"center",perspective:"1400px",overflow:"hidden",boxSizing:"border-box"}}>
+    <div onWheel={onWheel} style={{position:"relative",height:big?"clamp(430px,58vh,540px)":"clamp(351px,45vh,423px)",margin:"0 max(-60px,-4vw)",padding:"0 min(60px,4vw)",display:"flex",alignItems:"center",justifyContent:"center",perspective:"1400px",overflow:"hidden",boxSizing:"border-box"}}>
       {items.map((m,i)=>{
         let off=i-idx;if(off>n/2)off-=n;if(off<-n/2)off+=n;
         const abs=Math.abs(off),center=off===0;
