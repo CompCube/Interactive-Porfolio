@@ -1582,8 +1582,9 @@ float starsStatic(vec2 p){
   float size=smoothstep(0.965,0.999,rr)*0.86;
   float d=length(gf);
   float core=smoothstep(0.15,0.0,d);
-  float twBase=0.5+1.47*hash(gi+7.0);
-  float tw=(1.0-0.6)+0.6*(0.5+0.5*sin(uTime*twBase+hash(gi+1.0)*6.2831));
+  float twBase=0.8+1.8*hash(gi+7.0);
+  // Stars rest dim (10%) and briefly flash to full brightness: pow() sharpens the sine peak.
+  float tw=0.1+0.9*pow(0.5+0.5*sin(uTime*twBase+hash(gi+1.0)*6.2831),2.5);
   return size*core*tw;
 }
 float zoomLayer(vec2 p,float phase){
