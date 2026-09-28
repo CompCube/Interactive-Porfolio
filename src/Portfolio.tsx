@@ -1568,7 +1568,7 @@ vec3 nebula(vec2 p,float t){
   col=mix(col,gold,smoothstep(0.55,0.95,n2)*0.6);
   float density=smoothstep(0.15,0.85,n);
   // Gamma lift keeps faint wisps above the level low-contrast screens crush to black.
-  return pow(col*density,vec3(0.8))*1.6;
+  return pow(col*density,vec3(0.8))*1.8;
 }
 float starsStatic(vec2 p){
   vec2 gp=p*70.0*1.11;
