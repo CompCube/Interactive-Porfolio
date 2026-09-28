@@ -62,6 +62,7 @@ export default function Landing() {
       <style>{`@keyframes introUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}@keyframes introIn{from{opacity:0}to{opacity:1}}@keyframes introBlink{0%,100%{opacity:.14}50%{opacity:.44}}`}</style>
       <NebulaBg fixed />
       <div
+        className="big-scale"
         style={{
           position: "relative",
           zIndex: 1,
@@ -76,7 +77,7 @@ export default function Landing() {
         <div
           style={{
             position: "relative",
-            minHeight: "100vh",
+            minHeight: "calc(100vh / var(--bz, 1))",
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",

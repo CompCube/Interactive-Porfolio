@@ -23,6 +23,7 @@ export default function About() {
         onContact={() => navigate("/contact")}
       />
       <div
+        className="big-scale"
         style={{
           position: "relative",
           zIndex: 1,

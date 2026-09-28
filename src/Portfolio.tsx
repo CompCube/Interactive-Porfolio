@@ -597,6 +597,10 @@ export const CSS=`
 .bg-orb-2{animation:orbSpin 320s linear infinite reverse}
 @media(prefers-reduced-motion:reduce){.bg-orb,.bg-orb-2{animation:none!important}}
 .feat-grid{grid-template-columns:minmax(260px,.85fr) 1.15fr}
+/* Scale static pages up on large, tall screens so content isn't lost in empty space. --bz lets 100vh sections compensate. */
+@media(min-width:1800px) and (min-height:950px){.big-scale{zoom:1.15;--bz:1.15}}
+@media(min-width:2200px) and (min-height:1150px){.big-scale{zoom:1.3;--bz:1.3}}
+@media(min-width:2500px) and (min-height:1250px){.big-scale{zoom:1.4;--bz:1.4}}
 @media(max-width:860px){.feat-grid{grid-template-columns:1fr!important}}
 @media(max-width:700px){
   .hero-grid{grid-template-columns:1fr!important;justify-items:center}
