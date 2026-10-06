@@ -572,6 +572,38 @@ export const PLANETS=[
      thumbnail:gh("ai-projects/01-mainpage.png"),
      cta:"Try CareerPilot AI →",ctaHref:"https://career-pilot-ai-tan-ten.vercel.app",
      links:[{label:"View on GitHub",href:"https://github.com/CompCube/CareerPilotAI"}]},
+    {id:"sonified-data-melody-maker",label:"Sonified Data Melody Maker",icon:"🎵",orbitRadius:4.3,orbitSpeed:.008,startAngle:4.3,inclination:-.25,radius:.3,type:"Data Sonification",status:"FH Salzburg · 2026",
+     categories:[
+       {id:"concept",label:"Concept",
+        subcategories:[
+          {id:"the-brief",label:"The Brief",caption:"An audio workshop in my **Realtime Art & VFX** master at **FH Salzburg**: build an interactive, real-time data sonification in **one day**."},
+          {id:"the-idea",label:"The Idea",caption:"Inspired by **NASA's sonifications** of planetary data, but live. The app pulls **seven public data feeds** (NOAA solar wind, Kp storm index and X-ray flux, USGS earthquakes, Wikipedia live edits, Salzburg weather and the ISS position) and gives each one a **musical role**."},
+        ]},
+       {id:"design",label:"Design",
+        subcategories:[
+          {id:"the-critique",label:"The Critique",caption:"The first version worked, but my professor said you could not hear the data anymore: it was buried under the UI. I redesigned it around one question: **can the audience tell which sound is which data?**"},
+          {id:"the-solution",label:"The Solution",caption:"**Four sound modes** that show what design does to data: **Raw** (the data as measured), **Tuned** (snapped to a scale), **Groove** (on a beat grid) and **Techno**, where the planet becomes the DJ, turning filters and deciding when the drop hits.\n\nA **signal-flow interface** (Data in, Music rules, Mix out) with a plain-language \"data to sound\" readout on every part.\n\n**Four visualizations**, including a view where each layer is a coloured ring drawn from its own live waveform.\n\nWestern and world scales (Chinese, Japanese, Arabic, Egyptian, Indian), **MIDI out** to play real synths in a DAW, and **audio recording**."},
+        ]},
+       {id:"build",label:"Build",
+        subcategories:[
+          {id:"how-i-built-it",label:"How I Built It",caption:"**AI-assisted development with Claude.** I defined the concept, the musical mappings and the UX, then directed and iterated the build through several rounds of feedback, from a first prototype to a redesigned fifth version."},
+          {id:"tech",label:"Tech",caption:"HTML, CSS, JavaScript, **Web Audio API** (custom synthesis, lookahead scheduler, sidechain, convolution reverb), **Web MIDI**, **Canvas 2D**, live **REST** and **Server-Sent Events** APIs."},
+        ]},
+       {id:"what-i-learned",label:"What I Learned",
+        subcategories:[
+          {id:"the-mapping-is-the-composition",label:"The Mapping Is the Composition",caption:"In sonification, **the mapping is the composition**. The same data can sound like noise or like music depending on the design decisions, and the interface has to make those decisions visible instead of hiding them."},
+        ]},
+     ],
+     desc:"A browser instrument that turns live data from the Sun, the Earth and the internet into music. Solar wind plays the bass, earthquakes hit the kick, Wikipedia edits drive the hi-hats, and solar flares trigger the drop.",
+     overview:"**The planet's live data, played as a track.**\n\nA browser instrument that turns live data from the Sun, the Earth and the internet into music. Solar wind plays the bass, earthquakes hit the kick, Wikipedia edits drive the hi-hats, and solar flares trigger the drop.",
+     tags:["Creative Tech","Real-time Audio","Data Sonification","AI-assisted build","Web Audio API"],
+     features:["Seven live public data feeds, each with its own musical role","Four sound modes: Raw, Tuned, Groove and Techno","Signal-flow interface: Data in, Music rules, Mix out","Four live visualizations drawn from each layer's waveform","Western and world scales, MIDI out and audio recording"],
+     imgs:[
+       {label:"Sonified Data Melody Maker",src:gh("ai-projects/sonified-data-melody-maker/01-thumbnail.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)"},
+     ],
+     thumbnail:gh("ai-projects/sonified-data-melody-maker/01-thumbnail.png"),
+     cta:"Try the live demo →",ctaHref:"LIVE_URL",
+     links:[{label:"View on GitHub",href:"GITHUB_URL"},{label:"Watch the video",href:"VIDEO_URL"}]},
   ]},
   {id:"web",label:"Web Dev",icon:"🌐",hex:"#617EE5",orbitRadius:56,orbitSpeed:.00038,startAngle:2.4,radius:.75,orbitTilt:.64,desc:"Client websites deployed for clubs, stores and hospitality.",moons:[
     {id:"btt-valls",label:"btt-valls.com",icon:"🚵",orbitRadius:2.3,orbitSpeed:.013,startAngle:.8,inclination:.32,radius:.22,hex:"#70d4a0",
