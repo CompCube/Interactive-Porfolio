@@ -572,7 +572,7 @@ export const PLANETS=[
      thumbnail:gh("ai-projects/01-mainpage.png"),
      cta:"Try CareerPilot AI →",ctaHref:"https://career-pilot-ai-tan-ten.vercel.app",
      links:[{label:"View on GitHub",href:"https://github.com/CompCube/CareerPilotAI"}]},
-    {id:"sonified-data-melody-maker",label:"Sonified Data Melody Maker",icon:"🎵",orbitRadius:4.3,orbitSpeed:.008,startAngle:4.3,inclination:-.25,radius:.3,type:"Data Sonification",status:"FH Salzburg · 2026",
+    {id:"sonified-data-melody-maker",label:"Sonified Data Melody Maker",title:"Sonified Data Melody Maker (Planet Pulse)",icon:"🎵",orbitRadius:4.3,orbitSpeed:.008,startAngle:4.3,inclination:-.25,radius:.3,type:"Data Sonification",status:"FH Salzburg · 2026",
      categories:[
        {id:"concept",label:"Concept",
         subcategories:[
@@ -583,6 +583,12 @@ export const PLANETS=[
         subcategories:[
           {id:"the-critique",label:"The Critique",caption:"The first version worked, but my professor said you could not hear the data anymore: it was buried under the UI. I redesigned it around one question: **can the audience tell which sound is which data?**"},
           {id:"the-solution",label:"The Solution",caption:"**Four sound modes** that show what design does to data: **Raw** (the data as measured), **Tuned** (snapped to a scale), **Groove** (on a beat grid) and **Techno**, where the planet becomes the DJ, turning filters and deciding when the drop hits.\n\nA **signal-flow interface** (Data in, Music rules, Mix out) with a plain-language \"data to sound\" readout on every part.\n\n**Four visualizations**, including a view where each layer is a coloured ring drawn from its own live waveform.\n\nWestern and world scales (Chinese, Japanese, Arabic, Egyptian, Indian), **MIDI out** to play real synths in a DAW, and **audio recording**."},
+          {id:"sound-modes",label:"The Four Sound Modes",imgs:[
+            {label:"Raw Mode",src:gh("ai-projects/sonified-data-melody-maker/02-mode-raw.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)",caption:"**Raw**: the data exactly as measured. No beat grid, no scale: pitches follow the numbers continuously and every quake or edit sounds the instant it happens."},
+            {label:"Tuned Mode",src:gh("ai-projects/sonified-data-melody-maker/03-mode-tuned.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)",caption:"**Tuned**: same timing as Raw, but every pitch snaps to the scale, so it stays musical while you still hear each event as it happens."},
+            {label:"Groove Mode",src:gh("ai-projects/sonified-data-melody-maker/04-mode-groove.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)",caption:"**Groove**: a tempo grid. Events wait for the next 16th note, quakes become kicks, edits become hats and snares, and the solar wind plays bass and melody."},
+            {label:"Techno Mode",src:gh("ai-projects/sonified-data-melody-maker/05-mode-techno.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)",caption:"**Techno**: the beat never stops. The data does not play the drums, it turns the knobs like a DJ: filters, layers, energy, and when the drop hits."},
+          ]},
         ]},
        {id:"build",label:"Build",
         subcategories:[
@@ -600,6 +606,10 @@ export const PLANETS=[
      features:["Seven live public data feeds, each with its own musical role","Four sound modes: Raw, Tuned, Groove and Techno","Signal-flow interface: Data in, Music rules, Mix out","Four live visualizations drawn from each layer's waveform","Western and world scales, MIDI out and audio recording"],
      imgs:[
        {label:"Sonified Data Melody Maker",src:gh("ai-projects/sonified-data-melody-maker/01-thumbnail.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)"},
+       {label:"Raw Mode",src:gh("ai-projects/sonified-data-melody-maker/02-mode-raw.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)"},
+       {label:"Tuned Mode",src:gh("ai-projects/sonified-data-melody-maker/03-mode-tuned.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)"},
+       {label:"Groove Mode",src:gh("ai-projects/sonified-data-melody-maker/04-mode-groove.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)"},
+       {label:"Techno Mode",src:gh("ai-projects/sonified-data-melody-maker/05-mode-techno.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)"},
      ],
      thumbnail:gh("ai-projects/sonified-data-melody-maker/01-thumbnail.png"),
      cta:"Try the live demo →",ctaHref:"LIVE_URL",
@@ -1220,7 +1230,7 @@ export function CaseStudy({project,onClose}){
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:"1rem",padding:"1rem clamp(1.2rem,4vw,3rem) .7rem",maxWidth:1500,margin:"0 auto",width:"100%",boxSizing:"border-box"}}>
         <div style={{minWidth:0}}>
           <div style={{fontSize:".6rem",color:pC,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".22em",marginBottom:".2rem"}}>{[project.type,project.status].filter(Boolean).join(" · ").toUpperCase()}</div>
-          <div style={{fontSize:"1.3rem",fontWeight:700,color:"#e8e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{project.label}</div>
+          <div style={{fontSize:"1.3rem",fontWeight:700,color:"#e8e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{project.title||project.label}</div>
         </div>
         <button onClick={onClose} style={{background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.18)",color:"#e8e8f0",width:38,height:38,borderRadius:"50%",cursor:"pointer",fontSize:"1.1rem",flexShrink:0}}>✕</button>
       </div>
