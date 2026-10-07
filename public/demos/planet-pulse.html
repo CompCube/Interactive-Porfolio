@@ -1,0 +1,1412 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Planet Pulse</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=IBM+Plex+Mono:ital,wght@0,400;0,500;1,400&display=swap">
+<style>
+/* Layout: slim transport bar, a large visualization stage, then the signal flow in three columns: 1 Data in, 2 Music rules, 3 Mix out. */
+:root{
+  --ground:#0e0f13; --panel:#15171d; --panel-2:#1c1f27; --line:#272b35;
+  --ink:#e6e3dc; --muted:#8b8e98; --acc:#f2ad5e;
+  --c-bass:#e0a35c; --c-pads:#8fa8d6; --c-mel:#7fbfae; --c-drums:#d98a8f; --c-fx:#ab97d9;
+  --sans:"Geist", "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --mono:"Geist Mono", "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--ground);color:var(--ink);font:13.5px/1.5 var(--sans);padding-inline:clamp(16px,2.5vw,32px);padding-block:0 40px}
+.wrap{max-width:1500px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+button,select,input{font:inherit;color:inherit}
+button{background:var(--panel-2);border:1px solid var(--line);border-radius:6px;padding:6px 12px;cursor:pointer;transition:background-color .18s,border-color .18s,color .18s,transform .08s}
+button:hover{border-color:var(--muted);background:#23262f}
+button:active{transform:translateY(1px) scale(.98)}
+select{transition:border-color .18s}select:hover{border-color:var(--muted)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+select{background:var(--panel-2);border:1px solid var(--line);border-radius:6px;padding:5px 7px;max-width:100%;min-width:0}
+input[type=range]{accent-color:#b9b6ae;width:100%;min-width:60px;cursor:pointer}
+#masterVol{accent-color:var(--acc)}
+.part input[type=range]{accent-color:var(--pc)}
+label{color:var(--muted);font-size:12.5px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* transport */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--ground);border-bottom:1px solid var(--line);padding-block:12px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+.brand{display:flex;align-items:baseline;gap:10px;margin-right:auto}
+.brand b{font:600 17px/1 var(--sans);letter-spacing:-.01em}
+.brand span{color:var(--muted);font-size:12.5px}
+#startBtn{background:var(--acc);border-color:var(--acc);color:#1b1206;font-weight:600;min-width:110px;padding:11px 18px;font-size:15px;border-radius:9px}
+#startBtn:hover{background:#f5bd7a}
+#startBtn.on{background:transparent;color:var(--acc)}
+#recBtn.on{border-color:#e07a72;color:#e07a72}
+#midiBtn.on{border-color:var(--c-mel);color:var(--c-mel)}
+.inline{display:flex;align-items:center;gap:8px}
+.inline input[type=range]{width:90px}
+.note{font-size:12px;color:var(--muted)}
+.note a,#recLink a{color:var(--acc)}
+
+/* stage */
+.stage{position:relative;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#07080b;height:min(52vh,560px);min-height:300px}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+#stageOver{pointer-events:none}
+.tabs{position:absolute;top:10px;left:10px;display:flex;gap:2px;z-index:2;background:rgba(7,8,11,.6);border-radius:7px;padding:2px}
+.tabs button{background:transparent;border:0;border-radius:5px;padding:5px 11px;color:var(--muted);font-size:12.5px}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:#0e0f13}
+.cap{position:absolute;left:14px;bottom:10px;right:14px;z-index:2;font:12px/1.5 var(--mono);color:var(--muted);pointer-events:none;text-shadow:0 0 6px #07080b,0 0 2px #07080b;white-space:pre-wrap}
+.cap b{color:var(--ink);font-weight:400}
+.stage.paper .cap{color:#5d6069;text-shadow:none}.stage.paper .cap b{color:#15161a}
+.stage .hint{position:absolute;top:12px;right:14px;z-index:2;font-size:12px;color:var(--muted);pointer-events:none}
+
+/* columns */
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.45fr);gap:16px;align-items:start}
+@media (max-width:1150px){.cols{grid-template-columns:1fr 1fr}.col.mix{grid-column:1 / -1}}
+@media (max-width:760px){.cols{grid-template-columns:1fr}}
+.col{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.col h2{font:600 19px/1.1 var(--sans);letter-spacing:-.015em;margin:0;display:flex;align-items:center;gap:10px}
+.col h2 span{font:600 12px/1 var(--mono);color:var(--ground);background:var(--acc);width:22px;height:22px;border-radius:50%;display:inline-grid;place-items:center}
+.col h2 small{font:400 12px var(--sans);color:var(--muted);margin-left:auto}
+.group{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.group h3{font:600 13px/1.2 var(--sans);color:var(--ink);margin:0 0 2px}
+.ctl{display:grid;grid-template-columns:8.2em minmax(0,1fr) 4.6em;align-items:center;gap:8px}
+.ctl output,.ctl .val{font:12px var(--mono);color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}
+.ctl.sel{grid-template-columns:8.2em minmax(0,1fr)}
+.check{display:flex;align-items:center;gap:7px}
+
+/* feed table */
+.feeds{width:100%;border-collapse:collapse;font-size:12.5px}
+.feeds td{padding:5px 4px;border-bottom:1px solid var(--line);vertical-align:top}
+.feeds td.v{font:12px var(--mono);color:var(--ink);font-variant-numeric:tabular-nums}
+.feeds tr:last-child td{border-bottom:0}
+.chip{font:500 10px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:3px 6px;border-radius:99px;border:1px solid currentColor;white-space:nowrap}
+.chip.live{color:var(--c-mel)} .chip.sim{color:var(--c-drums)} .chip.wait{color:var(--muted)}
+
+/* harmony */
+.chords{display:flex;gap:6px;flex-wrap:wrap}
+.chord{font:500 15px/1 var(--mono);padding:8px 10px;border-radius:6px;border:1px solid var(--line);background:var(--panel-2);min-width:52px;text-align:center}
+.chord.now{border-color:var(--acc);color:var(--acc)}
+#mood{font:500 13px var(--sans);color:var(--ink)}
+#cvGrid{width:100%;height:150px;display:block;border-radius:6px;background:#0b0c10;border:1px solid var(--line)}
+
+/* parts */
+.part{border-top:1px solid var(--line);padding-top:10px;display:grid;gap:7px}
+.part:first-of-type{border-top:0;padding-top:0}
+.ph{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:7px 10px;border-radius:7px;background:color-mix(in srgb, var(--pc) 13%, transparent)}
+.ph i{width:12px;height:12px;border-radius:50%;display:inline-block;background:var(--pc);opacity:.35;box-shadow:0 0 0 0 var(--pc);transition:opacity .06s}
+.ph i.on{opacity:1;box-shadow:0 0 10px 1px var(--pc)}
+.ph .lvl{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);margin-left:auto}
+.ph .lvl input{width:110px}
+.ph .btns{margin-left:0!important}
+details.shape summary{cursor:pointer;color:var(--muted);font-size:12px;list-style:none;display:inline-flex;gap:6px;align-items:center}
+details.shape summary::-webkit-details-marker{display:none}
+details.shape summary::before{content:"+";font:500 12px var(--mono);width:14px;height:14px;display:inline-grid;place-items:center;border:1px solid var(--line);border-radius:3px}
+details.shape[open] summary::before{content:"−"}
+details.shape summary:hover{color:var(--ink)}
+details.shape .pc{margin-top:8px;grid-template-columns:repeat(3,minmax(0,1fr))}
+.ph b{font:700 17px/1.1 var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--pc)}
+.ph .src{color:var(--ink);opacity:.75;font-size:12.5px}
+#part-bass{--pc:var(--c-bass)} #part-pads{--pc:var(--c-pads)} #part-mel{--pc:var(--c-mel)} #part-drums{--pc:var(--c-drums)} #part-fx{--pc:var(--c-fx)}
+.part{border-top:0!important;padding-top:4px!important}
+.ph .btns{display:flex;gap:4px}
+.ph .btns button{padding:2px 8px;font:500 11px var(--mono)}
+.ph .btns button[aria-pressed="true"]{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+.ph .btns button.solo[aria-pressed="true"]{background:var(--acc);border-color:var(--acc)}
+.flow{font:12px/1.45 var(--mono);color:var(--ink);background:var(--panel-2);border-radius:6px;padding:6px 9px;white-space:pre-wrap;min-height:2.9em}
+.flow em{font-style:normal;color:var(--muted)}
+.pc{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px 10px;align-items:end}
+.pc label{display:grid;gap:1px;font-size:11.5px}
+.pextra{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center}
+.pextra label{display:flex;align-items:center;gap:6px}
+.muted-part{opacity:.4}
+.seg{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden}
+.seg button{border:0;border-radius:0;border-right:1px solid var(--line);background:var(--panel-2);padding:6px 12px;font-weight:500}
+.seg.big{border-radius:9px}
+.seg.big button{display:grid;gap:1px;text-align:left;padding:7px 16px;min-width:118px}
+.seg.big b{font:600 15px/1.1 var(--sans)}
+.seg.big small{font-size:11.5px;color:var(--muted)}
+.seg.big button[aria-pressed="true"] small{color:#45474f}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--ground)}
+.modewrap{display:flex;align-items:center;gap:8px}
+.modewrap>span{color:var(--muted);font-size:12.5px}
+#modeNote{margin:0;color:var(--ink);font-size:12.5px;background:var(--panel-2);border-radius:6px;padding:8px 10px}
+#modeNote b{font-weight:600}
+.meter{height:8px;background:var(--panel-2);border-radius:4px;overflow:hidden}
+.meter i{display:block;height:100%;width:0;background:var(--acc);transition:width .3s}
+.row3{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.seg button[data-tstyle]{flex:1}
+footer{color:var(--muted);font-size:12.5px;display:grid;gap:4px;max-width:110ch}
+footer a{color:var(--ink)}
+kbd{font:11px var(--mono);border:1px solid var(--line);border-radius:4px;padding:0 4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- TRANSPORT -->
+  <div class="bar" role="group" aria-label="Transport">
+    <div class="brand"><b>Planet Pulse</b><span>the planet's live data, played as a track</span></div>
+    <div class="seg big" role="group" aria-label="Sound mode"><button type="button" data-mode="raw" aria-pressed="false"><b>Raw</b><small>as measured</small></button><button type="button" data-mode="tuned" aria-pressed="false"><b>Tuned</b><small>snapped to a scale</small></button><button type="button" data-mode="groove" aria-pressed="true"><b>Groove</b><small>on a beat grid</small></button><button type="button" data-mode="techno" aria-pressed="false"><b>Techno</b><small>the planet DJs</small></button></div>
+    <button id="startBtn" type="button">Start</button>
+    <label class="inline" for="masterVol">Volume <input id="masterVol" type="range" min="0" max="1" step="0.01" value="0.8"></label>
+    <button id="recBtn" type="button">Record</button>
+    <span id="recLink" class="note"></span>
+    <button id="midiBtn" type="button">MIDI out</button>
+    <select id="midiOut" aria-label="MIDI output" hidden></select>
+    <label class="check" for="internal" id="internalWrap" hidden><input id="internal" type="checkbox" checked> browser sound</label>
+    <span id="midiMsg" class="note"></span>
+  </div>
+
+  <!-- STAGE -->
+  <section class="stage" id="stage" aria-label="Visualization">
+    <canvas id="stageCv" aria-label="Live visualization"></canvas>
+    <canvas id="stageOver" aria-hidden="true"></canvas>
+    <div class="tabs" role="group" aria-label="View">
+      <button type="button" data-view="data" aria-pressed="true">Data</button>
+      <button type="button" data-view="spectrum" aria-pressed="false">Spectrum</button>
+      <button type="button" data-view="orbit" aria-pressed="false">Orbit</button>
+      <button type="button" data-view="score" aria-pressed="false">Score</button>
+    </div>
+    <div class="hint" id="stageHint">press Start to hear it · <kbd>V</kbd> switches view</div>
+    <div class="cap" id="cap"></div>
+  </section>
+
+  <div class="cols">
+    <!-- 1 DATA -->
+    <section class="col" aria-label="Data in">
+      <h2><span>1</span> Data in <small>what is measured</small></h2>
+      <table class="feeds">
+        <tbody>
+          <tr><td>Solar wind</td><td class="v" id="fSun">--</td><td><span class="chip wait" id="cSun">loading</span></td></tr>
+          <tr><td>Kp storm index</td><td class="v" id="fKp">--</td><td><span class="chip wait" id="cKp">loading</span></td></tr>
+          <tr><td>X-ray flux</td><td class="v" id="fXr">--</td><td><span class="chip wait" id="cXr">loading</span></td></tr>
+          <tr><td>Earthquakes</td><td class="v" id="fQk">--</td><td><span class="chip wait" id="cQk">loading</span></td></tr>
+          <tr><td>Wikipedia</td><td class="v" id="fWk">--</td><td><span class="chip wait" id="cWk">loading</span></td></tr>
+          <tr><td>Salzburg weather</td><td class="v" id="fWx">--</td><td><span class="chip wait" id="cWx">loading</span></td></tr>
+          <tr><td>ISS</td><td class="v" id="fIss">--</td><td><span class="chip wait" id="cIss">loading</span></td></tr>
+        </tbody>
+      </table>
+      <div class="group"><h3>Time</h3>
+        <div class="ctl"><label for="speed">Data speed</label><input id="speed" type="range" min="0" max="6" step="1" value="2"><output id="speedV">1×</output></div>
+      </div>
+      <div class="group"><h3>Solar wind (NOAA, L1 point)</h3>
+        <div class="ctl sel"><label for="sunMode">Playback</label><select id="sunMode"><option value="sweep">Sweep the last 2 hours</option><option value="live">Hold the latest minute</option></select></div>
+        <div class="ctl"><label for="sunSweep">2 hours in</label><input id="sunSweep" type="range" min="3" max="120" step="1" value="40"><output id="sunSweepV">40 s</output></div>
+      </div>
+      <div class="group"><h3>Earthquakes (USGS)</h3>
+        <div class="ctl sel"><label for="quakeMode">Playback</label><select id="quakeMode"><option value="replay">Replay the last 24 hours</option><option value="live">Only new quakes</option></select></div>
+        <div class="ctl"><label for="quakeDur">24 hours in</label><input id="quakeDur" type="range" min="5" max="300" step="5" value="60"><output id="quakeDurV">60 s</output></div>
+        <div class="ctl"><label for="quakeMin">Min magnitude</label><input id="quakeMin" type="range" min="0" max="5" step="0.5" value="1"><output id="quakeMinV">1.0</output></div>
+      </div>
+      <div class="group"><h3>Wikipedia (live edits)</h3>
+        <div class="ctl sel"><label for="wikiSel">Language</label><select id="wikiSel"><option value="enwiki">English</option><option value="dewiki">German</option><option value="eswiki">Spanish</option><option value="cawiki">Catalan</option><option value="wikidatawiki">Wikidata (very busy)</option><option value="*">All wikis</option></select></div>
+        <label class="check" for="wikiBots"><input id="wikiBots" type="checkbox"> include bot edits</label>
+      </div>
+      <div class="group"><h3>ISS</h3>
+        <div class="ctl"><label for="issOrbit">One orbit in</label><input id="issOrbit" type="range" min="10" max="180" step="5" value="45"><output id="issOrbitV">45 s</output></div>
+      </div>
+    </section>
+
+    <!-- 2 MUSIC -->
+    <section class="col" aria-label="Music rules">
+      <h2><span>2</span> Music rules <small>how data becomes notes</small></h2>
+      <p id="modeNote"></p>
+      <div class="group" id="technoGroup" hidden><h3>Techno style</h3>
+        <div class="seg" role="group" aria-label="Techno style"><button type="button" data-tstyle="acid" aria-pressed="true">Acid</button><button type="button" data-tstyle="minimal" aria-pressed="false">Minimal</button><button type="button" data-tstyle="hard" aria-pressed="false">Hard</button><button type="button" data-tstyle="melodic" aria-pressed="false">Melodic</button></div>
+        <p class="note" id="technoNote" style="margin:0"></p>
+        <div class="ctl"><label>Section</label><span class="val" id="tkSec" style="text-align:left">--</span><span></span></div>
+        <div class="ctl"><label>Data energy</label><div class="meter"><i id="tkEnergy"></i></div><output id="tkEnergyV">0%</output></div>
+        <div class="row3"><span class="note">Jump to</span><button type="button" data-sec="build">Build</button><button type="button" data-sec="drop">Drop</button><button type="button" data-sec="breakdown">Breakdown</button></div>
+      </div>
+      <div class="group"><h3>Tempo (Groove and Techno)</h3>
+        <div class="ctl"><label for="bpm">Tempo</label><input id="bpm" type="range" min="60" max="160" step="1" value="92"><output id="bpmV">92</output></div>
+        <div class="ctl"><label for="swing">Swing</label><input id="swing" type="range" min="0" max="0.6" step="0.01" value="0.18"><output id="swingV">18%</output></div>
+        <label class="check" for="kpTempo"><input id="kpTempo" type="checkbox"> tempo follows the storm index (Kp)</label>
+      </div>
+      <div class="group"><h3>Scale</h3>
+        <div class="ctl sel"><label for="keySel">Root</label><select id="keySel"><option value="0">C</option><option value="1">C#</option><option value="2" selected>D</option><option value="3">Eb</option><option value="4">E</option><option value="5">F</option><option value="6">F#</option><option value="7">G</option><option value="8">Ab</option><option value="9">A</option><option value="10">Bb</option><option value="11">B</option></select></div>
+        <div class="ctl sel"><label for="scaleSel">Scale</label>
+          <select id="scaleSel">
+            <option value="auto">Auto (solar field picks)</option>
+            <optgroup label="Western scales">
+              <option value="ionian">Major (Ionian)</option><option value="aeolian">Natural minor (Aeolian)</option><option value="harmonic">Harmonic minor</option><option value="dorian">Dorian</option><option value="phrygian">Phrygian</option><option value="lydian">Lydian</option><option value="mixolydian">Mixolydian</option><option value="locrian">Locrian</option>
+            </optgroup>
+            <optgroup label="World scales">
+              <option value="gong">Chinese (pentatonic)</option><option value="hirajoshi">Japanese (Hirajoshi)</option><option value="hijaz">Arabic (Maqam Hijaz)</option><option value="egyptian">Egyptian</option><option value="bhairav">Indian (Raga Bhairav)</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="ctl sel"><label for="chordBars">Change every</label><select id="chordBars"><option value="1">1 bar</option><option value="2" selected>2 bars</option><option value="4">4 bars</option></select></div>
+        <p class="note" id="scaleNote" style="margin:0"></p>
+        <button type="button" id="hearScale">Hear this scale</button>
+      </div>
+      <div class="group"><h3>Now playing</h3>
+        <div id="mood">--</div>
+        <div class="chords" id="chords"></div>
+        <canvas id="cvGrid" aria-label="Step grid: which part played on each 16th note"></canvas>
+        <div class="note num" id="barBeat">bar - · step -</div>
+      </div>
+    </section>
+
+    <!-- 3 MIX -->
+    <section class="col mix" aria-label="Mix out">
+      <h2><span>3</span> Mix out <small>what you hear</small></h2>
+
+      <div class="part" id="part-bass">
+        <div class="ph"><i style="background:var(--c-bass)"></i><b>Bass</b><span class="src">solar wind</span><span class="lvl" data-lvl="bass"></span><span class="btns"><button type="button" data-mute="bass" aria-pressed="false">M</button><button type="button" class="solo" data-solo="bass" aria-pressed="false">S</button></span></div>
+        <div class="flow" id="flowBass">--</div>
+        <div class="pextra"><label for="bassPreset">sound <select id="bassPreset"><option value="sub">Sub sine</option><option value="acid">Acid saw</option><option value="pluck">Square pluck</option></select></label></div>
+        <details class="shape"><summary>tone, echo, space</summary><div class="pc" data-part="bass"></div></details>
+      </div>
+
+      <div class="part" id="part-pads">
+        <div class="ph"><i style="background:var(--c-pads)"></i><b>Pads</b><span class="src">Salzburg weather</span><span class="lvl" data-lvl="pads"></span><span class="btns"><button type="button" data-mute="pads" aria-pressed="false">M</button><button type="button" class="solo" data-solo="pads" aria-pressed="false">S</button></span></div>
+        <div class="flow" id="flowPads">--</div>
+        <div class="pextra"><label for="padsPreset">sound <select id="padsPreset"><option value="warm">Warm saw pad</option><option value="glass">Glass sine</option><option value="texture">Space texture (grains)</option></select></label></div>
+        <details class="shape"><summary>tone, echo, space</summary><div class="pc" data-part="pads"></div></details>
+      </div>
+
+      <div class="part" id="part-mel">
+        <div class="ph"><i style="background:var(--c-mel)"></i><b>Melody</b><span class="src" id="melSrcTxt">solar wind</span><span class="lvl" data-lvl="mel"></span><span class="btns"><button type="button" data-mute="mel" aria-pressed="false">M</button><button type="button" class="solo" data-solo="mel" aria-pressed="false">S</button></span></div>
+        <div class="flow" id="flowMel">--</div>
+        <div class="pextra">
+          <label for="melSrc">from <select id="melSrc"><option value="sun">Solar wind speed</option><option value="iss">ISS latitude</option></select></label>
+          <label for="melRate">notes <select id="melRate"><option value="4">Quarters</option><option value="2" selected>8ths</option><option value="1">16ths</option></select></label>
+          <label for="melPreset">sound <select id="melPreset"><option value="pluck">Pluck</option><option value="bell">FM bell</option><option value="texture">Space texture (grains)</option></select></label>
+        </div>
+        <details class="shape"><summary>tone, echo, space</summary><div class="pc" data-part="mel"></div></details>
+      </div>
+
+      <div class="part" id="part-drums">
+        <div class="ph"><i style="background:var(--c-drums)"></i><b>Drums</b><span class="src">quakes + Wikipedia</span><span class="lvl" data-lvl="drums"></span><span class="btns"><button type="button" data-mute="drums" aria-pressed="false">M</button><button type="button" class="solo" data-solo="drums" aria-pressed="false">S</button></span></div>
+        <div class="flow" id="flowDrums">--</div>
+        <div class="pextra">
+          <label for="drumsPreset">kit <select id="drumsPreset"><option value="808">808</option><option value="minimal">Minimal clicks</option></select></label>
+          <label class="check" for="floor"><input id="floor" type="checkbox"> guide kick on the beat</label>
+        </div>
+        <details class="shape"><summary>tone, echo, space</summary><div class="pc" data-part="drums"></div></details>
+      </div>
+
+      <div class="part" id="part-fx">
+        <div class="ph"><i style="background:var(--c-fx)"></i><b>Effects</b><span class="src">flares, big quakes, new pages</span><span class="lvl" data-lvl="fx"></span><span class="btns"><button type="button" data-mute="fx" aria-pressed="false">M</button><button type="button" class="solo" data-solo="fx" aria-pressed="false">S</button></span></div>
+        <div class="flow" id="flowFx">--</div>
+        <details class="shape"><summary>tone, echo, space</summary><div class="pc" data-part="fx"></div></details>
+      </div>
+
+      <div class="group"><h3>Master bus</h3>
+        <div class="ctl"><label for="duck">Sidechain duck</label><input id="duck" type="range" min="0" max="0.9" step="0.01" value="0.6"><output id="duckV">60%</output></div>
+        <div class="ctl"><label for="echoFb">Echo feedback</label><input id="echoFb" type="range" min="0" max="0.85" step="0.01" value="0.4"><output id="echoFbV">40%</output></div>
+        <div class="ctl"><label for="revAmt">Reverb return</label><input id="revAmt" type="range" min="0" max="1" step="0.01" value="0.8"><output id="revAmtV">80%</output></div>
+        <div class="ctl"><label>Limiter</label><span class="note num" id="limRead">idle</span></div>
+      </div>
+      <div class="group"><h3>Space sound for the grain textures</h3>
+        <input id="texFile" type="file" accept="audio/*" aria-label="Load an audio file for the space texture">
+        <span class="note" id="texName">Built-in: a synthesized plasma whistler. Load a NASA recording to replace it.</span>
+      </div>
+    </section>
+  </div>
+
+  <footer>
+    <div>Keys: <kbd>Space</kbd> start/stop · <kbd>Z</kbd> <kbd>X</kbd> <kbd>C</kbd> <kbd>T</kbd> Raw / Tuned / Groove / Techno · <kbd>V</kbd> next view · <kbd>1</kbd>-<kbd>5</kbd> mute bass, pads, melody, drums, effects · hold <kbd>Shift</kbd> + <kbd>1</kbd>-<kbd>5</kbd> to solo · <kbd>+</kbd> <kbd>-</kbd> data speed · <kbd>R</kbd> record.</div>
+    <div>MIDI: bass ch 1, pads 2, melody 3, effects 5, drums 10 (kick 36, snare 38, hat 42, open hat 46). Quarter tones are rounded to the nearest semitone over MIDI. Mac: IAC Driver; Windows: loopMIDI; Chrome or Edge.</div>
+    <div>Data: <a href="https://www.swpc.noaa.gov/products/real-time-solar-wind" target="_blank" rel="noopener">NOAA SWPC</a>, <a href="https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php" target="_blank" rel="noopener">USGS</a>, <a href="https://stream.wikimedia.org/?doc" target="_blank" rel="noopener">Wikimedia</a>, <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a>, <a href="https://wheretheiss.at" target="_blank" rel="noopener">wheretheiss.at</a>. NASA sound: <a href="https://photojournal.jpl.nasa.gov/catalog/PIA25030" target="_blank" rel="noopener">Juno at Ganymede</a>.</div>
+  </footer>
+</div>
+
+<script>
+"use strict";
+/* =========================================================
+   helpers
+   ========================================================= */
+const $ = id => document.getElementById(id);
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const lerp = (a,b,t) => a + (b-a)*t;
+const mtof = m => 440 * Math.pow(2, (m-69)/12);
+const ftom = f => 69 + 12*Math.log2(f/440);
+const NOTE = ['C','C#','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
+const noteName = m => { const r = Math.round(m*2)/2, base = Math.floor(r); return NOTE[((base % 12) + 12) % 12] + (r !== base ? '+¼' : '') + (Math.floor(base/12) - 1); };
+const PARTS = ['bass','pads','mel','drums','fx'];
+const PCOL = {bass:'#e0a35c', pads:'#8fa8d6', mel:'#7fbfae', drums:'#d98a8f', fx:'#ab97d9'};
+const SPEEDS = [0.25, 0.5, 1, 2, 4, 8, 16];
+const speed = () => SPEEDS[+$('speed').value];
+const nowS = () => performance.now()/1000;
+function setChip(id, live){ const c = $(id); c.className = 'chip ' + (live ? 'live' : 'sim'); c.textContent = live ? 'live' : 'simulated'; }
+async function getJSON(url){ const r = await fetch(url, {cache:'no-store'}); if (!r.ok) throw new Error(r.status); return r.json(); }
+function euclid(k, n){ const r = []; for (let i = 0; i < n; i++) r.push(Math.floor(i*k/n) !== Math.floor((i-1)*k/n) ? 1 : 0); return r; }
+function hash(s){ let h = 0; for (let i = 0; i < s.length; i++) h = (h*31 + s.charCodeAt(i)) | 0; return Math.abs(h); }
+const fmtBz = b => (b > 0 ? '+' : '−') + Math.abs(b).toFixed(1) + ' nT';
+
+/* =========================================================
+   SCALES
+   ========================================================= */
+// iv = semitones above the root (halves are quarter tones). style: "chords" = a progression built from the scale, "drone" = melody over a held root and fifth.
+const SCALES = {
+  lydian:{n:'Lydian', iv:[0,2,4,6,7,9,11], s:'chords'}, ionian:{n:'Ionian', iv:[0,2,4,5,7,9,11], s:'chords'}, mixolydian:{n:'Mixolydian', iv:[0,2,4,5,7,9,10], s:'chords'},
+  dorian:{n:'Dorian', iv:[0,2,3,5,7,9,10], s:'chords'}, aeolian:{n:'Aeolian', iv:[0,2,3,5,7,8,10], s:'chords'}, phrygian:{n:'Phrygian', iv:[0,1,3,5,7,8,10], s:'chords'}, locrian:{n:'Locrian', iv:[0,1,3,5,6,8,10], s:'chords'},
+  harmonic:{n:'Harmonic minor', iv:[0,2,3,5,7,8,11], s:'chords'}, melodic:{n:'Melodic minor', iv:[0,2,3,5,7,9,11], s:'chords'}, hungarian:{n:'Hungarian minor', iv:[0,2,3,6,7,8,11], s:'chords'},
+  gong:{n:'Gong', iv:[0,2,4,7,9], s:'drone'}, shang:{n:'Shang', iv:[0,2,5,7,10], s:'drone'}, jue:{n:'Jue', iv:[0,3,5,8,10], s:'drone'}, zhi:{n:'Zhi', iv:[0,2,5,7,9], s:'drone'}, yu:{n:'Yu', iv:[0,3,5,7,10], s:'drone'},
+  egyptian:{n:'Egyptian', iv:[0,2,5,7,10], s:'drone'},
+  hijaz:{n:'Hijaz', iv:[0,1,4,5,7,8,10], s:'drone'}, doubleharm:{n:'Double harmonic', iv:[0,1,4,5,7,8,11], s:'drone'},
+  rast:{n:'Maqam Rast', iv:[0,2,3.5,5,7,9,10.5], s:'drone'}, bayati:{n:'Maqam Bayati', iv:[0,1.5,3,5,7,8,10], s:'drone'}, saba:{n:'Maqam Saba', iv:[0,1.5,3,4,7,8,10], s:'drone'},
+  hirajoshi:{n:'Hirajoshi', iv:[0,2,3,7,8], s:'drone'}, bhairav:{n:'Raga Bhairav', iv:[0,1,4,5,7,8,11], s:'drone'}, in:{n:'In', iv:[0,1,5,7,8], s:'drone'}, blues:{n:'Blues', iv:[0,3,5,6,7,10], s:'drone'}, wholetone:{n:'Whole tone', iv:[0,2,4,6,8,10], s:'drone'}
+};
+const LADDER = ['lydian','ionian','mixolydian','dorian','aeolian','phrygian'];
+// pad voicings that carry each world scale's colour (semitones above the root)
+const PADV = {gong:[0,7,14,16], hirajoshi:[0,7,8,14], hijaz:[0,7,13,16], egyptian:[0,5,10,14], bhairav:[0,7,11,13]};
+const SCALE_NOTES = {
+  auto:'The solar magnetic field picks the mode at every chord change: field north (calm) = Lydian, the further south (storm risk), the darker, down to Phrygian.',
+  gong:'Five notes, no half steps: open and bright. Played over a drone.', hirajoshi:'Two half steps (2-3 and 5-6) give the koto sound. Played over a drone.', egyptian:'Five notes with no third, so it is neither major nor minor. Played over a drone.', bhairav:'Flat 2nd and flat 6th with a major 3rd and 7th: a morning raga. Played over a drone.',
+  rast:'Uses quarter tones (the 3rd and 7th sit between two piano keys). The browser plays them exactly.', bayati:'Uses a quarter-tone 2nd. The browser plays it exactly.', saba:'Uses a quarter-tone 2nd and a lowered 4th. The browser plays it exactly.',
+  hijaz:'The jump from the flat 2nd to the major 3rd is the classic Arabic sound. Played over a drone.', doubleharm:'Often called the "Arabic" or Byzantine scale.'
+};
+
+/* =========================================================
+   DATA FEEDS
+   ========================================================= */
+const SUN = {hist:[], sim:false, pos:1, cur:null, lo:300, hi:500};
+const KP = {val:2, sim:false};
+const XR = {hist:[], sim:false, cur:-6.5, prevClass:0, lastFlareAt:-1e9};
+const Q = {list:[], known:new Set(), sim:false, lastPos:0, flashes:[]};
+const W = {es:null, sim:false, simTimer:null, times:[], gotAny:false};
+const WX = {temp:12, wind:8, cloud:50, rain:0, day:1, sim:false};
+const ISS = {lat:0, lon:0, vis:'', phase0:0, prevLat:null, orbitPos:0, sim:false, have:false};
+const LABELS = [];
+let MODE = 'groove';
+const SCORE = {sun:[], notes:[], xr:[], quakes:[], wiki:[]};
+const lastLabelAt = {};
+function label(text, f, ang, kind, mag){
+  // keep the stage readable: at most one label per stream every 0.9 s, except big events
+  const t = nowS(); if (t - (lastLabelAt[kind] || 0) < 0.9 && !(mag >= 4.5)) return; lastLabelAt[kind] = t;
+  LABELS.push({text, born:nowS(), f, ang, kind, mag, scroll:SPEC.scroll}); if (LABELS.length > 60) LABELS.shift(); }
+
+async function loadSun(){
+  try{
+    const [wind, mag] = await Promise.all([getJSON('https://services.swpc.noaa.gov/json/rtsw/rtsw_wind_1m.json'), getJSON('https://services.swpc.noaa.gov/json/rtsw/rtsw_mag_1m.json')]);
+    const pick = arr => { const a = arr.filter(r => r.active); return a.length ? a : arr; };
+    const m = new Map(); for (const r of pick(mag)){ const k = r.time_tag.slice(0,16); if (r.bz_gsm != null && !m.has(k)) m.set(k, r); }
+    const rows = [], seen = new Set();
+    for (const r of pick(wind)){ if (r.proton_speed == null || r.proton_density == null) continue; const k = r.time_tag.slice(0,16); if (seen.has(k)) continue; seen.add(k); const g = m.get(k);
+      rows.push({t:new Date(k+':00Z'), speed:r.proton_speed, dens:r.proton_density, bz:g?g.bz_gsm:0, bt:g?g.bt:5}); }
+    rows.sort((a,b) => a.t - b.t); if (rows.length < 5) throw new Error('empty');
+    SUN.hist = rows.slice(-120); SUN.sim = false;
+  } catch(e){
+    try{
+      const [pl, mg] = await Promise.all([getJSON('https://services.swpc.noaa.gov/products/solar-wind/plasma-2-hour.json'), getJSON('https://services.swpc.noaa.gov/products/solar-wind/mag-2-hour.json')]);
+      const mm = new Map(mg.slice(1).map(r => [r[0].slice(0,16), r]));
+      SUN.hist = pl.slice(1).filter(r => r[1] != null && r[2] != null).map(r => { const g = mm.get(r[0].slice(0,16)); return {t:new Date(r[0].slice(0,16).replace(' ','T')+':00Z'), speed:+r[2], dens:+r[1], bz:g?+g[3]:0, bt:g?+g[6]:5}; });
+      if (SUN.hist.length < 5) throw new Error('empty'); SUN.sim = false;
+    } catch(e2){
+      SUN.sim = true; const h = []; let sp = 430, de = 6, bz = 1, now = Date.now();
+      for (let i = 119; i >= 0; i--){ sp = clamp(sp + (Math.random()-.5)*16, 300, 750); de = clamp(de + (Math.random()-.5)*0.9, 1, 25); bz = clamp(bz + (Math.random()-.5)*1.8, -14, 10); h.push({t:new Date(now - i*60000), speed:sp, dens:de, bz, bt:Math.abs(bz)+3}); }
+      SUN.hist = h;
+    }
+  }
+  let lo = 1e9, hi = -1e9; for (const r of SUN.hist){ lo = Math.min(lo, r.speed); hi = Math.max(hi, r.speed); }
+  if (hi - lo < 60){ const mid = (hi+lo)/2; lo = mid - 30; hi = mid + 30; }
+  SUN.lo = lo; SUN.hi = hi;
+  setChip('cSun', !SUN.sim);
+}
+function sunSample(){
+  const h = SUN.hist; if (!h.length) return null;
+  if ($('sunMode').value === 'live') return h[h.length-1];
+  const f = SUN.pos * (h.length-1), i = Math.floor(f), t = f - i, a = h[i], b = h[Math.min(i+1, h.length-1)];
+  return {t:new Date(lerp(+a.t, +b.t, t)), speed:lerp(a.speed,b.speed,t), dens:lerp(a.dens,b.dens,t), bz:lerp(a.bz,b.bz,t), bt:lerp(a.bt,b.bt,t)};
+}
+const sunNorm = s => clamp((s.speed - SUN.lo) / (SUN.hi - SUN.lo), 0, 1);
+async function loadKp(){
+  try{ const j = await getJSON('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json'); let v;
+    if (Array.isArray(j[0])) v = +j[j.length-1][1]; else v = +(j[j.length-1].Kp ?? j[j.length-1].kp_index);
+    if (!isFinite(v)) throw new Error('bad'); KP.val = v; KP.sim = false;
+  } catch(e){ KP.sim = true; KP.val = 3; }
+  setChip('cKp', !KP.sim);
+}
+async function loadXr(){
+  try{ const j = await getJSON('https://services.swpc.noaa.gov/json/goes/primary/xrays-6-hour.json');
+    const rows = j.filter(r => r.energy === '0.1-0.8nm' && r.flux > 0).map(r => ({t:new Date(r.time_tag), lf:Math.log10(r.flux)}));
+    if (rows.length < 5) throw new Error('empty'); XR.hist = rows; XR.sim = false;
+  } catch(e){ XR.sim = true; const now = Date.now(), h = []; let lf = -6.6;
+    for (let i = 359; i >= 0; i--){ lf = clamp(lf + (Math.random()-.5)*0.04, -7.5, -4.5); if (Math.random() < 0.006) lf += 1.1; lf = lerp(lf, -6.6, 0.01); h.push({t:new Date(now - i*60000), lf}); }
+    XR.hist = h; }
+  setChip('cXr', !XR.sim);
+}
+function xrAt(t){ const h = XR.hist; if (!h.length) return -6.5; const x = +t;
+  if (x <= +h[0].t) return h[0].lf; if (x >= +h[h.length-1].t) return h[h.length-1].lf;
+  let lo = 0, hi = h.length-1; while (hi - lo > 1){ const m = (lo+hi) >> 1; if (+h[m].t <= x) lo = m; else hi = m; } return h[lo].lf; }
+const flareClass = lf => { const c = lf >= -4 ? 'X' : lf >= -5 ? 'M' : lf >= -6 ? 'C' : lf >= -7 ? 'B' : 'A'; const base = {X:-4,M:-5,C:-6,B:-7,A:-8}[c]; return c + Math.pow(10, lf - base).toFixed(1); };
+const classIdx = lf => lf >= -4 ? 4 : lf >= -5 ? 3 : lf >= -6 ? 2 : lf >= -7 ? 1 : 0;
+
+function quakeFrom(f){ const [lon,lat,depth] = f.geometry.coordinates; return {id:f.id, t:f.properties.time, mag:f.properties.mag ?? 0, place:(f.properties.place || '').replace(/^.* of /,''), lon, lat, depth:Math.max(0, depth||0)}; }
+async function loadQuakes(first){
+  try{ const j = await getJSON('https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson');
+    const list = j.features.map(quakeFrom).sort((a,b) => a.t - b.t), fresh = first ? [] : list.filter(q => !Q.known.has(q.id));
+    list.forEach(q => Q.known.add(q.id)); Q.list = list; Q.sim = false;
+    if ($('quakeMode').value === 'live') fresh.forEach(q => { if (q.mag >= +$('quakeMin').value) quakeEvent(q); });
+  } catch(e){ if (!Q.list.length){ Q.sim = true; const now = Date.now(), places = ['Tonga','Alaska','Chile','Japan','Indonesia','Iceland','Greece','Peru','Philippines','Turkey'];
+    Q.list = Array.from({length:200}, (_,i) => ({id:'s'+i, t:now - Math.random()*864e5, mag:clamp(-Math.log(Math.random())*1.15, 0, 7), lon:Math.random()*360-180, lat:Math.random()*140-70, depth:Math.random()*300, place:places[i%10]})).sort((a,b) => a.t - b.t); } }
+  setChip('cQk', !Q.sim);
+}
+function tickQuakes(dt){
+  if ($('quakeMode').value !== 'replay' || !Q.list.length) return;
+  const pos = (Q.lastPos + dt * speed() / +$('quakeDur').value) % 1, t0 = Date.now() - 864e5, a = t0 + Q.lastPos*864e5, b = t0 + pos*864e5, min = +$('quakeMin').value;
+  for (const q of Q.list){ const hit = Q.lastPos <= pos ? (q.t > a && q.t <= b) : (q.t > a || q.t <= b); if (hit && q.mag >= min) quakeEvent(q); }
+  Q.lastPos = pos;
+}
+function connectWiki(){
+  if (W.es) W.es.close(); clearTimeout(W.simTimer); W.sim = false; W.gotAny = false;
+  try{ W.es = new EventSource('https://stream.wikimedia.org/v2/stream/recentchange');
+    W.es.onmessage = ev => { let e; try{ e = JSON.parse(ev.data); } catch(_){ return; }
+      if (!W.gotAny){ W.gotAny = true; setChip('cWk', true); }
+      const want = $('wikiSel').value; if (want !== '*' && e.wiki !== want) return;
+      if (e.type !== 'edit' && e.type !== 'new') return; if (e.bot && !$('wikiBots').checked) return;
+      wikiEvent({delta:e.length ? (e.length.new||0) - (e.length.old||0) : 0, isNew:e.type === 'new', title:e.title || ''}); };
+    W.es.onerror = () => { if (!W.gotAny) startWikiSim(); };
+  } catch(err){ startWikiSim(); }
+  setTimeout(() => { if (!W.gotAny) startWikiSim(); }, 9000);
+}
+function startWikiSim(){
+  if (W.sim) return; if (W.es) W.es.close(); W.sim = true; setChip('cWk', false);
+  const titles = ['Solar wind','Aurora','Salzburg','Magnetosphere','Jupiter','Earthquake','Coronal mass ejection','Mozart'];
+  const loop = () => { W.simTimer = setTimeout(() => { const big = Math.random() < .12; wikiEvent({delta:Math.round((Math.random()-.4)*(big?4000:200)), isNew:Math.random()<.03, title:titles[Math.floor(Math.random()*titles.length)]}); loop(); }, -Math.log(Math.random())*600); };
+  loop();
+}
+async function loadWx(){
+  try{ const j = await getJSON('https://api.open-meteo.com/v1/forecast?latitude=47.80&longitude=13.04&current=temperature_2m,wind_speed_10m,cloud_cover,precipitation,is_day&hourly=temperature_2m,cloud_cover,wind_speed_10m,precipitation&past_days=1&forecast_days=1&timezone=Europe%2FVienna');
+    const c = j.current; WX.temp = c.temperature_2m; WX.wind = c.wind_speed_10m; WX.cloud = c.cloud_cover; WX.rain = c.precipitation; WX.day = c.is_day; WX.sim = false;
+    const hr = j.hourly, hist = [];
+    if (hr && hr.time) for (let i = 0; i < hr.time.length; i++){ if (hr.time[i] > c.time) break; hist.push({t:hr.time[i].slice(11,16), temp:hr.temperature_2m[i], cloud:hr.cloud_cover[i], wind:hr.wind_speed_10m[i], rain:hr.precipitation[i]}); }
+    hist.push({t:c.time.slice(11,16), temp:c.temperature_2m, cloud:c.cloud_cover, wind:c.wind_speed_10m, rain:c.precipitation, now:true});
+    WX.hist = hist.slice(-25);
+  } catch(e){ WX.sim = true; WX.temp = 11; WX.wind = 12; WX.cloud = 70; WX.rain = 0.4; const hr = new Date().getHours(); WX.day = hr >= 7 && hr < 19 ? 1 : 0;
+    if (!WX.hist){ WX.hist = []; for (let i = 24; i >= 0; i--){ const h = (hr - i + 24) % 24, k = (24 - i)/24; WX.hist.push({t:String(h).padStart(2,'0') + ':00', temp:7 + 5*Math.sin((h - 9)/24*Math.PI*2) + k*1.5, cloud:clamp(30 + k*45 + Math.sin(i)*10, 0, 100), wind:6 + k*6 + Math.cos(i*0.7)*2, rain:i < 6 ? +(Math.random()*0.6).toFixed(1) : 0, now:i === 0}); } } }
+  setChip('cWx', !WX.sim);
+}
+const INC = 51.64;
+async function loadISS(){
+  try{ const j = await getJSON('https://api.wheretheiss.at/v1/satellites/25544');
+    const asc = ISS.prevLat == null ? true : j.latitude >= ISS.prevLat; ISS.prevLat = j.latitude; ISS.lat = j.latitude; ISS.lon = j.longitude; ISS.vis = j.visibility || '';
+    if ((ISS.fixes = (ISS.fixes || 0) + 1) <= 2){ const s = Math.asin(clamp(j.latitude/INC, -1, 1)); ISS.phase0 = asc ? s : Math.PI - s; ISS.orbitPos = 0; }
+    ISS.sim = false; ISS.have = true;
+  } catch(e){ if (!ISS.have){ ISS.sim = true; ISS.phase0 = Math.random()*Math.PI*2; ISS.have = true; } }
+  setChip('cIss', !ISS.sim);
+}
+const issLat = () => INC * Math.sin(ISS.phase0 + ISS.orbitPos * Math.PI * 2);
+
+/* =========================================================
+   AUDIO ENGINE + MIX BUS
+   ========================================================= */
+const A = {ctx:null, running:false, strips:{}, muted:{}, solo:new Set()};
+PARTS.forEach(p => A.muted[p] = false);
+let noiseBuf = null;
+const internal = () => $('internal').checked;
+function makeImpulse(ctx, secs){ const len = ctx.sampleRate*secs, buf = ctx.createBuffer(2, len, ctx.sampleRate); for (let c = 0; c < 2; c++){ const d = buf.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random()*2-1) * Math.pow(1 - i/len, 2.8); } return buf; }
+const toneHz = v => 200 * Math.pow(90, v);
+function level(p){ if (A.muted[p]) return 0; if (A.solo.size && !A.solo.has(p)) return 0; return +$(p+'Lvl').value; }
+function initAudio(){
+  const ctx = new (window.AudioContext || window.webkitAudioContext)(); A.ctx = ctx;
+  noiseBuf = ctx.createBuffer(1, ctx.sampleRate*2, ctx.sampleRate); { const d = noiseBuf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random()*2-1; }
+  A.sum = ctx.createGain();
+  A.lim = ctx.createDynamicsCompressor(); A.lim.threshold.value = -6; A.lim.knee.value = 0; A.lim.ratio.value = 20; A.lim.attack.value = 0.002; A.lim.release.value = 0.15;
+  A.master = ctx.createGain(); A.master.gain.value = +$('masterVol').value;
+  A.sum.connect(A.lim); A.lim.connect(A.master); A.master.connect(ctx.destination);
+  A.dest = ctx.createMediaStreamDestination(); A.master.connect(A.dest);
+  A.fft = ctx.createAnalyser(); A.fft.fftSize = 4096; A.fft.smoothingTimeConstant = 0.2; A.fft.minDecibels = -95; A.fft.maxDecibels = -12; A.master.connect(A.fft);
+  A.scope = ctx.createAnalyser(); A.scope.fftSize = 2048; A.master.connect(A.scope);
+  A.rev = ctx.createConvolver(); A.rev.buffer = makeImpulse(ctx, 3.2);
+  A.revRet = ctx.createGain(); A.revRet.gain.value = +$('revAmt').value; A.rev.connect(A.revRet); A.revRet.connect(A.sum);
+  A.dly = ctx.createDelay(2); A.dly.delayTime.value = 60/bpm()*0.75;
+  A.dlyFb = ctx.createGain(); A.dlyFb.gain.value = +$('echoFb').value;
+  A.dlyLp = ctx.createBiquadFilter(); A.dlyLp.type = 'lowpass'; A.dlyLp.frequency.value = 3200;
+  A.dly.connect(A.dlyLp); A.dlyLp.connect(A.dlyFb); A.dlyFb.connect(A.dly); A.dlyLp.connect(A.sum); A.dlyLp.connect(A.rev);
+  for (const p of PARTS){
+    const s = {input:ctx.createGain(), filter:ctx.createBiquadFilter(), duck:ctx.createGain(), level:ctx.createGain(), echo:ctx.createGain(), space:ctx.createGain()};
+    s.filter.type = 'lowpass'; s.filter.frequency.value = toneHz(+$(p+'Tone').value); s.filter.Q.value = 0.7;
+    s.level.gain.value = level(p); s.echo.gain.value = +$(p+'Echo').value; s.space.gain.value = +$(p+'Space').value;
+    s.input.connect(s.filter); s.filter.connect(s.duck); s.duck.connect(s.level); s.level.connect(A.sum);
+    s.level.connect(s.echo); s.echo.connect(A.dly); s.level.connect(s.space); s.space.connect(A.rev);
+    s.an = ctx.createAnalyser(); s.an.fftSize = 1024; s.level.connect(s.an); s.buf = new Float32Array(1024);
+    A.strips[p] = s;
+  }
+  A.padTrem = ctx.createGain(); A.padTrem.connect(A.strips.pads.input);
+  A.padLfo = ctx.createOscillator(); A.padLfo.frequency.value = 0.3; A.padLfoAmt = ctx.createGain(); A.padLfoAmt.gain.value = 0.1;
+  A.padLfo.connect(A.padLfoAmt); A.padLfoAmt.connect(A.padTrem.gain); A.padLfo.start();
+  const sh = ctx.createBufferSource(); sh.buffer = noiseBuf; sh.loop = true;
+  A.shBp = ctx.createBiquadFilter(); A.shBp.type = 'bandpass'; A.shBp.frequency.value = 6000; A.shBp.Q.value = 3;
+  A.shGain = ctx.createGain(); A.shGain.gain.value = 0; sh.connect(A.shBp); A.shBp.connect(A.shGain); A.shGain.connect(A.strips.fx.input); sh.start();
+  // techno: a mono acid voice (saw -> resonant lowpass -> amp -> distortion) and a kick distortion
+  A.acidShaper = ctx.createWaveShaper(); A.acidShaper.curve = distCurve(0.1); A.acidShaper.oversample = '2x'; A.acidShaper.connect(A.strips.mel.input);
+  A.acid = {osc:ctx.createOscillator(), lp:ctx.createBiquadFilter(), amp:ctx.createGain()};
+  A.acid.osc.type = 'sawtooth'; A.acid.lp.type = 'lowpass'; A.acid.lp.Q.value = 12; A.acid.amp.gain.value = 0;
+  A.acid.osc.connect(A.acid.lp); A.acid.lp.connect(A.acid.amp); A.acid.amp.connect(A.acidShaper); A.acid.osc.start();
+  A.kickShaper = ctx.createWaveShaper(); A.kickShaper.curve = distCurve(0.7); A.kickShaper.connect(A.strips.drums.input);
+  if (!TEX.buf) TEX.buf = makeWhistler(ctx);
+  // continuous voices for Raw and Tuned: solar drone (bass), glide tone (melody), air noise (pads)
+  const d = {lp:ctx.createBiquadFilter(), trem:ctx.createGain(), lfo:ctx.createOscillator(), lfoAmt:ctx.createGain(), amp:ctx.createGain()};
+  d.lp.type = 'lowpass'; d.lp.Q.value = 5; d.lfo.connect(d.lfoAmt); d.lfoAmt.connect(d.trem.gain); d.lfo.start(); d.amp.gain.value = 0;
+  d.oscs = [['sawtooth',0,0.5],['sawtooth',0,0.5],['sine',-12,0.8]].map(([type,semi,gv]) => { const o = ctx.createOscillator(); o.type = type; o.semi = semi; const a = ctx.createGain(); a.gain.value = gv; o.connect(a); a.connect(d.lp); o.start(); return o; });
+  d.lp.connect(d.trem); d.trem.connect(d.amp); d.amp.connect(A.strips.bass.input); A.drone = d;
+  const th = {o:ctx.createOscillator(), o2:ctx.createOscillator(), vib:ctx.createOscillator(), vibAmt:ctx.createGain(), amp:ctx.createGain()};
+  th.o2.type = 'triangle'; th.vib.frequency.value = 5; th.vibAmt.gain.value = 4; th.vib.connect(th.vibAmt); th.vibAmt.connect(th.o.detune); th.vibAmt.connect(th.o2.detune);
+  const t2 = ctx.createGain(); t2.gain.value = 0.3; th.o.connect(th.amp); th.o2.connect(t2); t2.connect(th.amp); th.amp.gain.value = 0; th.amp.connect(A.strips.mel.input); th.o.start(); th.o2.start(); th.vib.start(); A.ther = th;
+  const bed = {src:ctx.createBufferSource(), lp:ctx.createBiquadFilter(), amp:ctx.createGain()}; bed.src.buffer = noiseBuf; bed.src.loop = true; bed.lp.type = 'lowpass'; bed.amp.gain.value = 0;
+  bed.src.connect(bed.lp); bed.lp.connect(bed.amp); bed.amp.connect(A.padTrem); bed.src.start(); A.bed = bed;
+}
+function refreshLevels(){ if (!A.ctx) return; for (const p of PARTS) A.strips[p].level.gain.setTargetAtTime(level(p), A.ctx.currentTime, 0.03); }
+function duck(t){ const d = +$('duck').value; for (const p of ['bass','pads','mel']){ const g = A.strips[p].duck.gain, depth = p === 'mel' ? d*0.4 : d; g.setTargetAtTime(1 - depth, t, 0.004); g.setTargetAtTime(1, t + 0.04, 0.09); } }
+function env(g, t, a, peak, dur, rel){ g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(Math.max(0.0002, peak), t + a); g.gain.setValueAtTime(Math.max(0.0002, peak), t + Math.max(a, dur)); g.gain.exponentialRampToValueAtTime(0.0001, t + Math.max(a, dur) + rel); }
+function noiseSrc(t, dur){ const n = A.ctx.createBufferSource(); n.buffer = noiseBuf; n.start(t, Math.random()*1.5); n.stop(t + dur); return n; }
+function panTo(node, pan, dest){ const p = A.ctx.createStereoPanner(); p.pan.value = clamp(pan,-1,1); node.connect(p); p.connect(dest); }
+
+const TEX = {buf:null};
+function makeWhistler(ctx){
+  const sr = ctx.sampleRate, len = sr*8, buf = ctx.createBuffer(1, len, sr), d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = (Math.random()*2-1) * 0.05;
+  for (let w = 0; w < 14; w++){ const start = Math.floor(Math.random()*(len - sr*2)), L = Math.floor(sr*(0.8 + Math.random()*1.2)), f0 = 5000 + Math.random()*3000, f1 = 300 + Math.random()*500; let ph = 0;
+    for (let i = 0; i < L; i++){ const k = i/L, f = f0 * Math.pow(f1/f0, Math.sqrt(k)); ph += 2*Math.PI*f/sr; d[start+i] += Math.sin(ph) * Math.sin(Math.PI*k) * 0.35; } }
+  return buf;
+}
+function grain(dest, t, pos, rate, size, gain){
+  if (!TEX.buf) return; const s = A.ctx.createBufferSource(); s.buffer = TEX.buf; s.playbackRate.value = clamp(rate, 0.1, 4);
+  const g = A.ctx.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(gain, t + size/2); g.gain.linearRampToValueAtTime(0, t + size);
+  s.connect(g); g.connect(dest); s.start(t, clamp(pos, 0, 1) * Math.max(0, TEX.buf.duration - size*rate - 0.01)); s.stop(t + size + 0.02);
+}
+$('texFile').onchange = async e => { const f = e.target.files[0]; if (!f) return;
+  try{ if (!A.ctx) initAudio(); TEX.buf = await A.ctx.decodeAudioData(await f.arrayBuffer()); $('texName').textContent = 'Loaded ' + f.name + ' (' + TEX.buf.duration.toFixed(1) + ' s). Choose "Space texture" on Pads or Melody.'; }
+  catch(err){ $('texName').textContent = 'Could not decode that file. Try a WAV or MP3.'; } };
+
+/* MIDI */
+const MIDI = {access:null, out:null};
+$('midiBtn').onclick = async () => {
+  if (!navigator.requestMIDIAccess){ $('midiMsg').textContent = 'No Web MIDI in this browser. Use Chrome or Edge.'; return; }
+  try{ MIDI.access = await navigator.requestMIDIAccess();
+    const fill = () => { const sel = $('midiOut'); sel.innerHTML = ''; const outs = [...MIDI.access.outputs.values()];
+      if (!outs.length){ $('midiMsg').textContent = 'No MIDI outputs. Create a virtual port, then click again.'; sel.hidden = true; MIDI.out = null; return; }
+      outs.forEach(o => { const op = document.createElement('option'); op.value = o.id; op.textContent = o.name; sel.append(op); });
+      sel.hidden = false; $('internalWrap').hidden = false; MIDI.out = MIDI.access.outputs.get(sel.value); $('midiMsg').textContent = ''; $('midiBtn').classList.add('on'); $('midiBtn').textContent = 'MIDI on'; };
+    fill(); MIDI.access.onstatechange = fill;
+  } catch(err){ $('midiMsg').textContent = 'The browser blocked MIDI access.'; }
+};
+$('midiOut').onchange = e => { MIDI.out = MIDI.access.outputs.get(e.target.value); };
+function midi(ch, note, vel, t, dur){ if (!MIDI.out || !A.ctx) return; const at = performance.now() + Math.max(0, t - A.ctx.currentTime)*1000, n = clamp(Math.round(note), 0, 127), v = clamp(Math.round(vel*127), 1, 127);
+  try{ MIDI.out.send([0x90|ch, n, v], at); MIDI.out.send([0x80|ch, n, 0], at + Math.max(30, dur*1000)); } catch(e){} }
+
+/* =========================================================
+   CONDUCTOR: clock + harmony
+   ========================================================= */
+const CLK = {step:0, next:0, timer:null};
+const H = {key:'ionian', ladder:1, idx:0, iv:SCALES.ionian.iv, style:'chords', tones:[0,4,7,11], name:'--', set:false};
+const VIS = {steps:[], hits:[], chordAt:[]};
+function bpm(){ let b = +$('bpm').value; if ($('kpTempo').checked) b += (KP.val - 3) * 6; return clamp(b, 50, 180); }
+const stepDur = () => 60 / bpm() / 4;
+const keyRoot = () => +$('keySel').value;
+const ladderFor = bz => clamp(Math.round((5 - bz) / 3), 0, 5);
+function currentKey(){ return $('scaleSel').value === 'auto' ? LADDER[H.ladder] : $('scaleSel').value; }
+function progFor(iv){ return iv.includes(4) ? [0,4,5,3] : [0,5,2,6]; }
+function chordAt(iv, idx){ const deg = progFor(iv)[idx], t = k => iv[(deg+k) % 7] + 12*Math.floor((deg+k)/7); return [t(0), t(2), t(4), t(6)]; }
+function chordLabel(tones){ const r = tones[0], th = tones[1]-r, fi = tones[2]-r, nm = NOTE[Math.round(keyRoot() + r) % 12]; return nm + (fi === 6 ? '°' : fi === 8 ? '+' : th === 3 ? 'm' : th === 4 ? '' : 'sus'); }
+function updateHarmony(bar){
+  const cb = +$('chordBars').value;
+  if (bar % cb !== 0 && H.set) return false;
+  const prevKey = H.key;
+  if ($('scaleSel').value === 'auto' && SUN.cur) H.ladder = ladderFor(SUN.cur.bz);
+  H.key = currentKey(); const sc = SCALES[H.key]; H.iv = sc.iv; H.style = sc.s; H.idx = Math.floor(bar / cb) % 4;
+  H.tones = H.style === 'chords' ? chordAt(H.iv, H.idx) : [0, 7, 12, 19];
+  H.name = H.style === 'chords' ? chordLabel(H.tones) : NOTE[keyRoot()] + ' drone';
+  if (H.set && prevKey !== H.key) label('→ ' + NOTE[keyRoot()] + ' ' + sc.n + ($('scaleSel').value === 'auto' && SUN.cur ? ' (Bz ' + fmtBz(SUN.cur.bz) + ')' : ''), 250, Math.PI, 'mode');
+  H.set = true;
+  return true;
+}
+function snap(m, strong){
+  const root = keyRoot(), pcs = strong ? (H.style === 'chords' ? H.tones.slice(0,3).map(x => x % 12) : [0, 7]) : H.iv;
+  let best = m, bd = 99;
+  for (let o = -1; o <= 1; o++) for (const p of pcs){ const c = Math.floor((m-root)/12)*12 + o*12 + root + p, d = Math.abs(c - m); if (d < bd){ bd = d; best = c; } }
+  return best;
+}
+function scheduler(){
+  if (!A.running) return; const ctx = A.ctx;
+  while (CLK.next < ctx.currentTime + 0.12){
+    const s = CLK.step % 16, bar = Math.floor(CLK.step / 16), sd = stepDur(); let t = CLK.next; if (s % 2 === 1) t += +$('swing').value * sd * 0.66;
+    if (s === 0 && updateHarmony(bar)){ VIS.chordAt.push({t, idx:H.idx}); if (MODE !== 'techno' || TSTY === 'melodic') onChord(t, sd); }
+    A.dly.delayTime.setTargetAtTime(60/bpm()*0.75, t, 0.05);
+    VIS.steps.push({t, s, bar});
+    if (MODE === 'techno'){ technoStep(s, t, sd, bar); CLK.next += sd; CLK.step++; continue; }
+    playBass(s, t, sd); playPadGrains(s, t, sd); playMel(s, t, sd); playDrums(s, t, sd); playFx(s, t, sd);
+    CLK.next += sd; CLK.step++;
+  }
+}
+const LANE_PART = {bass:'bass', pads:'pads', mel:'mel', kick:'drums', snare:'drums', hat:'drums', fx:'fx'};
+function hit(lane, s, vel, t){ VIS.hits.push({lane, s, vel, t}); if (VIS.hits.length > 400) VIS.hits.splice(0, 100); }
+const futureT = t => nowS() + (t - A.ctx.currentTime);
+
+/* =========================================================
+   PARTS
+   ========================================================= */
+let bassLast = null;
+function playBass(s, t, sd){
+  const sun = SUN.cur; if (!sun) return;
+  const d = sun.dens, pat = d < 3 ? [0] : d < 7 ? [0,8] : d < 12 ? [0,6,8,14] : [0,3,6,8,11,14], i = pat.indexOf(s); if (i < 0) return;
+  const gap = (i+1 < pat.length ? pat[i+1] : 16) - s, root = keyRoot();
+  let note = 36 + ((root + H.tones[0]) % 12); const fifth = H.style === 'chords' ? H.tones[2] - H.tones[0] : 7;
+  if (sun.speed > 450 && s % 8 !== 0) note += fifth; if (sun.speed > 600 && s === 14) note += 12;
+  const vel = s === 0 ? 0.9 : 0.7, dur = gap * sd * 0.85, bright = clamp((sun.speed-300)/450, 0, 1);
+  bassLast = note; hit('bass', s, vel, t); midi(0, note, vel, t, dur); SCORE.notes.push({t:futureT(t), m:note, kind:'bass'});
+  if (!internal()) return;
+  const ctx = A.ctx, f = mtof(note), g = ctx.createGain(), preset = $('bassPreset').value;
+  if (preset === 'sub'){ const o = ctx.createOscillator(); o.frequency.value = f; const o2 = ctx.createOscillator(); o2.type = 'triangle'; o2.frequency.value = f; const g2 = ctx.createGain(); g2.gain.value = 0.25 + bright*0.4;
+    o.connect(g); o2.connect(g2); g2.connect(g); o.start(t); o2.start(t); o.stop(t+dur+0.2); o2.stop(t+dur+0.2); env(g, t, 0.006, 0.55*vel, dur, 0.08); }
+  else { const o = ctx.createOscillator(); o.type = preset === 'acid' ? 'sawtooth' : 'square'; o.frequency.value = f; const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = preset === 'acid' ? 14 : 2;
+    lp.frequency.setValueAtTime(300 + bright * (preset === 'acid' ? 3500 : 1500), t); lp.frequency.exponentialRampToValueAtTime(140, t + (preset === 'acid' ? dur*0.7 : 0.18));
+    o.connect(lp); lp.connect(g); o.start(t); o.stop(t+dur+0.4); env(g, t, 0.004, (preset === 'acid' ? 0.3 : 0.35)*vel, preset === 'pluck' ? 0.05 : dur, preset === 'pluck' ? 0.25 : 0.06); }
+  g.connect(A.strips.bass.input);
+}
+let padNotes = [];
+function onChord(t, sd){
+  const root = keyRoot();
+  if (H.style === 'chords'){ const tones = WX.temp >= 15 ? H.tones : H.tones.slice(0,3);
+    padNotes = tones.map(x => { let n = 60 + ((root + x) % 12); if (n > 71) n -= 12; return n; }).sort((a,b) => a-b);
+    if (KP.val >= 5 && padNotes.length < 4) padNotes.push(padNotes[0] + 14); }
+  else padNotes = [48 + root].concat((PADV[H.key] || [0,7,12]).map(x => 55 + root + x - 7 + (x < 7 ? 12 : 0)).slice(0, WX.temp >= 15 ? 4 : 3));
+  const dur = +$('chordBars').value * 16 * sd;
+  hit('pads', 0, 0.8, t); padNotes.forEach(n => midi(1, n, 0.6, t, dur));
+  A.padLfo.frequency.setTargetAtTime(0.15 + WX.wind/8, t, 0.5); A.padLfoAmt.gain.setTargetAtTime(clamp(WX.wind/45, 0.03, 0.45), t, 0.5);
+  if (!internal()) return;
+  const preset = $('padsPreset').value; if (preset === 'texture') return;
+  const ctx = A.ctx, cut = lerp(4200, 450, clamp(WX.cloud/100, 0, 1)), att = Math.min(1.4, dur*0.3);
+  for (const n of padNotes){ const g = ctx.createGain(), lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = cut;
+    const types = preset === 'warm' ? [['sawtooth',-7,1],['sawtooth',7,1]] : [['sine',0,1],['sine',1200,0.3],['sine',1902,0.12]];
+    for (const [type, det, amp] of types){ const o = ctx.createOscillator(); o.type = type; o.frequency.value = mtof(n); o.detune.value = det; const a = ctx.createGain(); a.gain.value = amp; o.connect(a); a.connect(lp); o.start(t); o.stop(t + dur + 2); }
+    lp.connect(g); env(g, t, att, (preset === 'warm' ? 0.055 : 0.085), dur - att, 1.6); g.connect(A.padTrem); }
+}
+let texDrift = Math.random();
+function playPadGrains(s, t, sd){
+  if (!internal() || $('padsPreset').value !== 'texture' || !padNotes.length) return;
+  texDrift = (texDrift + 0.0015) % 1; const rough = clamp(WX.wind/40, 0, 1), size = lerp(0.4, 0.06, rough), per = 1 + Math.round(rough*3);
+  for (const n of padNotes) for (let k = 0; k < per; k++) grain(A.padTrem, t + Math.random()*sd, texDrift + Math.random()*0.04, Math.pow(2, (n-72)/12), size, 0.12);
+}
+let melLast = null, melInfo = '';
+function melValue(){
+  if ($('melSrc').value === 'iss'){ const lat = issLat(); melInfo = 'ISS latitude ' + lat.toFixed(1) + '°'; return (lat + INC) / (2*INC); }
+  const cur = SUN.cur; if (!cur) return 0.5; melInfo = 'wind ' + cur.speed.toFixed(0) + ' km/s'; return sunNorm(cur);
+}
+function playMel(s, t, sd){
+  const every = +$('melRate').value; if (s % every !== 0) return;
+  const v = melValue(), strong = s % 4 === 0, target = snap(60 + keyRoot() + v*24, strong);
+  // walk toward the data in small steps so the line sings instead of jumping
+  let m = melLast == null ? target : melLast;
+  if (Math.abs(target - m) > 5) m = snap(m + Math.sign(target - m)*4, strong); else m = target;
+  if (m === melLast && s !== 0) return; melLast = m;
+  const vel = strong ? 0.75 : 0.55, dur = every * sd * 0.9;
+  hit('mel', s, vel, t); midi(2, m, vel, t, dur); SCORE.notes.push({t:futureT(t), m, kind:'mel'});
+  if (!internal()) return;
+  const ctx = A.ctx, f = mtof(m), preset = $('melPreset').value, dest = A.strips.mel.input;
+  if (preset === 'texture'){ const dens = SUN.cur ? SUN.cur.dens : 5, size = lerp(0.28, 0.05, clamp(dens/20, 0, 1)); for (let k = 0; k < 3; k++) grain(dest, t + k*dur/3, v, Math.pow(2, (m-72)/12), size, 0.35*vel); return; }
+  const g = ctx.createGain();
+  if (preset === 'pluck'){ const o = ctx.createOscillator(); o.type = 'triangle'; o.frequency.value = f; const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.setValueAtTime(5000, t); lp.frequency.exponentialRampToValueAtTime(700, t + 0.3);
+    o.connect(lp); lp.connect(g); o.start(t); o.stop(t + dur + 0.8); env(g, t, 0.004, 0.22*vel, 0.02, Math.max(0.25, dur)); }
+  else { const c = ctx.createOscillator(); c.frequency.value = f; const mo = ctx.createOscillator(); mo.frequency.value = f*3.5; const mg = ctx.createGain(); mg.gain.setValueAtTime(f*2.5, t); mg.gain.exponentialRampToValueAtTime(f*0.05, t + 1.2);
+    mo.connect(mg); mg.connect(c.frequency); c.connect(g); c.start(t); mo.start(t); c.stop(t + 2); mo.stop(t + 2); env(g, t, 0.003, 0.18*vel, 0.01, 1.6); }
+  panTo(g, (v - 0.5) * 0.8, dest);
+}
+const PEND = {kick:[], snare:[], impact:[], bell:[]};
+let lastQuake = null, lastWikiTxt = '';
+function quakeEvent(q){
+  Q.flashes.push({q, at:performance.now()}); lastQuake = q; SCORE.quakes.push({t:nowS(), q});
+  if (q.mag >= 2.5) label('M' + q.mag.toFixed(1) + ' · ' + q.depth.toFixed(0) + ' km deep · ' + q.place, 95, (q.lon/180)*Math.PI, 'quake', q.mag);
+  if (!A.running) return;
+  if (MODE === 'techno'){ technoQuake(q); return; }
+  if (MODE !== 'groove'){ boomNow(q); return; }
+  PEND.kick.push({q, step:CLK.step}); if (q.mag >= 5) PEND.impact.push({q, step:CLK.step}); if (PEND.kick.length > 32) PEND.kick.splice(0, 16);
+}
+function wikiEvent(ev){
+  const now = performance.now(); W.times.push(now); while (W.times.length && now - W.times[0] > 60000) W.times.shift();
+  lastWikiTxt = (ev.delta > 0 ? '+' : '') + ev.delta + ' B';
+  const size = Math.log10(1 + Math.abs(ev.delta)); SCORE.wiki.push({t:nowS(), size, add:ev.delta >= 0, isNew:ev.isNew});
+  if (Math.abs(ev.delta) >= 1500 || ev.isNew) label((ev.isNew ? 'new page · ' : (ev.delta > 0 ? '+' : '') + ev.delta + ' B · ') + ev.title.slice(0, 40), ev.isNew ? 2200 : 900, (hash(ev.title) % 628)/100, 'wiki');
+  if (!A.running) return;
+  if (MODE === 'techno'){ technoWiki(ev, size); return; }
+  if (MODE !== 'groove'){ pluckNow(ev, size); return; }
+  if (Math.abs(ev.delta) >= 1500) PEND.snare.push({step:CLK.step, delta:ev.delta}); if (ev.isNew) PEND.bell.push({step:CLK.step});
+  for (const k of ['snare','bell']) if (PEND[k].length > 8) PEND[k].shift();
+}
+function fresh(list){ const lim = CLK.step - 16; while (list.length && list[0].step < lim) list.shift(); }
+const hatK = () => clamp(Math.round(Math.log2(1 + W.times.length/5) * 2), 1, 11);
+let lastKickTxt = '--';
+function playDrums(s, t, sd){
+  fresh(PEND.kick); fresh(PEND.snare); const kit = $('drumsPreset').value;
+  const ok = s % 2 === 0 && (s % 4 === 0 || PEND.kick.some(p => p.q.mag >= 2.5));
+  if (PEND.kick.length && ok){ let bi = 0; PEND.kick.forEach((p,i) => { if (p.q.mag > PEND.kick[bi].q.mag) bi = i; }); const q = PEND.kick.splice(bi, 1)[0].q;
+    lastKickTxt = 'M' + q.mag.toFixed(1) + ', ' + q.depth.toFixed(0) + ' km'; kick(t, clamp(0.35 + q.mag*0.12, 0.3, 1), q.depth, q.lon/180, kit, s); }
+  else if ($('floor').checked && s % 4 === 0 && !PEND.kick.length) kick(t, 0.45, 20, 0, kit, s);
+  if ((s === 4 || s === 12) && PEND.snare.length){ const e = PEND.snare.shift(); snare(t, clamp(0.5 + Math.log10(Math.abs(e.delta))*0.1, 0.5, 1), kit, s); }
+  const pat = euclid(hatK(), 16); if (pat[s]) hat(t, (s % 4 === 0 ? 0.55 : 0.35) + Math.random()*0.1, kit, s, false); else if (s === 14 && hatK() > 7) hat(t, 0.4, kit, s, true);
+}
+function kick(t, vel, depth, pan, kit, s){
+  hit('kick', s, vel, t); duck(t); midi(9, 36, vel, t, 0.1); if (!internal()) return;
+  const ctx = A.ctx, g = ctx.createGain(), o = ctx.createOscillator(), len = kit === '808' ? 0.35 + depth/400 + vel*0.4 : 0.12 + depth/1500;
+  o.frequency.setValueAtTime(kit === '808' ? 140 : 180, t); o.frequency.exponentialRampToValueAtTime(kit === '808' ? 42 : 60, t + 0.09); o.connect(g); o.start(t); o.stop(t + len + 0.05); env(g, t, 0.002, 0.95*vel, 0.01, len);
+  if (kit === 'minimal'){ const n = noiseSrc(t, 0.02), hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 3000; const ng = ctx.createGain(); ng.gain.value = 0.3*vel; n.connect(hp); hp.connect(ng); ng.connect(g); }
+  panTo(g, pan*0.6, A.strips.drums.input);
+}
+function snare(t, vel, kit, s){
+  hit('snare', s, vel, t); midi(9, 38, vel, t, 0.1); if (!internal()) return;
+  const ctx = A.ctx, g = ctx.createGain(), n = noiseSrc(t, 0.3), bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = kit === '808' ? 1800 : 3500; bp.Q.value = 0.8; n.connect(bp); bp.connect(g);
+  if (kit === '808'){ const o = ctx.createOscillator(); o.type = 'triangle'; o.frequency.setValueAtTime(220, t); o.frequency.exponentialRampToValueAtTime(160, t + 0.08); const og = ctx.createGain(); og.gain.value = 0.5; o.connect(og); og.connect(g); o.start(t); o.stop(t + 0.2); }
+  env(g, t, 0.002, 0.5*vel, 0.01, kit === '808' ? 0.2 : 0.09); g.connect(A.strips.drums.input);
+}
+function hat(t, vel, kit, s, open){
+  hit('hat', s, vel, t); midi(9, open ? 46 : 42, vel, t, 0.05); if (!internal()) return;
+  const ctx = A.ctx, g = ctx.createGain(), n = noiseSrc(t, 0.4), hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = kit === '808' ? 7500 : 9500;
+  n.connect(hp); hp.connect(g); env(g, t, 0.001, 0.22*vel, 0.005, open ? 0.25 : (kit === '808' ? 0.045 : 0.02)); panTo(g, (Math.random()-0.5)*0.5, A.strips.drums.input);
+}
+let fxRiserBar = -1, fxLog = '';
+function playFx(s, t, sd){
+  const sun = SUN.cur, lf = sun ? xrAt(sun.t) : -6.5; XR.cur = lf;
+  if (internal()) A.shGain.gain.setTargetAtTime(clamp((lf + 7.5)/3.5, 0, 1) * 0.12, t, 0.3);
+  const ci = classIdx(lf);
+  if (s === 0 && ci > XR.prevClass && ci >= 2 && CLK.step - XR.lastFlareAt > 64){ XR.lastFlareAt = CLK.step; riser(t, 16*sd); fxRiserBar = Math.floor(CLK.step/16) + 1; fxLog = flareClass(lf) + ' flare'; label(fxLog, 7000, -Math.PI/2, 'xr'); }
+  if (s === 0) XR.prevClass = ci;
+  if (s === 0 && Math.floor(CLK.step/16) === fxRiserBar){ impact(t, 0.9); fxRiserBar = -1; }
+  fresh(PEND.impact); if (s === 0 && PEND.impact.length){ const q = PEND.impact.shift().q; impact(t, clamp(0.5 + (q.mag-5)*0.2, 0.5, 1)); fxLog = 'M' + q.mag.toFixed(1) + ' impact'; }
+  fresh(PEND.bell); if (s % 2 === 0 && PEND.bell.length){ PEND.bell.shift(); bell(t, snap(84 + keyRoot(), true)); fxLog = 'new page bell'; }
+  if (WX.rain > 0 && Math.random() < clamp(WX.rain/2, 0.05, 0.5)) droplet(t + Math.random()*sd*0.3);
+}
+function riser(t, len){ hit('fx', 0, 0.9, t); midi(4, 48, 0.8, t, len); if (!internal()) return;
+  const ctx = A.ctx, n = noiseSrc(t, len + 0.1), bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 4; bp.frequency.setValueAtTime(300, t); bp.frequency.exponentialRampToValueAtTime(9000, t + len);
+  const g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.35, t + len*0.98); g.gain.linearRampToValueAtTime(0, t + len + 0.05); n.connect(bp); bp.connect(g); g.connect(A.strips.fx.input); }
+function impact(t, vel){ hit('fx', 0, vel, t); duck(t); midi(4, 36, vel, t, 1); if (!internal()) return;
+  const ctx = A.ctx, o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.setValueAtTime(90, t); o.frequency.exponentialRampToValueAtTime(28, t + 1.2); o.connect(g); o.start(t); o.stop(t + 2.6);
+  const n = noiseSrc(t, 2.5), lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.setValueAtTime(5000, t); lp.frequency.exponentialRampToValueAtTime(200, t + 2); const ng = ctx.createGain(); ng.gain.value = 0.5; n.connect(lp); lp.connect(ng); ng.connect(g);
+  env(g, t, 0.003, 0.8*vel, 0.05, 2.4); g.connect(A.strips.fx.input); }
+function bell(t, note){ hit('fx', 0, 0.5, t); midi(4, note, 0.6, t, 1.5); if (!internal()) return;
+  const ctx = A.ctx, f = mtof(note); [1, 2.76, 5.4].forEach((r, i) => { const o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.value = f*r/2; o.connect(g); o.start(t); o.stop(t + 3); env(g, t, 0.004, 0.12/(i+1), 0.01, 2.8); g.connect(A.strips.fx.input); }); }
+function droplet(t){ if (!internal()) return; const ctx = A.ctx, o = ctx.createOscillator(), g = ctx.createGain(), f = 1500 + Math.random()*2500;
+  o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f*1.6, t + 0.03); o.connect(g); o.start(t); o.stop(t + 0.08); env(g, t, 0.001, 0.05, 0.002, 0.05); panTo(g, Math.random()*2-1, A.strips.pads.input); }
+
+/* =========================================================
+   TECHNO: steady four-on-the-floor, the data turns the knobs
+   ========================================================= */
+const TSTYLE = {
+  acid:{n:'Acid', bpm:130, note:'A squelchy 303 line leads. Solar wind speed turns the filter knob, density adds resonance and accents, a southward field adds grit.'},
+  minimal:{n:'Minimal', bpm:124, note:'Dry and tight: short kick, clicks and pitched blips. Wikipedia edits add small percussion, the solar wind shifts the blip pattern.'},
+  hard:{n:'Hard', bpm:140, note:'Berlin style: distorted kick with a rumbling tail. A southward solar field means more distortion, quakes add metal hits.'},
+  melodic:{n:'Melodic', bpm:122, note:'Big pads from the weather and a 16th arpeggio through the chords. The solar wind opens the arpeggio filter.'}
+};
+let TSTY = 'acid';
+const TK = {sec:'intro', secBar:0, secLen:16, flare:false, fill:false, punch:0, impact:false, recentQ:[], pat:null, patKey:'', dist:-1, prevNote:null, forced:null, metal:false};
+function distCurve(k){ const n = 1024, c = new Float32Array(n), a = 1 + k*40; for (let i = 0; i < n; i++){ const x = i/(n-1)*2 - 1; c[i] = Math.tanh(a*x) / Math.tanh(a); } return c; }
+function setTempo(v){ $('bpm').value = v; $('bpm').dispatchEvent(new Event('input')); }
+document.querySelectorAll('[data-tstyle]').forEach(b => b.onclick = () => { TSTY = b.dataset.tstyle; document.querySelectorAll('[data-tstyle]').forEach(x => x.setAttribute('aria-pressed', x === b)); $('technoNote').textContent = TSTYLE[TSTY].note; setTempo(TSTYLE[TSTY].bpm); TK.patKey = ''; if (A.running && MODE === 'techno') label(TSTYLE[TSTY].n.toLowerCase() + ' techno', 300, Math.PI, 'mode', 9); });
+document.querySelectorAll('[data-sec]').forEach(b => b.onclick = () => { TK.forced = b.dataset.sec; });
+$('technoNote').textContent = TSTYLE.acid.note;
+function technoReset(){ TK.sec = 'intro'; TK.secBar = -1; TK.secLen = 16; TK.flare = false; TK.fill = false; TK.patKey = ''; TK.prevNote = null; }
+function technoEnergy(){
+  const s = SUN.cur, now = nowS(); TK.recentQ = TK.recentQ.filter(t => now - t < 30);
+  const sun = s ? sunNorm(s) : 0.5, south = s ? clamp(-s.bz/10, 0, 1) : 0;
+  return clamp(0.35*sun + 0.25*clamp(W.times.length/60, 0, 1) + 0.25*clamp(TK.recentQ.length/6, 0, 1) + 0.15*clamp((XR.cur + 7.5)/3.5, 0, 1) + 0.1*south, 0, 1);
+}
+function technoQuake(q){ TK.recentQ.push(nowS()); TK.punch = Math.max(TK.punch, clamp(q.mag/6, 0, 1)); lastKickTxt = 'M' + q.mag.toFixed(1) + ', ' + q.depth.toFixed(0) + ' km'; if (q.mag >= 5) TK.impact = true; if (TSTY === 'hard' && q.mag >= 2) TK.metal = true; }
+function technoWiki(ev, size){ if (Math.abs(ev.delta) >= 1500) TK.fill = true; if (ev.isNew) PEND.bell.push({step:CLK.step}); if (TSTY === 'minimal') TK.click = true; }
+function enterSection(nx, len, t, sd){
+  TK.sec = nx; TK.secLen = len; TK.secBar = 0;
+  label('→ ' + nx, 300, Math.PI, 'mode', 9);
+  if (nx === 'build') riser(t, len*16*sd);
+  if (nx === 'drop') impact(t, 0.85);
+}
+function nextSection(t, sd){
+  const e = technoEnergy(), cur = TK.sec;
+  if (TK.forced){ const f = TK.forced; TK.forced = null; return enterSection(f, f === 'drop' ? 32 : f === 'build' ? 8 : 16, t, sd); }
+  if (TK.flare){ TK.flare = false; return cur === 'build' ? enterSection('drop', 32, t, sd) : enterSection('build', 8, t, sd); }
+  if (cur === 'intro') return enterSection('build', e > 0.5 ? 8 : 16, t, sd);
+  if (cur === 'build') return enterSection('drop', 32, t, sd);
+  if (cur === 'drop') return e > 0.62 ? enterSection('drop', 16, t, sd) : enterSection('breakdown', 16, t, sd);
+  return enterSection('build', e > 0.5 ? 8 : 16, t, sd);
+}
+// a 16-step pattern written by the data: the same numbers always give the same riff
+function seeded(n){ let x = (n|0) || 1; return () => { x ^= x << 13; x ^= x >> 17; x ^= x << 5; return ((x >>> 0) % 10000) / 10000; }; }
+function technoPattern(){
+  const sun = SUN.cur; if (!sun) return null;
+  const key = TSTY + Math.round(sun.speed/12) + '_' + Math.round(sun.dens) + '_' + (sun.bz < -2 ? 's' : 'n') + H.key + keyRoot();
+  if (key === TK.patKey && TK.pat) return TK.pat;
+  const rnd = seeded(Math.round(sun.speed)*7919 + Math.round(sun.dens*10)*104729 + keyRoot()*31), iv = H.iv, dens = sun.dens, south = sun.bz < -2;
+  const degs = south ? [0,0,1,2,0,4,1,0] : [0,0,0,2,4,0,6,3];
+  const pat = [];
+  for (let i = 0; i < 16; i++){
+    const on = i % 4 === 0 ? rnd() < 0.9 : rnd() < 0.35 + clamp(dens/30, 0, 0.4);
+    const d = degs[Math.floor(rnd()*degs.length)] % iv.length;
+    pat.push({on, iv:iv[d], oct:rnd() < 0.18 ? 12 : 0, acc:rnd() < 0.2 + clamp(dens/25, 0, 0.5), slide:rnd() < 0.22});
+  }
+  TK.pat = pat; TK.patKey = key; return pat;
+}
+function tKick(t, s){
+  const ctx = A.ctx, punch = TK.punch, hard = TSTY === 'hard', min = TSTY === 'minimal';
+  const vel = 0.8 + punch*0.2, len = min ? 0.16 : hard ? 0.42 : 0.3 + punch*0.25;
+  hit('kick', s, vel, t); duck(t); midi(9, 36, vel, t, 0.1);
+  if (!internal()) return;
+  const g = ctx.createGain(), o = ctx.createOscillator();
+  o.frequency.setValueAtTime(hard ? 190 : min ? 160 : 150, t); o.frequency.exponentialRampToValueAtTime(hard ? 48 : 44, t + (min ? 0.05 : 0.08));
+  o.connect(g); o.start(t); o.stop(t + len + 0.05); env(g, t, 0.001, vel, 0.01, len);
+  const n = noiseSrc(t, 0.015), hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 2500; const ng = ctx.createGain(); ng.gain.value = min ? 0.5 : 0.25; n.connect(hp); hp.connect(ng); ng.connect(g);
+  g.connect(hard ? A.kickShaper : A.strips.drums.input);
+}
+function tRumble(t, sd){
+  // the dark tail after the kick that hard and acid techno lean on
+  if (!internal()) return; const ctx = A.ctx, hard = TSTY === 'hard', f = mtof(28 + keyRoot() + (hard ? 0 : 12));
+  const o = ctx.createOscillator(), lp = ctx.createBiquadFilter(), g = ctx.createGain(); o.type = 'sawtooth'; o.frequency.value = f; lp.type = 'lowpass'; lp.frequency.value = hard ? 180 : 140;
+  o.connect(lp); lp.connect(g); o.start(t); o.stop(t + sd*2); env(g, t, 0.01, hard ? 0.38 : 0.22, sd*0.8, sd*0.9);
+  g.connect(hard ? A.kickShaper : A.strips.bass.input);
+}
+function tBass(t, s, sd, note, len){
+  hit('bass', s, 0.7, t); midi(0, note, 0.7, t, len); SCORE.notes.push({t:futureT(t), m:note, kind:'bass'}); bassLast = note;
+  if (!internal()) return; const ctx = A.ctx, o = ctx.createOscillator(), lp = ctx.createBiquadFilter(), g = ctx.createGain();
+  o.type = TSTY === 'minimal' ? 'square' : 'sawtooth'; o.frequency.value = mtof(note); lp.type = 'lowpass'; lp.Q.value = 3;
+  lp.frequency.setValueAtTime(900, t); lp.frequency.exponentialRampToValueAtTime(150, t + len);
+  o.connect(lp); lp.connect(g); o.start(t); o.stop(t + len + 0.1); env(g, t, 0.003, 0.32, len*0.6, len*0.4); g.connect(A.strips.bass.input);
+}
+function tAcid(t, s, sd, step, secMul){
+  const sun = SUN.cur, ctx = A.ctx, a = A.acid, note = 36 + keyRoot() + step.iv + step.oct + (TSTY === 'hard' ? 0 : 12);
+  const base = (120 + Math.pow(sunNorm(sun), 1.4) * 2600) * secMul, envAmt = step.acc ? base*3.2 : base*1.6;
+  const q = 5 + clamp(sun.dens/15, 0, 1)*17, peak = step.acc ? 0.34 : 0.24, gl = TK.prevNote != null && step.slide;
+  hit('mel', s, step.acc ? 1 : 0.6, t); midi(2, note, step.acc ? 1 : 0.7, t, sd); SCORE.notes.push({t:futureT(t), m:note, kind:'mel'}); melLast = note;
+  TK.cut = base; TK.res = q;
+  if (!internal()) return;
+  a.lp.Q.setValueAtTime(q, t);
+  if (gl) a.osc.frequency.linearRampToValueAtTime(mtof(note), t + sd*0.6); else a.osc.frequency.setValueAtTime(mtof(note), t);
+  a.lp.frequency.cancelScheduledValues(t); a.lp.frequency.setValueAtTime(Math.min(16000, base + envAmt), t); a.lp.frequency.setTargetAtTime(base, t + 0.005, step.acc ? 0.06 : 0.12);
+  a.amp.gain.cancelScheduledValues(t); a.amp.gain.setTargetAtTime(peak, t, 0.003);
+  if (!step.slide) a.amp.gain.setTargetAtTime(0, t + sd*0.7, 0.012);
+  TK.prevNote = note;
+}
+function tBlip(t, s, step){
+  const note = 72 + keyRoot() + step.iv + step.oct; hit('mel', s, 0.6, t); midi(2, note, 0.6, t, 0.05); SCORE.notes.push({t:futureT(t), m:note, kind:'mel'}); melLast = note;
+  if (!internal()) return; const ctx = A.ctx, o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.value = mtof(note);
+  o.connect(g); o.start(t); o.stop(t + 0.15); env(g, t, 0.001, 0.2, 0.005, 0.07); panTo(g, (Math.random()-0.5)*0.8, A.strips.mel.input);
+}
+function tArp(t, s, sd, secMul){
+  const sun = SUN.cur, ct = H.style === 'chords' ? H.tones.slice(0,3) : [0,7,12], seq = [0,1,2,1,0,2,1,2], idx = seq[s % 8], up = s >= 8 ? 12 : 0;
+  const note = 60 + keyRoot() + (ct[idx] % 12) + up; hit('mel', s, 0.55, t); midi(2, note, 0.6, t, sd); SCORE.notes.push({t:futureT(t), m:note, kind:'mel'}); melLast = note;
+  if (!internal()) return; const ctx = A.ctx, o = ctx.createOscillator(), o2 = ctx.createOscillator(), lp = ctx.createBiquadFilter(), g = ctx.createGain();
+  o.type = 'sawtooth'; o2.type = 'sawtooth'; o.frequency.value = mtof(note); o2.frequency.value = mtof(note); o2.detune.value = 9;
+  lp.type = 'lowpass'; lp.frequency.value = (500 + sunNorm(sun)*4500) * secMul; lp.Q.value = 2;
+  o.connect(lp); o2.connect(lp); lp.connect(g); o.start(t); o2.start(t); o.stop(t + 0.5); o2.stop(t + 0.5); env(g, t, 0.003, 0.09, 0.02, 0.28); panTo(g, (idx - 1)*0.4, A.strips.mel.input);
+}
+function technoStep(s, t, sd, bar){
+  if (s === 0){
+    TK.secBar++; if (TK.secBar >= TK.secLen || TK.forced) nextSection(t, sd);
+    const ci = classIdx(XR.cur); if (ci > XR.prevClass && ci >= 2 && CLK.step - XR.lastFlareAt > 64){ XR.lastFlareAt = CLK.step; TK.flare = true; fxLog = flareClass(XR.cur) + ' flare → build and drop'; label(flareClass(XR.cur) + ' flare', 7000, -Math.PI/2, 'xr', 9); } XR.prevClass = ci;
+    const sun = SUN.cur, d = TSTY === 'hard' ? 0.55 + (sun ? clamp(-sun.bz/10, 0, 1)*0.45 : 0) : TSTY === 'acid' ? 0.08 + (sun ? clamp(-sun.bz/10, 0, 1)*0.5 : 0) : 0;
+    if (Math.abs(d - TK.dist) > 0.04){ TK.dist = d; A.acidShaper.curve = distCurve(d); A.kickShaper.curve = distCurve(Math.max(0.3, d)); }
+    if (TK.impact){ TK.impact = false; impact(t, 0.8); fxLog = 'M5+ quake impact'; }
+    TK.punch *= 0.75;
+  }
+  if (internal()) A.shGain.gain.setTargetAtTime(clamp((XR.cur + 7.5)/3.5, 0, 1) * 0.1, t, 0.3);
+  const sec = TK.sec, st = TSTY, lastBar = TK.secBar === TK.secLen - 1, prog = TK.secLen > 1 ? TK.secBar / (TK.secLen - 1) : 1;
+  const kickOn = sec !== 'breakdown' && !(sec === 'build' && lastBar && s >= 8) && !(sec === 'intro' && TK.secBar < 2);
+  const secMul = sec === 'drop' ? 1 : sec === 'build' ? 0.35 + prog*0.65 : sec === 'intro' ? 0.35 : 0.25;
+  const kit = st === 'minimal' ? 'minimal' : '808';
+  // kick + rumble
+  if (s % 4 === 0 && kickOn) tKick(t, s);
+  if ((st === 'hard' || st === 'acid') && s % 4 === 2 && kickOn && sec !== 'intro') tRumble(t, sd);
+  // hats: offbeat open hat, 16ths thicken with the Wikipedia edit rate
+  if (sec !== 'breakdown' || st === 'melodic'){
+    if (s % 4 === 2 && st !== 'minimal' && (sec === 'drop' || sec === 'build')) hat(t, 0.55, kit, s, true);
+    const p = clamp(W.times.length/50, 0.12, 0.9) * (sec === 'drop' ? 1 : 0.5);
+    if (s % 4 !== 0 && Math.random() < p) hat(t, s % 2 ? 0.28 : 0.4, kit, s, false);
+  }
+  // clap on 2 and 4
+  if ((s === 4 || s === 12) && (sec === 'drop' || (sec === 'build' && prog > 0.4))) snare(t, 0.7, st === 'hard' ? '808' : 'minimal', s);
+  // snare roll: end of every build, and after a big Wikipedia edit at the end of a phrase
+  if ((sec === 'build' && lastBar && s >= 8) || (TK.fill && bar % 4 === 3 && s >= 8)){ if (s % (s >= 12 ? 1 : 2) === 0) snare(t, 0.35 + (s - 8)/14, 'minimal', s); if (s === 15) TK.fill = false; }
+  // minimal: clicks from new edits, hard: metal hits from quakes
+  if (TK.click && s % 2 === 1){ TK.click = false; hat(t, 0.5, 'minimal', s, false); }
+  if (TK.metal && s % 4 === 3){ TK.metal = false; if (internal()){ const n = noiseSrc(t, 0.3), bp = A.ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2400 + Math.random()*2000; bp.Q.value = 18; const g = A.ctx.createGain(); n.connect(bp); bp.connect(g); env(g, t, 0.001, 0.6, 0.01, 0.25); g.connect(A.kickShaper); } hit('snare', s, 0.8, t); }
+  // bass
+  const root = 36 + keyRoot() + (st === 'melodic' && H.style === 'chords' ? H.tones[0] % 12 : 0);
+  const bassOn = sec === 'drop' || (sec === 'build' && prog > 0.25) || (sec === 'intro' && TK.secBar >= 8);
+  if (bassOn){
+    if (st === 'melodic'){ if (s % 4 !== 0) tBass(t, s, sd, root, sd*0.8); }
+    else if (st === 'minimal'){ if (s === 3 || s === 10) tBass(t, s, sd, root, sd*1.5); }
+    else if (st === 'acid'){ if (s % 4 === 2) tBass(t, s, sd, root, sd*1.6); }
+  }
+  // lead
+  const leadOn = sec !== 'intro' || TK.secBar >= 4;
+  if (leadOn){
+    if (st === 'acid' || st === 'hard'){ const pat = technoPattern(); if (pat && pat[s].on && (st === 'acid' || sec !== 'intro')) tAcid(t, s, sd, pat[s], secMul); else if (!pat || !pat[s].on){ A.acid.amp.gain.setTargetAtTime(0, t, 0.01); TK.prevNote = null; } }
+    else if (st === 'minimal'){ const pat = technoPattern(); if (pat && pat[s].on && s % 2 === 1 && Math.random() < 0.8) tBlip(t, s, pat[s]); }
+    else if (st === 'melodic' && sec !== 'intro') tArp(t, s, sd, secMul);
+  }
+  // effects: new-page bells
+  fresh(PEND.bell); if (s % 4 === 0 && PEND.bell.length){ PEND.bell.shift(); bell(t, snap(84 + keyRoot(), true)); fxLog = 'new page bell'; }
+}
+function technoReadouts(s){
+  const e = technoEnergy();
+  $('tkSec').textContent = TK.sec + ' · bar ' + (Math.max(0, TK.secBar) + 1) + ' of ' + TK.secLen + (TK.flare ? ' · flare: drop coming' : '') + (TK.forced ? ' · next: ' + TK.forced : '');
+  $('tkEnergy').style.width = Math.round(e*100) + '%'; $('tkEnergyV').textContent = Math.round(e*100) + '%';
+  const st = TSTY, south = s.bz < -2;
+  $('flowBass').innerHTML = st === 'acid' ? 'rolling offbeat bass on ' + NOTE[keyRoot()] + '\nkick rumble <em>·</em> section ' + TK.sec : st === 'hard' ? 'kick rumble through distortion\n<em>Bz</em> ' + fmtBz(s.bz) + ' <em>→</em> ' + (south ? 'more distortion' : 'normal drive') : st === 'minimal' ? 'two short bass notes per bar\n<em>dry, no rumble</em>' : 'rolling 16th bass following the chord root\n' + (H.style === 'chords' ? 'chord ' + H.name : NOTE[keyRoot()] + ' drone');
+  $('flowMel').innerHTML = (st === 'acid' || st === 'hard') ? 'wind ' + s.speed.toFixed(0) + ' km/s <em>→</em> acid filter ' + Math.round(TK.cut || 0) + ' Hz\ndensity ' + s.dens.toFixed(1) + ' <em>→</em> resonance ' + (TK.res || 0).toFixed(0) + ' and accents <em>·</em> riff rewritten as the wind changes' : st === 'minimal' ? 'wind ' + s.speed.toFixed(0) + ' km/s <em>→</em> blip pattern\n<em>the same numbers always give the same riff</em>' : 'wind ' + s.speed.toFixed(0) + ' km/s <em>→</em> arpeggio brightness\n16ths through the chord tones';
+  $('flowDrums').innerHTML = 'kick every beat, quake ' + lastKickTxt + ' <em>→</em> punch\n' + W.times.length + ' edits/min <em>→</em> hat density <em>·</em> big edits <em>→</em> snare rolls';
+  $('flowPads').innerHTML = st === 'melodic' ? 'clouds ' + WX.cloud + '% <em>→</em> pad brightness <em>·</em> wind <em>→</em> tremolo\nchords change every ' + $('chordBars').value + ' bars' : '<em>pads are only used in Melodic techno</em>';
+  $('flowFx').innerHTML = 'data energy ' + Math.round(e*100) + '% <em>→</em> ' + (e > 0.62 ? 'stays in the drop' : 'heads to a breakdown') + '\n' + (fxLog || 'a solar flare forces a build and a drop');
+}
+
+/* =========================================================
+   RAW + TUNED: no grid, the data plays the moment it changes
+   ========================================================= */
+const MODE_NOTES = {
+  raw:'<b>Raw</b>: the data exactly as measured. No beat grid, no scale: pitches follow the numbers continuously and every quake or edit sounds the instant it happens.',
+  tuned:'<b>Tuned</b>: same timing as Raw, but every pitch snaps to the scale below, so it stays musical while you still hear each event as it happens.',
+  techno:'<b>Techno</b>: the beat never stops. The data does not play the drums, it turns the knobs like a DJ: filters, layers, energy, and when the drop hits.',
+  groove:'<b>Groove</b>: a tempo grid. Events wait for the next 16th note, quakes become kicks, edits become hats and snares, and the solar wind plays bass and melody.'
+};
+let droneM = null, therM = null, pseudoBar = 0, lastHarmT = 0, contPrevClass = -1, lastPluck = 0, therInfo = '', droneInfo = '';
+function setMode(m){
+  MODE = m; droneM = null; therM = null; melLast = null;
+  document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === m));
+  $('modeNote').innerHTML = MODE_NOTES[m];
+  $('technoGroup').hidden = m !== 'techno';
+  const setSwing = v => { $('swing').value = v; $('swing').dispatchEvent(new Event('input')); };
+  if (m === 'techno'){ setTempo(TSTYLE[TSTY].bpm); setSwing(0.04); } else if (m === 'groove'){ setTempo(92); setSwing(0.18); }
+  if (A.running){
+    clearInterval(CLK.timer);
+    if (m === 'groove' || m === 'techno'){ CLK.next = A.ctx.currentTime + 0.08; CLK.step = 0; H.set = false; technoReset(); CLK.timer = setInterval(scheduler, 25); }
+    silenceContinuous();
+    label(m === 'raw' ? 'raw data' : m === 'tuned' ? 'tuned · ' + NOTE[keyRoot()] + ' ' + SCALES[currentKey()].n : m === 'techno' ? TSTYLE[TSTY].n.toLowerCase() + ' techno · ' + Math.round(bpm()) + ' bpm' : 'groove · ' + Math.round(bpm()) + ' bpm', 300, Math.PI, 'mode', 9);
+  }
+}
+document.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => setMode(b.dataset.mode));
+function silenceContinuous(){ if (!A.drone) return; const t = A.ctx.currentTime; A.acid.amp.gain.cancelScheduledValues(t); A.acid.amp.gain.setTargetAtTime(0, t, 0.05); A.drone.amp.gain.setTargetAtTime(0, t, 0.2); A.ther.amp.gain.setTargetAtTime(0, t, 0.2); A.bed.amp.gain.setTargetAtTime(0, t, 0.2); }
+function updateContinuous(){
+  if (!A.running || MODE === 'groove' || MODE === 'techno' || !A.drone || !SUN.cur) return;
+  const t = A.ctx.currentTime, s = SUN.cur, tuned = MODE === 'tuned', on = internal();
+  // harmony keeps moving without a grid: one "chord change" per chord length at the current tempo
+  if (nowS() - lastHarmT > +$('chordBars').value * 16 * stepDur()){ lastHarmT = nowS(); updateHarmony(pseudoBar); renderHarmony(H.style === 'chords' ? H.idx : -1); pseudoBar += +$('chordBars').value; }
+  // bass: solar drone, pitch = wind speed
+  const rawB = 36 + sunNorm(s)*24; let mB = rawB;
+  if (tuned){ if (droneM == null || Math.abs(rawB - droneM) > 0.75) droneM = snap(rawB, false); mB = droneM; }
+  const d = A.drone, south = clamp(-s.bz/12, 0, 1);
+  d.oscs.forEach((o,i) => { o.frequency.setTargetAtTime(mtof(mB + o.semi), t, tuned ? 0.015 : 0.08); o.detune.setTargetAtTime(i === 1 ? 4 + south*40 : 0, t, 0.3); });
+  d.lp.frequency.setTargetAtTime(220 * Math.pow(18, clamp(Math.log1p(s.dens)/Math.log1p(30), 0, 1)), t, 0.2);
+  d.lfo.frequency.setTargetAtTime(0.2 + south*6, t, 0.3); d.lfoAmt.gain.setTargetAtTime(0.04 + south*0.35, t, 0.3);
+  d.amp.gain.setTargetAtTime(on ? 0.16 : 0, t, 0.3); bassLast = mB; droneInfo = mtof(mB).toFixed(0) + ' Hz';
+  // melody: glide tone, pitch = melody source
+  const v = melValue(), rawM = 62 + v*24; let mM = rawM;
+  if (tuned){ if (therM == null || Math.abs(rawM - therM) > 0.75) therM = snap(rawM, false); mM = therM; }
+  A.ther.o.frequency.setTargetAtTime(mtof(mM), t, tuned ? 0.02 : 0.1); A.ther.o2.frequency.setTargetAtTime(mtof(mM), t, tuned ? 0.02 : 0.1);
+  A.ther.amp.gain.setTargetAtTime(on ? 0.06 : 0, t, 0.3); melLast = mM; therInfo = mtof(mM).toFixed(0) + ' Hz';
+  // pads: the weather as air, wind = loudness and flutter, clouds = muffled
+  A.bed.lp.frequency.setTargetAtTime(lerp(5000, 500, clamp(WX.cloud/100, 0, 1)), t, 0.5);
+  A.bed.amp.gain.setTargetAtTime(on ? 0.015 + clamp(WX.wind/50, 0, 1)*0.07 : 0, t, 0.5);
+  A.padLfo.frequency.setTargetAtTime(0.15 + WX.wind/8, t, 0.5); A.padLfoAmt.gain.setTargetAtTime(clamp(WX.wind/45, 0.03, 0.45), t, 0.5);
+  if (WX.rain > 0 && Math.random() < clamp(WX.rain/4, 0.02, 0.25)) droplet(t + Math.random()*0.1);
+  // effects: x-ray shimmer, a chime when the flare class goes up
+  const lf = xrAt(s.t); XR.cur = lf; if (on) A.shGain.gain.setTargetAtTime(clamp((lf + 7.5)/3.5, 0, 1) * 0.12, t, 0.3);
+  const ci = classIdx(lf); if (contPrevClass >= 0 && ci > contPrevClass && ci >= 2){ fxLog = flareClass(lf) + ' flare'; label(fxLog, 7000, -Math.PI/2, 'xr', 9); bell(t, tuned ? snap(84 + keyRoot(), true) : 84 + keyRoot()); } contPrevClass = ci;
+}
+function boomNow(q){
+  const ctx = A.ctx, t = ctx.currentTime, m = clamp(q.mag, 0, 8), dur = 0.5 + m*0.45 + q.depth/250, peak = clamp(0.06 + m*0.09, 0.05, 0.9);
+  let midi = 64 - m*4; if (MODE === 'tuned') midi = snap(midi, true);
+  lastKickTxt = 'M' + q.mag.toFixed(1) + ', ' + q.depth.toFixed(0) + ' km'; hit('kick', 0, clamp(0.35 + m*0.12, 0.3, 1), t); midi9(36, clamp(0.35 + m*0.12, 0.3, 1), t);
+  if (q.mag >= 5){ impact(t, clamp(0.5 + (q.mag-5)*0.2, 0.5, 1)); fxLog = 'M' + q.mag.toFixed(1) + ' impact'; }
+  if (!internal()) return;
+  const f0 = mtof(midi), g = ctx.createGain(), o = ctx.createOscillator();
+  o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(Math.max(28, f0/3), t + dur*0.6); o.connect(g); o.start(t); o.stop(t + dur + 0.05);
+  const n = noiseSrc(t, 1), lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 300 + m*250; const ng = ctx.createGain(); ng.gain.setValueAtTime(peak*0.5, t); ng.gain.exponentialRampToValueAtTime(0.0001, t + Math.min(1, dur*0.4)); n.connect(lp); lp.connect(ng); ng.connect(g);
+  env(g, t, 0.01, peak, 0.01, dur); panTo(g, q.lon/180, A.strips.drums.input);
+}
+const midi9 = (n, v, t) => midi(9, n, v, t, 0.1);
+function pluckNow(ev, size){
+  const now = performance.now(); if (now - lastPluck < 125) return; lastPluck = now;
+  const ctx = A.ctx, t = ctx.currentTime; let m = lerp(90, 52, clamp(size/4, 0, 1)); if (MODE === 'tuned') m = snap(m, false);
+  const vel = clamp(0.05 + size*0.06, 0.04, 0.3); hit('hat', 0, vel*3, t); midi(9, Math.round(m), vel, t, 0.1);
+  if (ev.isNew){ bell(t, MODE === 'tuned' ? snap(84 + keyRoot(), true) : 84 + keyRoot()); fxLog = 'new page bell'; }
+  if (!internal()) return;
+  const g = ctx.createGain(), o = ctx.createOscillator(), lp = ctx.createBiquadFilter(), add = ev.delta >= 0;
+  o.type = add ? 'triangle' : 'sine'; o.frequency.value = mtof(m); lp.type = 'lowpass'; lp.frequency.value = add ? 5000 : 900;
+  o.connect(lp); lp.connect(g); o.start(t); o.stop(t + 1.2); env(g, t, 0.004, vel, 0.01, 0.25 + vel*2); panTo(g, (Math.random()-0.5)*1.2, A.strips.drums.input);
+}
+
+/* =========================================================
+   UI wiring
+   ========================================================= */
+const LEDS = {}; PARTS.forEach(pp => LEDS[pp] = document.querySelector('#part-'+pp+' .ph i'));
+const STRIP_DEF = {bass:[0.75,0.55,0,0.05], pads:[0.5,0.8,0.2,0.5], mel:[0.5,0.85,0.3,0.35], drums:[0.8,1,0.05,0.1], fx:[0.5,1,0.35,0.7]};
+for (const p of PARTS){
+  const [lv, tone, echo, space] = STRIP_DEF[p], el = document.querySelector('.pc[data-part="'+p+'"]');
+  document.querySelector('[data-lvl="'+p+'"]').innerHTML = '<label for="'+p+'Lvl">level</label><input id="'+p+'Lvl" type="range" min="0" max="1" step="0.01" value="'+lv+'">';
+  el.innerHTML = [['Tone','tone',tone],['Echo','echo',echo],['Space','space',space]].map(([id, nm, v]) => '<label for="'+p+id+'">'+nm+'<input id="'+p+id+'" type="range" min="0" max="1" step="0.01" value="'+v+'"></label>').join('');
+  $(p+'Lvl').oninput = refreshLevels;
+  $(p+'Tone').oninput = () => { if (A.ctx) A.strips[p].filter.frequency.setTargetAtTime(toneHz(+$(p+'Tone').value), A.ctx.currentTime, 0.03); };
+  $(p+'Echo').oninput = () => { if (A.ctx) A.strips[p].echo.gain.setTargetAtTime(+$(p+'Echo').value, A.ctx.currentTime, 0.03); };
+  $(p+'Space').oninput = () => { if (A.ctx) A.strips[p].space.gain.setTargetAtTime(+$(p+'Space').value, A.ctx.currentTime, 0.03); };
+}
+function toggleMute(p){ A.muted[p] = !A.muted[p]; document.querySelector('[data-mute="'+p+'"]').setAttribute('aria-pressed', A.muted[p]); $('part-'+p).classList.toggle('muted-part', A.muted[p]); refreshLevels(); }
+function toggleSolo(p){ A.solo.has(p) ? A.solo.delete(p) : A.solo.add(p); PARTS.forEach(k => { document.querySelector('[data-solo="'+k+'"]').setAttribute('aria-pressed', A.solo.has(k)); $('part-'+k).classList.toggle('muted-part', A.muted[k] || (A.solo.size > 0 && !A.solo.has(k))); }); refreshLevels(); }
+document.querySelectorAll('[data-mute]').forEach(b => b.onclick = () => toggleMute(b.dataset.mute));
+document.querySelectorAll('[data-solo]').forEach(b => b.onclick = () => toggleSolo(b.dataset.solo));
+const show = (id, fmt) => { const f = () => $(id+'V').textContent = fmt(+$(id).value); $(id).addEventListener('input', f); f(); };
+show('bpm', () => Math.round(bpm())); show('swing', v => Math.round(v*100) + '%'); show('speed', () => speed() + '×');
+show('sunSweep', v => v + ' s'); show('quakeDur', v => v + ' s'); show('quakeMin', v => v.toFixed(1)); show('issOrbit', v => v + ' s');
+show('duck', v => Math.round(v*100) + '%'); show('echoFb', v => Math.round(v*100) + '%'); show('revAmt', v => Math.round(v*100) + '%');
+$('kpTempo').onchange = () => $('bpmV').textContent = Math.round(bpm());
+$('masterVol').oninput = e => { if (A.ctx) A.master.gain.setTargetAtTime(+e.target.value, A.ctx.currentTime, 0.05); };
+$('echoFb').addEventListener('input', e => { if (A.ctx) A.dlyFb.gain.setTargetAtTime(+e.target.value, A.ctx.currentTime, 0.05); });
+$('revAmt').addEventListener('input', e => { if (A.ctx) A.revRet.gain.setTargetAtTime(+e.target.value, A.ctx.currentTime, 0.05); });
+$('quakeMode').onchange = () => { Q.lastPos = 0; };
+$('wikiSel').onchange = () => { W.times = []; };
+$('melSrc').onchange = () => { $('melSrcTxt').textContent = $('melSrc').value === 'iss' ? 'ISS orbit' : 'solar wind'; };
+function playScaleRun(){
+  if (!A.ctx) initAudio(); A.ctx.resume();
+  const key = $('scaleSel').value === 'auto' ? (SUN.cur ? LADDER[ladderFor(SUN.cur.bz)] : 'ionian') : $('scaleSel').value, iv = SCALES[key].iv, r = 60 + keyRoot();
+  const seq = iv.map(x => r + x).concat([r + 12]); const full = seq.concat(seq.slice(0, -1).reverse());
+  const t0 = A.ctx.currentTime + 0.05, d = 0.16;
+  full.forEach((m, i) => { const t = t0 + i*d, g = A.ctx.createGain(), o = A.ctx.createOscillator(); o.type = 'triangle'; o.frequency.value = mtof(m);
+    o.connect(g); o.start(t); o.stop(t + 0.6); env(g, t, 0.005, 0.22, 0.02, 0.4); g.connect(A.strips.mel.input); midi(2, m, 0.7, t, d); hit('mel', 0, 0.8, t); });
+  const dr = A.ctx.createGain(), o = A.ctx.createOscillator(); o.frequency.value = mtof(r - 12); o.connect(dr); o.start(t0); o.stop(t0 + full.length*d + 1); env(dr, t0, 0.2, 0.12, full.length*d, 0.8); dr.connect(A.strips.bass.input);
+}
+function scaleChanged(){ H.set = false; melLast = null; const v = $('scaleSel').value; $('scaleNote').textContent = SCALE_NOTES[v] || (SCALES[v] && SCALES[v].s === 'drone' ? 'Played as a melody over a drone (root and fifth), the way this music is traditionally built.' : 'Chords are built from the notes of this scale.'); renderHarmony(-1); }
+['keySel','scaleSel','chordBars'].forEach(id => $(id).addEventListener('change', scaleChanged));
+$('hearScale').onclick = playScaleRun;
+$('scaleSel').addEventListener('change', () => { if (A.running) playScaleRun(); });
+
+function start(){
+  if (!A.ctx) initAudio(); A.ctx.resume(); A.running = true;
+  CLK.next = A.ctx.currentTime + 0.08; CLK.step = 0; H.set = false; melLast = null; for (const k in PEND) PEND[k] = [];
+  clearInterval(CLK.timer); if (MODE === 'groove' || MODE === 'techno'){ technoReset(); CLK.timer = setInterval(scheduler, 25); }
+  $('startBtn').textContent = 'Stop'; $('startBtn').classList.add('on'); $('stageHint').hidden = true;
+}
+function stop(){
+  A.running = false; clearInterval(CLK.timer); setTimeout(() => { if (!A.running && A.ctx) A.ctx.suspend(); }, 2500);
+  if (A.shGain) A.shGain.gain.setTargetAtTime(0, A.ctx.currentTime, 0.2); silenceContinuous();
+  $('startBtn').textContent = 'Start'; $('startBtn').classList.remove('on'); if (A.rec && A.rec.state === 'recording') toggleRec();
+}
+$('startBtn').onclick = () => A.running ? stop() : start();
+function toggleRec(){
+  if (!A.ctx) start(); if (A.rec && A.rec.state === 'recording'){ A.rec.stop(); return; }
+  A.chunks = []; try{ A.rec = new MediaRecorder(A.dest.stream); } catch(e){ $('recLink').textContent = 'Recording is not supported here.'; return; }
+  A.rec.ondataavailable = e => e.data.size && A.chunks.push(e.data);
+  A.rec.onstop = () => { const blob = new Blob(A.chunks, {type:A.rec.mimeType || 'audio/webm'}), a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+    a.download = 'planet-pulse-' + new Date().toISOString().slice(0,19).replace(/:/g,'') + ((A.rec.mimeType||'').includes('mp4') ? '.m4a' : '.webm'); a.textContent = 'download recording (' + (blob.size/1e6).toFixed(1) + ' MB)';
+    $('recLink').innerHTML = ''; $('recLink').append(a); $('recBtn').textContent = 'Record'; $('recBtn').classList.remove('on'); };
+  A.rec.start(); $('recBtn').textContent = 'Stop recording'; $('recBtn').classList.add('on'); $('recLink').textContent = 'recording';
+}
+$('recBtn').onclick = toggleRec;
+const VIEWS = ['data','spectrum','orbit','score'];
+let view = 'data';
+function setView(v){ view = v; document.querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-pressed', b.dataset.view === v)); $('stage').classList.toggle('paper', v === 'score'); SPEC.reset = true; }
+document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => setView(b.dataset.view));
+function nudgeSpeed(d){ const el = $('speed'); el.value = clamp(+el.value + d, 0, 6); el.dispatchEvent(new Event('input')); }
+document.addEventListener('keydown', e => {
+  if (e.target.matches('input,select')) return;
+  if (e.code === 'Space'){ e.preventDefault(); A.running ? stop() : start(); }
+  const digit = e.code.startsWith('Digit') ? +e.code.slice(5) : 0;
+  if (digit >= 1 && digit <= 5){ e.shiftKey ? toggleSolo(PARTS[digit-1]) : toggleMute(PARTS[digit-1]); }
+  if (e.key === 'r' || e.key === 'R') toggleRec();
+  if (e.key === 't' || e.key === 'T') setMode('techno');
+  if (e.key === 'z' || e.key === 'Z') setMode('raw'); if (e.key === 'x' || e.key === 'X') setMode('tuned'); if (e.key === 'c' || e.key === 'C') setMode('groove');
+  if (e.key === 'v' || e.key === 'V') setView(VIEWS[(VIEWS.indexOf(view) + 1) % VIEWS.length]);
+  if (e.key === '+' || e.key === '=') nudgeSpeed(1); if (e.key === '-') nudgeSpeed(-1);
+});
+
+/* =========================================================
+   STAGE VIEWS
+   ========================================================= */
+const stageCv = $('stageCv'), overCv = $('stageOver');
+const SPEC = {scroll:0, reset:true};
+function fitCv(cv){ const dpr = window.devicePixelRatio || 1, r = cv.getBoundingClientRect(), w = Math.round(r.width*dpr), h = Math.round(r.height*dpr); let changed = false;
+  if (cv.width !== w || cv.height !== h){ cv.width = w; cv.height = h; changed = true; } return {g:cv.getContext('2d'), dpr, w:r.width, h:r.height, changed}; }
+const INK = '#e6e3dc', DIM = '#8b8e98', LINE = '#272b35', AMB = '#f2ad5e';
+
+// DATA: the raw measurements
+function drawData(){
+  const {g, dpr, w, h} = fitCv(stageCv); g.setTransform(dpr,0,0,dpr,0,0); g.fillStyle = '#07080b'; g.fillRect(0,0,w,h);
+  const split = w > 700 ? w*0.56 : w, top = 70;
+  drawSunChart(g, 14, top, split - 28, h - top - 58);
+  if (w > 700){ const rw = w - split - 20, rh = h - top - 58, qh = Math.round(rh*0.44);
+    drawQuakeMap(g, split + 6, top, rw, qh);
+    drawWeather(g, split + 6, top + qh + 30, rw, rh - qh - 30); }
+  clearOver();
+}
+// Salzburg weather, last 24 hours: four small multiples on one shared time axis (no dual axes),
+// each with its current value and the musical rule it drives, and the rule's thresholds drawn in.
+const STAGE_MOUSE = {x:null, y:null};
+stageCv.addEventListener('mousemove', e => { const r = stageCv.getBoundingClientRect(); STAGE_MOUSE.x = e.clientX - r.left; STAGE_MOUSE.y = e.clientY - r.top; });
+stageCv.addEventListener('mouseleave', () => { STAGE_MOUSE.x = null; });
+function drawWeather(g, x0, y0, w, h){
+  const H = WX.hist || [], blue = PCOL.pads;
+  g.font = '11px IBM Plex Mono, monospace'; g.textBaseline = 'alphabetic'; g.textAlign = 'left'; g.fillStyle = DIM;
+  g.fillText('SALZBURG WEATHER, LAST 24 HOURS', x0, y0 - 10); g.textAlign = 'right'; g.fillText('drives the PADS', x0 + w, y0 - 10); g.textAlign = 'left';
+  g.strokeStyle = LINE; g.lineWidth = 1; g.strokeRect(x0, y0, w, h);
+  if (H.length < 2){ g.fillStyle = DIM; g.fillText('waiting for weather data', x0 + 10, y0 + 20); return; }
+  const labW = 118, effW = w > 470 ? 128 : 0, px0 = x0 + labW, pw = w - labW - effW - 10, axisH = 16, rh = (h - axisH - 6) / 4;
+  const X = i => px0 + i/(H.length - 1)*pw;
+  let hov = null; if (STAGE_MOUSE.x != null && STAGE_MOUSE.x >= px0 && STAGE_MOUSE.x <= px0 + pw && STAGE_MOUSE.y >= y0 && STAGE_MOUSE.y <= y0 + h) hov = Math.round((STAGE_MOUSE.x - px0)/pw*(H.length - 1));
+  const cur = H[H.length - 1], at = k => hov != null ? H[hov][k] : cur[k];
+  const temps = H.map(d => d.temp), tLo = Math.min(...temps, 15) - 1, tHi = Math.max(...temps, 15) + 1;
+  const wMax = Math.max(25, ...H.map(d => d.wind)) * 1.1, rMax = Math.max(1.5, ...H.map(d => d.rain));
+  const rows = [
+    {name:'Temperature', val:at('temp').toFixed(1) + '°C', key:'temp', lo:tLo, hi:tHi, kind:'line', refs:[[15, '15°C']], eff:at('temp') >= 15 ? '7th chords' : 'plain triads'},
+    {name:'Cloud cover', val:Math.round(at('cloud')) + '%', key:'cloud', lo:0, hi:100, kind:'area', refs:[[30, '30'], [70, '70']], eff:at('cloud') > 70 ? 'dark filter' : at('cloud') > 30 ? 'mellow filter' : 'bright filter'},
+    {name:'Wind', val:Math.round(at('wind')) + ' km/h', key:'wind', lo:0, hi:wMax, kind:'line', refs:[], eff:'tremolo ' + (0.15 + at('wind')/8).toFixed(1) + ' Hz'},
+    {name:'Rain', val:(+at('rain')).toFixed(1) + ' mm', key:'rain', lo:0, hi:rMax, kind:'bars', refs:[], eff:at('rain') > 0 ? 'droplets on' : 'no droplets'}
+  ];
+  rows.forEach((r, ri) => {
+    const ry = y0 + 4 + ri*rh, top = ry + 5, bot = ry + rh - 5, Y = v => bot - clamp((v - r.lo)/(r.hi - r.lo), 0, 1)*(bot - top);
+    if (ri) { g.strokeStyle = 'rgba(39,43,53,0.7)'; g.beginPath(); g.moveTo(x0 + 6, ry); g.lineTo(x0 + w - 6, ry); g.stroke(); }
+    // label + current value in text ink, never in the series colour
+    g.textBaseline = 'middle'; g.fillStyle = DIM; g.font = '11px IBM Plex Sans, sans-serif'; g.fillText(r.name, x0 + 10, ry + rh*0.32);
+    g.fillStyle = INK; g.font = '500 13px IBM Plex Mono, monospace'; g.fillText(r.val, x0 + 10, ry + rh*0.7);
+    // threshold reference lines = the musical rule's boundaries
+    g.setLineDash([3, 3]); g.strokeStyle = 'rgba(139,142,152,0.55)'; g.lineWidth = 1;
+    for (const [v, lb] of r.refs){ if (v <= r.lo || v >= r.hi) continue; const y = Y(v); g.beginPath(); g.moveTo(px0, y); g.lineTo(px0 + pw, y); g.stroke(); g.fillStyle = DIM; g.font = '10px IBM Plex Mono, monospace'; g.textBaseline = 'bottom'; g.fillText(lb, px0 + 2, y - 1); g.textBaseline = 'middle'; }
+    g.setLineDash([]);
+    // the series
+    if (r.kind === 'bars'){ const bw = Math.max(2, pw/H.length - 2); g.fillStyle = blue;
+      H.forEach((d, i) => { const v = d[r.key]; if (v <= 0) return; const y = Y(v); g.fillRect(X(i) - bw/2, y, bw, bot - y); });
+      g.strokeStyle = 'rgba(139,142,152,0.4)'; g.beginPath(); g.moveTo(px0, bot); g.lineTo(px0 + pw, bot); g.stroke(); }
+    else {
+      if (r.kind === 'area'){ g.beginPath(); g.moveTo(X(0), bot); H.forEach((d, i) => g.lineTo(X(i), Y(d[r.key]))); g.lineTo(X(H.length - 1), bot); g.closePath(); g.fillStyle = rgba(blue, 0.18); g.fill(); }
+      g.beginPath(); H.forEach((d, i) => i ? g.lineTo(X(i), Y(d[r.key])) : g.moveTo(X(i), Y(d[r.key]))); g.strokeStyle = blue; g.lineWidth = 2; g.lineJoin = 'round'; g.stroke();
+    }
+    // now dot (with a surface ring) and the hovered point
+    const di = hov != null ? hov : H.length - 1, dv = H[di][r.key];
+    g.fillStyle = '#07080b'; g.beginPath(); g.arc(X(di), Y(dv), 5, 0, 7); g.fill(); g.fillStyle = blue; g.beginPath(); g.arc(X(di), Y(dv), 3.5, 0, 7); g.fill();
+    // the musical effect it produces right now
+    if (effW){ g.fillStyle = INK; g.font = '12px IBM Plex Sans, sans-serif'; g.fillText('→ ' + r.eff, x0 + w - effW + 6, ry + rh/2); }
+  });
+  // shared time axis
+  g.textBaseline = 'alphabetic'; g.fillStyle = DIM; g.font = '10px IBM Plex Mono, monospace';
+  const ay = y0 + h - 5; g.textAlign = 'left'; g.fillText(H[0].t, px0, ay); g.textAlign = 'center'; g.fillText(H[Math.floor((H.length - 1)/2)].t, X(Math.floor((H.length - 1)/2)), ay); g.textAlign = 'right'; g.fillText('now', px0 + pw, ay); g.textAlign = 'left';
+  // crosshair
+  if (hov != null){ g.strokeStyle = 'rgba(230,227,220,0.5)'; g.beginPath(); g.moveTo(X(hov), y0 + 2); g.lineTo(X(hov), y0 + h - axisH); g.stroke();
+    g.fillStyle = INK; g.textAlign = X(hov) > px0 + pw - 60 ? 'right' : 'left'; g.fillText(H[hov].t + (H[hov].now ? ' (now)' : ''), X(hov) + (g.textAlign === 'right' ? -4 : 4), y0 + 12); g.textAlign = 'left'; }
+  if (WX.sim){ g.fillStyle = DIM; g.textAlign = 'right'; g.fillText('simulated', x0 + w - 6, ay); g.textAlign = 'left'; }
+}
+function drawSunChart(g, x0, y0, w, h){
+  const Hh = SUN.hist; if (Hh.length < 2) return;
+  const X = i => x0 + i/(Hh.length-1)*w, ys = v => y0 + h - clamp((v - SUN.lo + 40)/(SUN.hi - SUN.lo + 80), 0, 1)*h;
+  const yd = v => y0 + h - clamp(Math.log1p(v)/Math.log1p(30), 0, 1)*h, yx = lf => y0 + h - clamp((lf+8)/4, 0, 1)*h;
+  g.font = '11px IBM Plex Mono, monospace'; g.textBaseline = 'alphabetic';
+  g.strokeStyle = LINE; g.lineWidth = 1; g.strokeRect(x0, y0, w, h);
+  Hh.forEach((r,i) => { if (r.bz < -1){ g.fillStyle = 'rgba(143,168,214,0.35)'; g.fillRect(X(i)-1, y0+h, 2, -clamp(-r.bz/15,0,1)*h*0.35); } });
+  if (XR.hist.length){ g.beginPath(); Hh.forEach((r,i) => { const y = yx(xrAt(r.t)); i ? g.lineTo(X(i), y) : g.moveTo(X(i), y); }); g.strokeStyle = 'rgba(171,151,217,0.85)'; g.lineWidth = 1.2; g.stroke(); }
+  g.beginPath(); Hh.forEach((r,i) => i ? g.lineTo(X(i), yd(r.dens)) : g.moveTo(X(i), yd(r.dens))); g.strokeStyle = 'rgba(127,191,174,0.8)'; g.lineWidth = 1.2; g.stroke();
+  g.beginPath(); Hh.forEach((r,i) => i ? g.lineTo(X(i), ys(r.speed)) : g.moveTo(X(i), ys(r.speed))); g.strokeStyle = AMB; g.lineWidth = 2; g.stroke();
+  const p = $('sunMode').value === 'live' ? 1 : SUN.pos, px = x0 + p*w;
+  g.strokeStyle = INK; g.lineWidth = 1; g.beginPath(); g.moveTo(px, y0); g.lineTo(px, y0+h); g.stroke();
+  if (SUN.cur){ g.fillStyle = AMB; g.beginPath(); g.arc(px, ys(SUN.cur.speed), 4, 0, 7); g.fill(); g.fillStyle = INK; g.textAlign = px > x0 + w - 150 ? 'right' : 'left'; g.fillText(SUN.cur.speed.toFixed(0) + ' km/s · ' + SUN.cur.t.toISOString().slice(11,16) + ' UTC', px + (g.textAlign === 'right' ? -8 : 8), y0 + 14); }
+  g.textAlign = 'left'; g.fillStyle = DIM; g.fillText('SOLAR WIND, LAST 2 HOURS', x0, y0 - 10);
+  g.fillStyle = AMB; g.fillText('speed', x0 + 6, y0 + h - 8); g.fillStyle = 'rgba(127,191,174,1)'; g.fillText('density', x0 + 56, y0 + h - 8); g.fillStyle = 'rgba(171,151,217,1)'; g.fillText('x-ray', x0 + 122, y0 + h - 8); g.fillStyle = 'rgba(143,168,214,1)'; g.fillText('Bz south', x0 + 172, y0 + h - 8);
+}
+function drawQuakeMap(g, x0, y0, w, h){
+  const X = lon => x0 + (lon+180)/360*w, Y = lat => y0 + (90-lat)/180*h;
+  g.strokeStyle = LINE; g.lineWidth = 1; g.strokeRect(x0, y0, w, h);
+  for (let lon = -120; lon <= 120; lon += 60){ g.beginPath(); g.moveTo(X(lon), y0); g.lineTo(X(lon), y0+h); g.stroke(); }
+  for (let lat = -60; lat <= 60; lat += 30){ g.beginPath(); g.moveTo(x0, Y(lat)); g.lineTo(x0+w, Y(lat)); g.stroke(); }
+  g.fillStyle = DIM; g.font = '11px IBM Plex Mono, monospace'; g.fillText('EARTHQUAKES, LAST 24 HOURS', x0, y0 - 10);
+  const min = +$('quakeMin').value;
+  for (const q of Q.list){ if (q.mag < min) continue; g.fillStyle = 'rgba(217,138,143,0.28)'; g.beginPath(); g.arc(X(q.lon), Y(q.lat), 1 + Math.max(0,q.mag)*1.3, 0, 7); g.fill(); }
+  const now = performance.now(); Q.flashes = Q.flashes.filter(f => now - f.at < 2500);
+  for (const f of Q.flashes){ const k = (now - f.at)/2500, r = 3 + Math.max(0,f.q.mag)*3 + k*30; g.strokeStyle = 'rgba(217,138,143,' + (1-k) + ')'; g.lineWidth = 2; g.beginPath(); g.arc(X(f.q.lon), Y(f.q.lat), r, 0, 7); g.stroke(); }
+  if (ISS.have && $('melSrc').value === 'iss'){ const lat = issLat(); g.fillStyle = PCOL.mel; g.beginPath(); g.arc(X(ISS.lon || 0), Y(lat), 4, 0, 7); g.fill(); g.fillText('ISS', X(ISS.lon||0) + 6, Y(lat) + 4); }
+  if ($('quakeMode').value === 'replay'){ g.fillStyle = 'rgba(217,138,143,1)'; g.fillRect(x0, y0 + h - 2, Q.lastPos*w, 2); }
+}
+function clearOver(){ const {g} = fitCv(overCv); g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,overCv.width,overCv.height); }
+
+// SPECTRUM: what the speakers are playing, with each event labelled on its own sound
+const PAL = (() => { const p = [], stops = [[0,[7,8,11]],[0.35,[70,38,14]],[0.7,[242,173,94]],[1,[255,246,230]]];
+  for (let i = 0; i < 256; i++){ const v = i/255; let a = stops[0], b = stops[1]; for (let k = 1; k < stops.length; k++) if (v <= stops[k][0]){ a = stops[k-1]; b = stops[k]; break; } const t = (v - a[0])/(b[0]-a[0] || 1); p.push(a[1].map((c,j) => Math.round(lerp(c, b[1][j], t)))); } return p; })();
+const F_MIN = 30, F_MAX = 12000, yOfF = (f, H) => H * (1 - Math.log(clamp(f,F_MIN,F_MAX)/F_MIN) / Math.log(F_MAX/F_MIN));
+function drawSpectrum(){
+  const {g, dpr, changed} = fitCv(stageCv), W = stageCv.width, Hh = stageCv.height; g.setTransform(1,0,0,1,0,0);
+  if (changed || SPEC.reset){ g.fillStyle = '#07080b'; g.fillRect(0,0,W,Hh); SPEC.reset = false; }
+  const px = Math.max(1, Math.round(2*dpr)); g.globalCompositeOperation = 'copy'; g.drawImage(stageCv, -px, 0); g.globalCompositeOperation = 'source-over'; SPEC.scroll += px;
+  const col = g.createImageData(px, Hh);
+  if (A.fft && A.running){ const bins = new Uint8Array(A.fft.frequencyBinCount); A.fft.getByteFrequencyData(bins); const nyq = A.ctx.sampleRate/2;
+    for (let y = 0; y < Hh; y++){ const f = F_MIN * Math.pow(F_MAX/F_MIN, 1 - y/Hh), v = bins[Math.min(bins.length-1, Math.round(f/nyq*bins.length))], c = PAL[Math.round(Math.pow(v/255, 2.1)*255)];
+      for (let x = 0; x < px; x++){ const o = (y*px + x)*4; col.data[o] = c[0]; col.data[o+1] = c[1]; col.data[o+2] = c[2]; col.data[o+3] = 255; } } }
+  else for (let i = 0; i < col.data.length; i += 4){ col.data[i] = 7; col.data[i+1] = 8; col.data[i+2] = 11; col.data[i+3] = 255; }
+  g.putImageData(col, W - px, 0);
+  const o = fitCv(overCv), og = o.g, w = o.w, h = o.h; og.setTransform(o.dpr,0,0,o.dpr,0,0); og.clearRect(0,0,w,h);
+  const scrim = og.createLinearGradient(0, h - 70, 0, h); scrim.addColorStop(0, 'rgba(7,8,11,0)'); scrim.addColorStop(1, 'rgba(7,8,11,0.85)'); og.fillStyle = scrim; og.fillRect(0, h - 70, w, 70);
+  og.fillStyle = 'rgba(7,8,11,0.55)'; og.fillRect(0, 0, 60, h);
+  og.font = '11px IBM Plex Mono, monospace'; og.textBaseline = 'middle'; og.fillStyle = 'rgba(230,227,220,0.55)';
+  for (const f of [100,200,500,1000,2000,5000]){ const y = yOfF(f, h); og.fillText(f >= 1000 ? f/1000 + ' kHz' : f + ' Hz', 8, y); }
+  const placed = [];
+  for (const L of LABELS){ const x = w - (SPEC.scroll - L.scroll)/o.dpr; if (x < 66) continue; let y = yOfF(L.f, h); const wl = og.measureText(L.text).width + 10;
+    for (let k = 0; k < 12 && placed.some(p => Math.abs(p.y - y) < 13 && x < p.x + p.w && p.x < x + wl); k++) y -= 13;
+    placed.push({x, y, w:wl}); og.fillStyle = L.kind === 'quake' || L.kind === 'xr' ? AMB : 'rgba(230,227,220,0.88)'; og.fillRect(x, y-3, 1, 6); og.fillText(L.text, x + 5, y); }
+}
+
+// ORBIT: one coloured ring per layer, each drawn from that layer's own sound
+const ORB = {rot:{}, waves:[], sparks:[], env:{}};
+const RINGS = [['bass','Bass','solar wind',0.42,0.45],['pads','Pads','Salzburg weather',0.62,2.5],['mel','Melody','solar wind / ISS',0.82,1.6],['drums','Drums','quakes + Wikipedia',1.02,0.9],['fx','Effects','flares, big events',1.22,2.0]];
+const rgba = (hex, a) => { const n = parseInt(hex.slice(1), 16); return 'rgba(' + (n>>16) + ',' + ((n>>8)&255) + ',' + (n&255) + ',' + a + ')'; };
+function drawOrbit(dt){
+  const {g, dpr, w, h} = fitCv(stageCv); g.setTransform(dpr,0,0,dpr,0,0);
+  g.fillStyle = 'rgba(7,8,11,0.28)'; g.fillRect(0,0,w,h);
+  const cx = w > 760 ? w*0.56 : w/2, cy = h/2 + 10, R = Math.min(w*0.8, h) * 0.33, s = SUN.cur, n = s ? sunNorm(s) : 0.5;
+  // centre glow = x-ray flux, in the effects colour
+  const lv = clamp((XR.cur + 7.6)/3.6, 0, 1), grd = g.createRadialGradient(cx, cy, 0, cx, cy, R*0.4);
+  grd.addColorStop(0, rgba(PCOL.fx, 0.08 + lv*0.35)); grd.addColorStop(1, rgba(PCOL.fx, 0)); g.fillStyle = grd; g.beginPath(); g.arc(cx, cy, R*0.4, 0, 7); g.fill();
+  const N = 360;
+  for (const [p, name, src, rf, boost] of RINGS){
+    const st = A.strips && A.strips[p], on = A.running && st && level(p) > 0;
+    let rms = 0;
+    if (on){ st.an.getFloatTimeDomainData(st.buf); for (let i = 0; i < st.buf.length; i += 4) rms += st.buf[i]*st.buf[i]; rms = Math.sqrt(rms / (st.buf.length/4)); }
+    ORB.env[p] = Math.max(rms, (ORB.env[p] || 0) * 0.9);
+    ORB.rot[p] = (ORB.rot[p] || Math.random()*6) + dt * (0.04 + rf*0.06) * (p === 'mel' || p === 'bass' ? 0.6 + n : 1) * (rf*10 % 2 ? 1 : -1);
+    const r0 = R*rf, glow = clamp(ORB.env[p]*6, 0, 1), col = PCOL[p];
+    g.beginPath();
+    for (let i = 0; i <= N; i++){
+      const a = i/N*Math.PI*2 + ORB.rot[p], wv = on ? st.buf[Math.floor(i/N*(st.buf.length-1))] : 0;
+      const r = r0 + clamp(wv*R*0.45*boost, -R*0.09, R*0.09);
+      const x = cx + Math.cos(a)*r, y = cy + Math.sin(a)*r; i ? g.lineTo(x,y) : g.moveTo(x,y);
+    }
+    g.strokeStyle = rgba(col, on ? 0.35 + glow*0.65 : 0.15); g.lineWidth = 1.2 + glow*2.2;
+    g.shadowColor = col; g.shadowBlur = glow*14; g.stroke(); g.shadowBlur = 0;
+    // ring name, sitting at the top-right of its own ring
+    const la = -Math.PI/2 + 0.55, lx = cx + Math.cos(la)*(r0 + 6), ly = cy + Math.sin(la)*(r0 + 6);
+    g.font = '600 11px Geist, IBM Plex Sans, sans-serif'; g.fillStyle = rgba(col, on ? 0.95 : 0.4); g.textBaseline = 'middle'; g.textAlign = 'left'; g.fillText(name.toUpperCase(), lx + 4, ly);
+  }
+  // events: quakes ripple out from the drums ring at their longitude, Wikipedia edits spark off it
+  const t = nowS(), Rd = R*1.02;
+  for (const L of LABELS){ if (L.orb) continue; L.orb = true; if (t - L.born > 1) continue;
+    if (L.kind === 'quake') ORB.waves.push({a:L.ang - Math.PI/2, born:t, mag:L.mag ?? 3, text:L.text}); if (L.kind === 'wiki') ORB.sparks.push({a:L.ang, born:t, text:L.text}); }
+  ORB.waves = ORB.waves.filter(q => t - q.born < 4); ORB.sparks = ORB.sparks.filter(q => t - q.born < 4);
+  g.font = '11px Geist Mono, IBM Plex Mono, monospace';
+  for (const q of ORB.waves){ const k = (t - q.born)/4, x = cx + Math.cos(q.a)*Rd, y = cy + Math.sin(q.a)*Rd;
+    g.strokeStyle = rgba(PCOL.drums, 1-k); g.lineWidth = 1.5; g.beginPath(); g.arc(x, y, 4 + k*(18 + q.mag*14), 0, 7); g.stroke();
+    if (k < 0.7){ g.fillStyle = rgba(PCOL.drums, 1 - k/0.7); g.textAlign = Math.cos(q.a) < 0 ? 'right' : 'left'; g.fillText(q.text, x + Math.cos(q.a)*(26 + q.mag*8), y + Math.sin(q.a)*(26 + q.mag*8)); } }
+  for (const q of ORB.sparks){ const k = (t - q.born)/4, r = Rd + 10 + k*R*0.5, x = cx + Math.cos(q.a)*r, y = cy + Math.sin(q.a)*r;
+    g.fillStyle = rgba(INK, 1-k); g.beginPath(); g.arc(x, y, 2, 0, 7); g.fill(); }
+  g.textAlign = 'left';
+  // legend: what each colour is
+  if (w > 520){ let y = 60; g.textBaseline = 'middle';
+    for (const [p, name, src] of RINGS){ const on = A.running && level(p) > 0;
+      g.fillStyle = rgba(PCOL[p], on ? 1 : 0.35); g.beginPath(); g.arc(22, y, 5, 0, 7); g.fill();
+      g.font = '600 13px Geist, IBM Plex Sans, sans-serif'; g.fillText(name, 34, y);
+      g.font = '12px Geist, IBM Plex Sans, sans-serif'; g.fillStyle = on ? 'rgba(230,227,220,0.6)' : 'rgba(230,227,220,0.3)'; g.fillText(src, 104, y);
+      y += 22; }
+    g.font = '12px Geist, IBM Plex Sans, sans-serif'; g.fillStyle = 'rgba(230,227,220,0.5)';
+    g.fillText('each ring is the live waveform of one layer', 16, y + 8);
+    g.fillText('centre glow = x-ray flux · ripples = earthquakes', 16, y + 26); }
+  clearOver();
+}
+
+// SCORE: a graphic score written by the data
+function drawScore(){
+  const {g, dpr, w, h} = fitCv(stageCv); g.setTransform(dpr,0,0,dpr,0,0);
+  const t = nowS(), pps = 70, nowX = w*0.8, X = tt => nowX - (t - tt)*pps, ink = '#15161a', dim = '#6c6f77', red = '#c23b2e';
+  g.fillStyle = '#e6e7e9'; g.fillRect(0,0,w,h);
+  const top = 58, bottom = h - 44, lanes = ['SOLAR WIND','X-RAY FLUX','EARTHQUAKES','WIKIPEDIA'], lh = (bottom - top)/lanes.length, left = 110;
+  g.font = 'italic 12px IBM Plex Mono, monospace'; g.fillStyle = ink; g.textBaseline = 'middle';
+  g.fillText('♩ = ' + Math.round(bpm()) + ' · ' + NOTE[keyRoot()] + ' ' + SCALES[H.key].n.toLowerCase() + (H.style === 'drone' ? ' · over a drone' : ''), w - 16 - g.measureText('♩ = 000 · D maqam bayati · over a drone').width, 22);
+  g.font = '11px IBM Plex Mono, monospace';
+  lanes.forEach((nm, i) => { const y0 = top + i*lh; g.strokeStyle = 'rgba(21,22,26,0.13)'; g.lineWidth = 1;
+    for (let k = 0; k < 5; k++){ const y = y0 + lh*0.2 + k*lh*0.15; g.beginPath(); g.moveTo(left, y); g.lineTo(w - 12, y); g.stroke(); }
+    g.fillStyle = dim; g.fillText(nm, 14, y0 + lh*0.5); });
+  g.strokeStyle = red; g.beginPath(); g.moveTo(nowX, top - 8); g.lineTo(nowX, bottom); g.stroke();
+  if (SUN.cur){ g.fillStyle = red; g.textAlign = 'center'; g.fillText(SUN.cur.t.toISOString().slice(11,16) + ' UTC', nowX, top - 18); g.textAlign = 'left'; }
+  g.save(); g.beginPath(); g.rect(left, 0, w - left - 12, h); g.clip();
+  const sy = m => top + lh*0.88 - (clamp(m,30,90)-30)/60 * lh*0.76;
+  g.strokeStyle = 'rgba(21,22,26,0.35)'; g.lineCap = 'round';
+  for (let i = 1; i < SCORE.sun.length; i++){ const a = SCORE.sun[i-1], b = SCORE.sun[i]; if (b.t - a.t > 0.5) continue; g.lineWidth = 0.6 + clamp(b.dens/6, 0, 4); g.beginPath(); g.moveTo(X(a.t), sy(40 + a.n*40)); g.lineTo(X(b.t), sy(40 + b.n*40)); g.stroke(); }
+  for (const nt of SCORE.notes){ if (nt.t > t) continue; g.fillStyle = nt.kind === 'bass' ? dim : ink; g.beginPath(); g.ellipse(X(nt.t), sy(nt.m), 4.2, 3, -0.4, 0, 7); g.fill(); }
+  const xy = top + lh*1.5, th = p => 1 + clamp((p.lf + 7.6)/3.6, 0, 1) * lh*0.3;
+  if (SCORE.xr.length > 1){ g.fillStyle = 'rgba(21,22,26,0.8)'; g.beginPath(); SCORE.xr.forEach((p,i) => i ? g.lineTo(X(p.t), xy - th(p)) : g.moveTo(X(p.t), xy - th(p))); for (let i = SCORE.xr.length - 1; i >= 0; i--) g.lineTo(X(SCORE.xr[i].t), xy + th(SCORE.xr[i])); g.closePath(); g.fill(); }
+  for (const e of SCORE.quakes){ const x = X(e.t), q = e.q, y = top + lh*2.2 + clamp(q.depth/300, 0, 1)*lh*0.6, r = 1.5 + Math.max(0,q.mag)*2.2;
+    g.fillStyle = q.mag >= 5 ? red : ink; g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); if (q.mag >= 3){ g.fillStyle = dim; g.fillText('M' + q.mag.toFixed(1), x + r + 3, y - r - 2); } }
+  const wy = top + lh*3.5; g.strokeStyle = ink; g.lineWidth = 1;
+  for (const e of SCORE.wiki){ const x = X(e.t), L = 3 + e.size*lh*0.09; g.beginPath(); g.moveTo(x, wy); g.lineTo(x, e.add ? wy - L : wy + L); g.stroke(); if (e.isNew){ g.fillStyle = red; g.fillRect(x-3, wy-3, 6, 6); } }
+  g.restore(); clearOver();
+}
+function recordScore(){
+  const t = nowS(), s = SUN.cur; if (!s) return;
+  SCORE.sun.push({t, n:sunNorm(s), dens:s.dens}); SCORE.xr.push({t, lf:XR.cur});
+  const cut = t - stageCv.clientWidth/70 - 2; for (const k in SCORE) while (SCORE[k].length && SCORE[k][0].t < cut) SCORE[k].shift();
+}
+
+/* step grid + harmony readout */
+function renderHarmony(curIdx){
+  const box = $('chords'); box.innerHTML = '';
+  const auto = $('scaleSel').value === 'auto', key = H.set ? H.key : (auto && SUN.cur ? LADDER[ladderFor(SUN.cur.bz)] : currentKey()), sc = SCALES[key];
+  if (sc.s === 'chords'){ for (let i = 0; i < 4; i++){ const d = document.createElement('div'); d.className = 'chord' + (i === curIdx ? ' now' : ''); d.textContent = chordLabel(chordAt(sc.iv, i)); box.append(d); } }
+  else { const d = document.createElement('div'); d.className = 'chord now'; d.textContent = NOTE[keyRoot()] + ' drone'; box.append(d); }
+  $('mood').innerHTML = NOTE[keyRoot()] + ' ' + sc.n + (auto ? ' <span class="note">picked by the solar field' + (SUN.cur ? ' (Bz ' + fmtBz(SUN.cur.bz) + ')' : '') + '</span>' : '') + '<br><span class="note num">steps above the root: ' + sc.iv.join(' ') + (sc.s === 'drone' ? ' · melody over a drone' : ' · chords from the scale') + '</span>';
+}
+const LANES = [['fx','Effects',PCOL.fx],['pads','Pads',PCOL.pads],['mel','Melody',PCOL.mel],['bass','Bass',PCOL.bass],['hat','Hats',PCOL.drums],['snare','Snare',PCOL.drums],['kick','Kick',PCOL.drums]];
+let shownChord = null, idleKey = '';
+function drawGrid(now){
+  const {g, dpr, w, h} = fitCv($('cvGrid')); g.setTransform(dpr,0,0,dpr,0,0); g.clearRect(0,0,w,h);
+  const left = 54, top = 4, cw = (w - left - 4)/16, lh = (h - top - 4)/LANES.length;
+  let cur = null; for (const st of VIS.steps) if (st.t <= now) cur = st; VIS.steps = VIS.steps.filter(st => st.t > now - 1);
+  for (const c of VIS.chordAt) if (c.t <= now && c !== shownChord){ shownChord = c; renderHarmony(c.idx); }
+  VIS.chordAt = VIS.chordAt.filter(c => c.t > now || c === shownChord);
+  g.font = '11px IBM Plex Sans, sans-serif'; g.textBaseline = 'middle';
+  LANES.forEach(([k, nm], li) => { const y = top + li*lh; g.fillStyle = DIM; g.fillText(nm, 4, y + lh/2); for (let s = 0; s < 16; s++){ g.fillStyle = s % 4 === 0 ? '#22252e' : '#17191f'; g.fillRect(left + s*cw + 1, y + 1.5, cw - 2, lh - 3); } });
+  for (const ht of VIS.hits){ if (ht.t > now) continue; const age = now - ht.t; if (age > 2.5) continue; const li = LANES.findIndex(l => l[0] === ht.lane); if (li < 0) continue;
+    g.globalAlpha = clamp(1 - age/2.5, 0, 1) * clamp(ht.vel + 0.2, 0.3, 1); g.fillStyle = LANES[li][2]; g.fillRect(left + ht.s*cw + 1, top + li*lh + 1.5, cw - 2, lh - 3); }
+  g.globalAlpha = 1;
+  if (MODE === 'raw' || MODE === 'tuned'){ g.fillStyle = 'rgba(14,15,19,0.78)'; g.fillRect(left, 0, w - left, h); g.fillStyle = INK; g.textAlign = 'center'; g.fillText('No beat grid in ' + (MODE === 'raw' ? 'Raw' : 'Tuned') + ': events play the instant they happen', left + (w-left)/2, h/2); g.textAlign = 'left'; $('barBeat').textContent = MODE === 'raw' ? 'free time · raw data' : 'free time · pitches tuned to ' + NOTE[keyRoot()] + ' ' + SCALES[H.set ? H.key : currentKey()].n; return; }
+  if (cur && A.running){ g.strokeStyle = INK; g.lineWidth = 1.5; g.strokeRect(left + cur.s*cw + 1, top, cw - 2, h - top - 3); $('barBeat').textContent = (MODE === 'techno' ? TSTYLE[TSTY].n + ' techno · ' + TK.sec + ' bar ' + (TK.secBar + 1) + ' of ' + TK.secLen : 'bar ' + (cur.bar + 1)) + ' · step ' + (cur.s + 1) + ' · ' + Math.round(bpm()) + ' bpm'; }
+  if (!A.running){ const k = currentKey() + keyRoot() + $('scaleSel').value; if (k !== idleKey){ idleKey = k; renderHarmony(-1); } }
+}
+
+/* readouts: one line per part, data -> sound */
+function updateReadouts(){
+  const s = SUN.cur;
+  if (s){ $('fSun').textContent = s.speed.toFixed(0) + ' km/s · ' + s.dens.toFixed(1) + ' p/cm³ · Bz ' + fmtBz(s.bz);
+    $('flowBass').innerHTML = 'density ' + s.dens.toFixed(1) + ' p/cm³ <em>→</em> ' + (s.dens < 3 ? 'whole notes' : s.dens < 7 ? 'half notes' : s.dens < 12 ? 'syncopated' : 'busy 8ths') + '\nspeed ' + s.speed.toFixed(0) + ' km/s <em>→</em> ' + (s.speed > 600 ? 'fifths + octave jumps' : s.speed > 450 ? 'root + fifths' : 'root only') + (bassLast != null ? ' <em>·</em> ' + noteName(bassLast) : ''); }
+  if (s && XR.hist.length) XR.cur = xrAt(s.t);
+  $('fKp').textContent = 'Kp ' + KP.val.toFixed(2) + (KP.val >= 5 ? ' · storm' : '');
+  $('fXr').textContent = XR.hist.length ? flareClass(XR.cur) + ' class' : '--';
+  $('fQk').textContent = Q.list.length + ' in 24 h' + (lastQuake ? ' · last M' + lastQuake.mag.toFixed(1) + ' ' + lastQuake.place : '');
+  $('fWk').textContent = W.times.length + ' edits/min' + (lastWikiTxt ? ' · ' + lastWikiTxt : '');
+  $('fWx').textContent = WX.temp.toFixed(1) + '°C · wind ' + WX.wind.toFixed(0) + ' km/h · clouds ' + WX.cloud + '%' + (WX.rain > 0 ? ' · rain' : '');
+  $('fIss').textContent = ISS.have ? (ISS.sim ? 'modelled · lat ' + issLat().toFixed(1) + '°' : 'lat ' + ISS.lat.toFixed(1) + '° · lon ' + ISS.lon.toFixed(1) + '°') : '--';
+  $('flowPads').innerHTML = 'clouds ' + WX.cloud + '% <em>→</em> ' + (WX.cloud > 70 ? 'dark filter' : WX.cloud > 30 ? 'mellow filter' : 'bright filter') + ' <em>·</em> wind ' + WX.wind.toFixed(0) + ' km/h <em>→</em> tremolo\n' + WX.temp.toFixed(1) + '°C <em>→</em> ' + (WX.temp >= 15 ? 'added 7th' : 'plain chord') + (WX.rain > 0 ? ' <em>·</em> rain <em>→</em> droplets' : '') + (KP.val >= 5 ? ' <em>·</em> storm <em>→</em> added 9th' : '');
+  melValue(); $('flowMel').innerHTML = melInfo + ' <em>→</em> pitch ' + (melLast != null ? noteName(melLast) : '--') + '\n<em>strong beats snap to the chord, a repeated value rests</em>';
+  $('flowDrums').innerHTML = 'quake ' + lastKickTxt + ' <em>→</em> kick\n' + W.times.length + ' edits/min <em>→</em> ' + hatK() + ' hats per bar <em>·</em> big edits <em>→</em> snare';
+  $('flowFx').innerHTML = 'x-ray ' + flareClass(XR.cur) + ' <em>→</em> shimmer level\n' + (fxLog ? 'last: ' + fxLog : '<em>waiting for a flare, an M5+ quake or a new page</em>');
+  if (MODE === 'techno' && s) technoReadouts(s);
+  if ((MODE === 'raw' || MODE === 'tuned') && s){
+    const tn = MODE === 'tuned' ? ' (snapped to the scale)' : ' (continuous)';
+    $('flowBass').innerHTML = 'speed ' + s.speed.toFixed(0) + ' km/s <em>→</em> drone pitch ' + (droneInfo || '--') + tn + '\ndensity ' + s.dens.toFixed(1) + ' <em>→</em> brightness <em>·</em> Bz ' + fmtBz(s.bz) + ' <em>→</em> ' + (s.bz < -1 ? 'wobble' : 'steady');
+    $('flowMel').innerHTML = melInfo + ' <em>→</em> glide tone ' + (therInfo || '--') + tn + '\n<em>the line moves exactly as the data moves</em>';
+    $('flowPads').innerHTML = 'wind ' + WX.wind.toFixed(0) + ' km/h <em>→</em> air noise + flutter <em>·</em> clouds ' + WX.cloud + '% <em>→</em> ' + (WX.cloud > 60 ? 'muffled' : 'open') + (WX.rain > 0 ? '\nrain <em>→</em> droplets' : '\n<em>no chords in ' + MODE + ' mode, just the weather as sound</em>');
+    $('flowDrums').innerHTML = 'quake ' + lastKickTxt + ' <em>→</em> boom now (bigger = lower, louder)\neach edit <em>→</em> a pluck now (bigger edit = lower note)';
+  }
+  if (A.lim){ const r = A.lim.reduction; $('limRead').textContent = r < -0.5 ? r.toFixed(1) + ' dB reduction' : 'not clipping'; }
+  $('bpmV').textContent = Math.round(bpm());
+  const sc = SCALES[H.set ? H.key : currentKey()];
+  $('cap').innerHTML = (s ? 'solar wind <b>' + s.speed.toFixed(0) + ' km/s</b> · ' + s.dens.toFixed(1) + ' p/cm³ · Bz ' + fmtBz(s.bz) + '   ' : '') + 'x-ray <b>' + flareClass(XR.cur) + '</b>   ' + (lastQuake ? 'quake <b>M' + lastQuake.mag.toFixed(1) + '</b> ' + lastQuake.place + '   ' : '') + 'wikipedia <b>' + W.times.length + '</b>/min\n' + NOTE[keyRoot()] + ' ' + sc.n + ' · ' + Math.round(bpm()) + ' bpm · data ' + speed() + '×';
+}
+
+/* =========================================================
+   MAIN LOOP
+   ========================================================= */
+let lastFrame = performance.now(), lastRead = 0, lastRec = 0;
+function frame(ms){
+  const dt = Math.min(0.25, (ms - lastFrame)/1000); lastFrame = ms;
+  if ($('sunMode').value === 'sweep' && SUN.hist.length) SUN.pos = (SUN.pos + dt * speed() / +$('sunSweep').value) % 1; else SUN.pos = 1;
+  SUN.cur = sunSample();
+  if (ISS.have) ISS.orbitPos = (ISS.orbitPos + dt * speed() / +$('issOrbit').value) % 1;
+  tickQuakes(dt);
+  if (ms - lastRec > 50){ lastRec = ms; recordScore(); updateContinuous(); }
+  if (view === 'data') drawData(); else if (view === 'spectrum') drawSpectrum(); else if (view === 'orbit') drawOrbit(dt); else drawScore();
+  drawGrid(A.ctx ? A.ctx.currentTime : 0);
+  { const at = A.ctx ? A.ctx.currentTime : 0, lit = {}; for (const h of VIS.hits){ const d = at - h.t; if (d >= 0 && d < 0.13) lit[LANE_PART[h.lane]] = 1; }
+    for (const pp of PARTS){ const cont = A.running && (MODE === 'raw' || MODE === 'tuned') && (pp === 'bass' || pp === 'mel' || pp === 'pads'); LEDS[pp].classList.toggle('on', !A.muted[pp] && !!(cont || lit[pp])); } }
+  if (ms - lastRead > 200){ lastRead = ms; updateReadouts(); }
+  requestAnimationFrame(frame);
+}
+scaleChanged(); setMode('groove');
+loadSun(); loadKp(); loadXr(); loadQuakes(true); connectWiki(); loadWx();
+loadISS().then(() => setTimeout(loadISS, 6000));
+setInterval(loadSun, 60000); setInterval(loadXr, 60000); setInterval(() => loadQuakes(false), 60000);
+setInterval(loadKp, 600000); setInterval(loadWx, 600000); setInterval(loadISS, 30000);
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

@@ -612,7 +612,7 @@ export const PLANETS=[
        {label:"Techno Mode · Orbit view",src:gh("ai-projects/sonified-data-melody-maker/05-mode-techno.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)"},
      ],
      thumbnail:gh("ai-projects/sonified-data-melody-maker/01-thumbnail.png"),
-     cta:"Try the live demo →",ctaHref:"LIVE_URL",
+     cta:"Try the live demo →",ctaHref:"/demos/planet-pulse.html",
      links:[{label:"View on GitHub",href:"GITHUB_URL"},{label:"Watch the video",href:"VIDEO_URL"}]},
   ]},
   {id:"web",label:"Web Dev",icon:"🌐",hex:"#617EE5",orbitRadius:56,orbitSpeed:.00038,startAngle:2.4,radius:.75,orbitTilt:.64,desc:"Client websites deployed for clubs, stores and hospitality.",moons:[
@@ -1265,10 +1265,10 @@ export function CaseStudy({project,onClose}){
                 <div style={{height:3,background:"rgba(255,255,255,.06)",borderRadius:2}}><div style={{height:"100%",width:`${project.devPct}%`,background:`linear-gradient(90deg,${pC}66,${pC})`,borderRadius:2}}/></div>
               </div>)}
               {project.launchDate&&<div style={{marginBottom:"1.3rem"}}><Countdown targetDate={project.launchDate} c={pC}/></div>}
-              {project.cta&&(()=>{const href=project.ctaHref||"#";const ext=href.startsWith("http");const lp=ext?{href,target:"_blank",rel:"noopener noreferrer"}:{href:"#",onClick:e=>e.preventDefault()};
+              {project.cta&&(()=>{const href=project.ctaHref||"#";const ext=href.startsWith("http")||href.startsWith("/");const lp=ext?{href,target:"_blank",rel:"noopener noreferrer"}:{href:"#",onClick:e=>e.preventDefault()};
                 return(<a {...lp} className="pf-btn" style={{display:"block",textAlign:"center",padding:".85rem",background:`${pC}22`,border:`1px solid ${pC}66`,borderRadius:"10px",color:pC,textDecoration:"none",fontSize:".9rem",fontWeight:600,transition:"filter .2s"}}>{project.cta}</a>);})()}
               {project.links?.length>0&&(<div style={{display:"flex",flexDirection:"column",gap:".55rem",marginTop:project.cta?".55rem":0}}>
-                {project.links.map(l=>{const href=l.href||"#";const ext=href.startsWith("http");const lp=ext?{href,target:"_blank",rel:"noopener noreferrer"}:{href:"#",onClick:e=>e.preventDefault()};
+                {project.links.map(l=>{const href=l.href||"#";const ext=href.startsWith("http")||href.startsWith("/");const lp=ext?{href,target:"_blank",rel:"noopener noreferrer"}:{href:"#",onClick:e=>e.preventDefault()};
                   return(<a key={l.label} {...lp} className="pf-btn" style={{display:"block",textAlign:"center",padding:".85rem",background:`${pC}14`,border:`1px solid ${pC}44`,borderRadius:"10px",color:pC,textDecoration:"none",fontSize:".9rem",fontWeight:600,transition:"filter .2s"}}>{l.label}</a>);
                 })}
               </div>)}
@@ -1406,7 +1406,7 @@ function ProjectPanel({project,onClose}){
   };
   const TagsRow=()=><div style={{display:"flex",flexWrap:"wrap",gap:".38rem"}}>{project.tags.map(t=><T key={t} t={t}/>)}</div>;
   const WishlistBtn=({c=pC})=>{
-    const href=project.ctaHref||"#";const isExt=href.startsWith("http");
+    const href=project.ctaHref||"#";const isExt=href.startsWith("http")||href.startsWith("/");
     const lp=isExt?{href,target:"_blank",rel:"noopener noreferrer"}:{href:"#",onClick:e=>e.preventDefault()};
     return(<a {...lp} className="pf-btn" style={{display:"block",textAlign:"center",padding:".85rem",background:`${c}22`,border:`1px solid ${c}66`,borderRadius:"10px",color:c,textDecoration:"none",fontSize:".9rem",fontWeight:600,transition:"filter .2s"}}>{project.cta}</a>);
   };
