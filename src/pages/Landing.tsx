@@ -36,12 +36,12 @@ export default function Landing() {
     {
       icon: "✦",
       title: "Real-Time 3D & Environments",
-      text: "Games, immersive installations and interactive spaces built in Unity and Unreal Engine, from modular environments to lighting, atmosphere and scene composition.",
+      text: "Games, immersive installations and interactive spaces, from modular environments to lighting, atmosphere and scene composition.",
     },
     {
       icon: "✦",
       title: "Motion & VFX",
-      text: "Shaders, real-time effects and procedural animation using tools like Houdini, Unreal Engine and Blender, balancing visual impact with performance.",
+      text: "Shaders, real-time effects and procedural animation balancing visual impact with performance.",
     },
     {
       icon: "✦",
@@ -191,10 +191,8 @@ export default function Landing() {
                     animation: "introIn .8s .3s both",
                   }}
                 >
-                  <span style={{ display: "block", color: "rgba(255,248,240,.88)", marginBottom: ".6rem" }}>
-                    Creative Technologist working across real-time 3D, motion and interactive experiences.
-                  </span>
-                  From games and immersive installations to interactive web experiences.
+                  Creative Technologist working across real-time 3D, motion and interactive experiences. From games
+                  and immersive installations to interactive web experiences.
                 </p>
                 <div
                   className="hero-ctas"
