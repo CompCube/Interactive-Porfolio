@@ -180,16 +180,6 @@ export default function Landing() {
                   >
                     Jordi.
                   </span>
-                  <br />
-                  {["Welcome", "to", "my", "portfolio!"].map((w, i) => (
-                    <span
-                      key={i}
-                      className="word"
-                      style={{ animationDelay: `${0.42 + i * 0.07}s`, marginRight: ".32em" }}
-                    >
-                      {w}
-                    </span>
-                  ))}
                 </h1>
                 <p
                   style={{
