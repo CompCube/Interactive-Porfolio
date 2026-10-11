@@ -272,7 +272,7 @@ summary:"I’m a Creative Technologist with 3+ years of experience in real-time 
 bio:"Hi, I'm Jordi, a **Game Developer and Technical Artist** from Barcelona.\n\nI began studying Computer Engineering, but after my first year I realized I was more interested in **creating interactive experiences** than building abstract software. That led me to pursue a degree in **Game Design and Development** at the University of Girona, where I developed a multidisciplinary background spanning programming, game design, 3D art, level design, and technical implementation.",
 bioExtended:"Hi, I'm Jordi, a **Game Developer and Technical Artist** from Barcelona.\n\nI began studying Computer Engineering, but after my first year I realized I was more interested in **creating interactive experiences** than building abstract software. That led me to pursue a degree in **Game Design and Development** at the University of Girona, where I developed a multidisciplinary background spanning programming, game design, 3D art, level design, and technical implementation.\n\nDuring my studies, I discovered that what I enjoyed most was the **intersection between art and technology**. A Riot Games talk on Technical Art helped me put a name to the role I had naturally gravitated toward: **bridging artists and programmers to create visually ambitious experiences that remain efficient and scalable**.\n\nSince then, I've focused on building that skill set through **Unity (HDRP), Blender, Substance 3D Painter, and C#**, combining artistic workflows with technical problem-solving. My final degree project, **Hollow End**, brought those disciplines together in a solo-developed photorealistic horror game, where I designed modular environment pipelines, created custom editor tools, VFXs, and owned the project from concept to implementation, earning **High Honors** in 2025.\n\nOutside game development, I enjoy exploring disciplines that push me to think differently, whether it's web development, AI, languages, or music. I believe that curiosity translates directly into my work, helping me approach problems from different perspectives and continuously improve my workflows.\n\nI'm now looking to join a team as a **Technical Artist**, where I can contribute to building better tools, pipelines, and real-time experiences while continuing to grow alongside experienced developers.",
 skills:[{s:"Unity / C#",p:88},{s:"Blender / 3D Art",p:86},{s:"Shader Graph / VFX",p:80},{s:"Substance 3D Painter",p:78},{s:"Game Design",p:85},{s:"React / Web",p:76},{s:"Python / AI",p:72},{s:"Git",p:82}],
-langs:[{l:"English",lv:"C1"},{l:"German",lv:"B1 · learning"},{l:"Catalan",lv:"Native"},{l:"Spanish",lv:"Native"},{l:"Italian",lv:"B1"}],
+langs:[{l:"English",lv:"C1"},{l:"German",lv:"B1, learning"},{l:"Catalan",lv:"Native"},{l:"Spanish",lv:"Native"},{l:"Italian",lv:"B1"}],
 timeline:[{y:"Q4 2026",l:"Steam release",d:"Planned launch of Hollow End."},{y:"2025",l:"Graduated in Game Design & Development",d:"Final Degree Project awarded High Honors."},{y:"2024",l:"Began developing Hollow End",d:"A solo photorealistic horror game in Unity HDRP."},{y:"2024",l:"Joined DXC Technology",d:"ServiceNow Software Developer."},{y:"2020",l:"Switched to Game Design & Development",d:"University of Girona."},{y:"2019",l:"Started Computer Engineering",d:""},{y:"2019",l:"Graduated High School",d:""}]};
 
 const CP_CATEGORIES=[
@@ -1078,7 +1078,7 @@ export function AboutTab({c,onContact}){
   const cv=`https://raw.githubusercontent.com/${GH_USER}/${GH_REPO}/${GH_BRANCH}/src/JordiAltisen_CV.pdf`;
   const info=[
     {icon:"pin",t:"Salzburg, Austria",d:"Originally from Barcelona"},
-    {icon:"langs",t:"Languages",list:STAR.langs},
+    {icon:"langs",t:"Languages",d:STAR.langs.map(({l,lv})=>`${l} (${lv})`).join(" · ")},
     {icon:"sparkles",t:"Currently",d:"Master’s in Real-Time Art & VFX at FH Salzburg"},
   ];
   const sec={marginTop:"3.2rem"};
@@ -1100,8 +1100,7 @@ export function AboutTab({c,onContact}){
     <div className="about-info-grid" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"1rem",marginTop:"2.2rem"}}>
       {info.map(it=>(<div key={it.t} style={aboutCard}>
         <div style={{display:"flex",alignItems:"center",gap:".8rem",marginBottom:".7rem"}}><IcoBox n={it.icon} c={c}/><span style={{fontSize:"1.05rem",fontWeight:700,color:"#f0f0f6"}}>{it.t}</span></div>
-        {it.list?(<div style={{display:"flex",flexDirection:"column",gap:".45rem"}}>{it.list.map(({l,lv})=>(<div key={l} style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:".8rem",fontSize:".85rem",color:"rgba(232,232,240,.78)"}}><span>{l}</span><span style={{fontSize:".66rem",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".04em",color:c,background:`${c}14`,border:`1px solid ${c}33`,borderRadius:"999px",padding:".12rem .55rem",whiteSpace:"nowrap"}}>{lv}</span></div>))}</div>)
-        :(<p style={{fontSize:".85rem",lineHeight:1.65,color:"rgba(232,232,240,.66)",margin:0}}>{it.d}</p>)}
+        <p style={{fontSize:".85rem",lineHeight:1.65,color:"rgba(232,232,240,.66)",margin:0}}>{it.d}</p>
       </div>))}
     </div>
 
