@@ -59,7 +59,7 @@ export default function Landing() {
         fontFamily: "'Space Grotesk', sans-serif",
       }}
     >
-      <style>{`@keyframes introUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}@keyframes introIn{from{opacity:0}to{opacity:1}}@keyframes introBlink{0%,100%{opacity:.14}50%{opacity:.44}}`}</style>
+      <style>{`@keyframes introUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}@keyframes introIn{from{opacity:0}to{opacity:1}}@keyframes introBlink{0%,100%{opacity:.14}50%{opacity:.44}}.about-text{text-align:justify;hyphens:auto}@media (max-width:600px){.about-text{text-align:left;hyphens:manual}}`}</style>
       <NebulaBg fixed />
       <div
         className="big-scale"
@@ -400,7 +400,7 @@ export default function Landing() {
           <div style={{ position: "relative", padding: "2.5rem 0" }}>
             <div style={{ position: "relative", zIndex: 1 }}>
               <SecTitle t="ABOUT ME" c={c} />
-              <p style={{ fontSize: ".88rem", lineHeight: 1.8, color: "rgba(232,232,240,.62)", whiteSpace: "pre-line", maxWidth: 820, margin: "0 auto" }}>
+              <p className="about-text" style={{ fontSize: ".88rem", lineHeight: 1.8, color: "rgba(232,232,240,.62)", whiteSpace: "pre-line", maxWidth: 820, margin: "0 auto" }}>
                 {renderBold(STAR.summary)}
               </p>
             </div>
