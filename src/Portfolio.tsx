@@ -1077,10 +1077,10 @@ export function AboutTab({c,onContact}){
   const[bioX,setBioX]=useState(false);
   const cv=`https://raw.githubusercontent.com/${GH_USER}/${GH_REPO}/${GH_BRANCH}/src/JordiAltisen_CV.pdf`;
   const info=[
-    {icon:"user",t:"Jordi Altisèn Cortijo",d:"Creative Technologist working across real-time 3D, motion and interactive experiences. Currently studying a Master’s in Real-Time Art & VFX at FH Salzburg."},
-    {icon:"pin",t:"Barcelona / Salzburg",d:"Based in Barcelona, where I build Hollow End and my other projects."},
+    {icon:"user",t:"Jordi Altisèn Cortijo",d:"Creative Technologist working across real-time 3D, motion and interactive experiences."},
+    {icon:"pin",t:"Barcelona / Salzburg",d:"From Barcelona and currently based in Salzburg."},
     {icon:"langs",t:"Languages",d:STAR.langs.map(({l,lv})=>`${l} (${lv})`).join(" · ")},
-    {icon:"sparkles",t:"What I do",d:"I bridge art and engineering: real-time pipelines, shaders, editor tools and optimisation in Unity, plus full-stack and AI products."},
+    {icon:"sparkles",t:"What I do",d:"I bridge art and engineering: real-time pipelines, shaders and full-stack AI products. Currently studying a Master’s in Real-Time Art & VFX at FH Salzburg."},
   ];
   const sec={marginTop:"3.2rem"};
   return(<div style={{padding:"0 clamp(1rem,3vw,2.5rem) 2.5rem"}}>
