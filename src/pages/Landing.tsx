@@ -194,8 +194,7 @@ export default function Landing() {
                   <span style={{ display: "block", color: "rgba(255,248,240,.88)", marginBottom: ".6rem" }}>
                     Creative Technologist working across real-time 3D, motion and interactive experiences.
                   </span>
-                  I combine 3D art, shaders and code to create great visuals that perform well in real time,
-                  from games and immersive installations to interactive web experiences.
+                  From games and immersive installations to interactive web experiences.
                 </p>
                 <div
                   className="hero-ctas"
