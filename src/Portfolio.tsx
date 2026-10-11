@@ -2,22 +2,61 @@ import { useState, useRef, useEffect, useCallback, createContext, useContext } f
 import { useNavigate } from "react-router-dom";
 import * as THREE from "three";
 
-const PVERT=`varying vec3 vP;varying vec3 vN;void main(){vP=normalize(position);vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
 const PH=`uniform float u_t;uniform float u_hover;varying vec3 vP;varying vec3 vN;`;
 const NS=`float h3(vec3 p){return fract(sin(dot(floor(p),vec3(127.1,311.7,74.7)))*43758.);}float ns(vec3 p){vec3 f=fract(p);f=f*f*(3.-2.*f);return mix(mix(mix(h3(floor(p)),h3(floor(p)+vec3(1,0,0)),f.x),mix(h3(floor(p)+vec3(0,1,0)),h3(floor(p)+vec3(1,1,0)),f.x),f.y),mix(mix(h3(floor(p)+vec3(0,0,1)),h3(floor(p)+vec3(1,0,1)),f.x),mix(h3(floor(p)+vec3(0,1,1)),h3(floor(p)+vec3(1,1,1)),f.x),f.y),f.z);}float fbm(vec3 p){return ns(p)*.5+ns(p*2.1+vec3(3.7,1.2,.8))*.25+ns(p*4.4+vec3(1.5,2.8,.4))*.125+ns(p*8.8+vec3(.9,1.4,2.1))*.0625;}`;
 const PT2=`float ep=.012;vec3 pp=vP*5.;float nx=ns(pp+vec3(ep,0,0))-ns(pp-vec3(ep,0,0));float ny=ns(pp+vec3(0,ep,0))-ns(pp-vec3(0,ep,0));float nz=ns(pp+vec3(0,0,ep))-ns(pp-vec3(0,0,ep));vec3 bN=normalize(vN+vec3(nx,ny,nz)*2.2);vec3 sd=normalize(vec3(.55,.72,.45));float diff=max(dot(bN,sd),0.)*.85+.22;vec3 hd=normalize(sd+vec3(0,0,1));float spec=pow(max(dot(bN,hd),0.),60.)*.50;float fr=pow(1.-max(dot(normalize(vN),vec3(0,0,1)),0.),1.7);c*=diff;c+=vec3(1.,.94,.78)*spec;c+=rimC*fr*1.2;c*=(1.+u_hover*.4);gl_FragColor=vec4(c,1.);}`;
-const PF={
-  games:   PH+NS+`void main(){float t=u_t;vec3 p=vP*3.;float v=fbm(p+vec3(t*.04,0,0));vec3 c=mix(vec3(.12,.06,.18),vec3(.38,.22,.52),v);c=mix(c,vec3(.65,.50,.85),max(0.,v-.65)*3.2);c+=vec3(.30,.15,.55)*fbm(p*2.+vec3(0,0,t*.1))*.16;vec3 rimC=vec3(.62,.40,.88);`+PT2,
-  vfx:     PH+NS+`void main(){float t=u_t;vec3 p=vP*4.;float v=fbm(p+vec3(t*.03,0,t*.025));vec3 c=mix(vec3(.12,.05,.10),vec3(.36,.16,.28),v);c=mix(c,vec3(.60,.32,.50),max(0.,v-.70)*3.8);c+=vec3(.42,.20,.38)*fbm(p*2.)*.12;vec3 rimC=vec3(.55,.22,.48);`+PT2,
-  tools:   PH+NS+`void main(){vec3 p=vP*5.;float v=fbm(p);vec3 c=mix(vec3(.08,.08,.22),vec3(.26,.28,.58),v);c=mix(c,vec3(.42,.48,.82),max(0.,v-.72)*3.5);c+=vec3(.14,.16,.52)*fbm(p*2.)*.12;vec3 rimC=vec3(.30,.36,.88);`+PT2,
-  environments:PH+NS+`void main(){float t=u_t;vec3 p=vP*3.;float v=fbm(p+vec3(t*.06,0,0));vec3 c=mix(vec3(.16,.06,.05),vec3(.44,.22,.18),v);c=mix(c,vec3(.72,.45,.35),max(0.,v-.72)*4.2);c+=vec3(.55,.24,.18)*fbm(p*2.+vec3(0,0,t*.12))*.25;vec3 rimC=vec3(.72,.30,.22);`+PT2,
-  props:   PH+NS+`void main(){float t=u_t;vec3 p=vP*4.;float v=fbm(p+vec3(t*.1,0,0));vec3 c=mix(vec3(.26,.10,.04),vec3(.54,.24,.12),smoothstep(.2,.65,v));c=mix(c,vec3(.88,.55,.28),max(0.,.18-v)*5.5);c+=vec3(.88,.42,.14)*max(0.,.30-v)*1.5*(sin(vP.y*8.+t*2.)*.5+.5);vec3 rimC=vec3(.88,.44,.16);`+PT2,
-  ai:      PH+NS+`void main(){float t=u_t;vec3 p=vP*3.;float v=fbm(p+vec3(0,t*.05,0));float pulse=fbm(p*2.5+vec3(0,0,t*.18))*.38;vec3 c=mix(vec3(.01,.14,.18),vec3(.05,.55,.68),v);c=mix(c,vec3(.28,.92,.99),max(0.,v+pulse-.78)*3.2);c+=vec3(.06,.60,.78)*pulse*.6;vec3 rimC=vec3(.06,.82,.98);`+PT2,
-  web:     PH+NS+`void main(){float t=u_t;vec3 p=vP*4.;float v=fbm(p+vec3(t*.05,0,t*.03));vec3 c=mix(vec3(.04,.16,.10),vec3(.10,.45,.28),v);c=mix(c,vec3(.20,.72,.48),max(0.,v-.68)*3.5);c+=vec3(.08,.38,.22)*fbm(p*2.+vec3(0,t*.08,0))*.14;vec3 rimC=vec3(.18,.75,.48);`+PT2,
-};
-const NEBFRAG=`varying vec3 vD;float h3(vec3 p){return fract(sin(dot(floor(p),vec3(127.1,311.7,74.7)))*43758.);}float sm(vec3 p){vec3 f=fract(p);f=f*f*(3.-2.*f);return mix(mix(mix(h3(floor(p)),h3(floor(p)+vec3(1,0,0)),f.x),mix(h3(floor(p)+vec3(0,1,0)),h3(floor(p)+vec3(1,1,0)),f.x),f.y),mix(mix(h3(floor(p)+vec3(0,0,1)),h3(floor(p)+vec3(1,0,1)),f.x),mix(h3(floor(p)+vec3(0,1,1)),h3(floor(p)+vec3(1,1,1)),f.x),f.y),f.z);}float fbm(vec3 p){return sm(p)*.5+sm(p*2.1+vec3(3.7))*.25+sm(p*4.3+vec3(1.5,2.8,.4))*.125;}void main(){vec3 d=normalize(vD);float band=exp(-d.y*d.y*7.)*fbm(d*3.+vec3(1.5));float n1=fbm(d*2.+vec3(1.5,.3,.7));float n2=fbm(d*2.5+vec3(-1.2,1.8,-.4));float n3=fbm(d*1.8+vec3(.4,-.9,2.1));vec3 col=vec3(.005,.003,.014);col+=vec3(.003,.002,.02)*n1*n1;col+=vec3(.014,.002,.004)*n2*n2*.8;col+=vec3(.001,.007,.004)*n3*.55;col+=vec3(.028,.022,.045)*band;float core=fbm(d*3.+vec3(2.,1.,.5));col+=vec3(.008,.006,.022)*core*core*step(.6,core);gl_FragColor=vec4(col,1.);}`;
-const VERT=`varying vec3 vN;varying vec3 vP;void main(){vN=normalize(normalMatrix*normal);vP=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`;
-const FRAG=`uniform float u_t;varying vec3 vN;varying vec3 vP;vec3 h33(vec3 p){p=fract(p*vec3(443.897,397.297,491.187));p+=dot(p.zxy,p.yxz+19.19);return fract(p.xxy*p.yyz*p.zyx);}float vor(vec3 x,float t){vec3 n=floor(x),f=fract(x);float md=8.0;for(int k=-1;k<=1;k++)for(int j=-1;j<=1;j++)for(int i=-1;i<=1;i++){vec3 g=vec3(float(i),float(j),float(k));vec3 o=h33(n+g);o=0.5+0.5*sin(t*0.3+6.28318*o);md=min(md,length(g+o-f));}return md;}void main(){float t=u_t;vec3 p=vP*5.0;float v1=vor(p,t),v2=vor(p*2.1+vec3(3.7,1.1,5.3),t*1.4),v3=vor(p*4.7+vec3(7.1,2.4,3.6),t*.75);float v=v1*.5+v2*.32+v3*.18;vec3 c=vec3(1.0,0.97,0.85);c=mix(c,vec3(1.0,0.78,0.12),smoothstep(0.0,0.38,v));c=mix(c,vec3(1.0,0.40,0.04),smoothstep(0.32,0.62,v));c=mix(c,vec3(0.5,0.08,0.01),smoothstep(0.55,0.88,v));float prm=smoothstep(0.6,0.15,v1)*(0.5+0.5*sin(vP.y*16.0+t*2.0));c+=vec3(0.6,0.2,0.0)*prm*0.7;float blu=smoothstep(0.75,0.25,v2)*(0.5+0.5*cos(vP.x*20.0+t*1.5));c+=vec3(0.05,0.15,0.9)*blu*0.12;float rim=dot(normalize(vN),vec3(0.0,0.0,1.0));c*=0.4+0.6*pow(max(rim,0.0),0.4);gl_FragColor=vec4(c*1.5,1.0);}`;
+// Sky sphere for the 3D solar system: same palette as the landing nebula (games purple, AI cyan, star gold),
+// domain-warped noise on the view direction, denser along the orbital plane, gamma-lifted like the landing one.
+const nebFrag=(str)=>`varying vec3 vD;float h3(vec3 p){return fract(sin(dot(floor(p),vec3(127.1,311.7,74.7)))*43758.);}float sm(vec3 p){vec3 f=fract(p);f=f*f*(3.-2.*f);return mix(mix(mix(h3(floor(p)),h3(floor(p)+vec3(1,0,0)),f.x),mix(h3(floor(p)+vec3(0,1,0)),h3(floor(p)+vec3(1,1,0)),f.x),f.y),mix(mix(h3(floor(p)+vec3(0,0,1)),h3(floor(p)+vec3(1,0,1)),f.x),mix(h3(floor(p)+vec3(0,1,1)),h3(floor(p)+vec3(1,1,1)),f.x),f.y),f.z);}float fbm(vec3 p){return sm(p)*.5+sm(p*2.1+vec3(3.7))*.25+sm(p*4.3+vec3(1.5,2.8,.4))*.125+sm(p*8.7+vec3(.9,1.4,2.1))*.0625;}void main(){vec3 d=normalize(vD);float n1=fbm(d*2.2+vec3(1.5,.3,.7));float n2=fbm(d*3.1+vec3(-1.2,1.8,-.4)+n1*1.5);float n=fbm(d*2.6+vec3(n1,n2,n1)*1.4);vec3 games=vec3(.349,.267,.651),ai=vec3(.106,.761,.890),gold=vec3(.929,.765,.165);vec3 col=mix(games,ai,smoothstep(.35,.65,n1));col=mix(col,gold,smoothstep(.6,.85,n2)*.35);float band=.35+.65*exp(-d.y*d.y*4.);float dens=smoothstep(.32,.78,n)*band;vec3 c=vec3(.005,.003,.014)+pow(col*dens,vec3(.8))*${str.toFixed(3)};gl_FragColor=vec4(c,1.);}`;
+// Semi-transparent cloud shell between the camera and the sky; several at different radii give parallax depth.
+const nebShellFrag=(seed,str)=>`varying vec3 vD;float h3(vec3 p){return fract(sin(dot(floor(p),vec3(127.1,311.7,74.7)))*43758.);}float sm(vec3 p){vec3 f=fract(p);f=f*f*(3.-2.*f);return mix(mix(mix(h3(floor(p)),h3(floor(p)+vec3(1,0,0)),f.x),mix(h3(floor(p)+vec3(0,1,0)),h3(floor(p)+vec3(1,1,0)),f.x),f.y),mix(mix(h3(floor(p)+vec3(0,0,1)),h3(floor(p)+vec3(1,0,1)),f.x),mix(h3(floor(p)+vec3(0,1,1)),h3(floor(p)+vec3(1,1,1)),f.x),f.y),f.z);}float fbm(vec3 p){return sm(p)*.5+sm(p*2.1+vec3(3.7))*.25+sm(p*4.3+vec3(1.5,2.8,.4))*.125+sm(p*8.7+vec3(.9,1.4,2.1))*.0625;}void main(){vec3 d=normalize(vD)+vec3(${seed.toFixed(2)});float n1=fbm(d*2.8);float n=fbm(d*3.4+vec3(n1*1.8,-n1,n1));vec3 games=vec3(.349,.267,.651),ai=vec3(.106,.761,.890);vec3 col=mix(games,ai,smoothstep(.35,.65,n1));float a=smoothstep(.45,.9,n);gl_FragColor=vec4(pow(col*a,vec3(.8))*${str.toFixed(3)},1.);}`;
+const NEBFRAG=nebFrag(0.12);
+
+// Photoreal star: granulation cells, supergranulation, sunspots/faculae, limb darkening and a hot colour ramp.
+const SUN_VERT=`varying vec3 vP;varying vec3 vN;varying vec3 vV;void main(){vP=normalize(position);vN=normalize(normalMatrix*normal);vec4 mv=modelViewMatrix*vec4(position,1.);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}`;
+const SUN_FRAG=`uniform float u_t;varying vec3 vP;varying vec3 vN;varying vec3 vV;
+vec3 h33(vec3 p){p=fract(p*vec3(443.897,397.297,491.187));p+=dot(p.zxy,p.yxz+19.19);return fract(p.xxy*p.yyz*p.zyx);}
+float h3(vec3 p){return fract(sin(dot(p,vec3(127.1,311.7,74.7)))*43758.5453);}
+float vn(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(mix(h3(i),h3(i+vec3(1,0,0)),f.x),mix(h3(i+vec3(0,1,0)),h3(i+vec3(1,1,0)),f.x),f.y),mix(mix(h3(i+vec3(0,0,1)),h3(i+vec3(1,0,1)),f.x),mix(h3(i+vec3(0,1,1)),h3(i+vec3(1,1,1)),f.x),f.y),f.z);}
+float fbm(vec3 p){float v=0.,a=.5;for(int i=0;i<4;i++){v+=a*vn(p);p=p*2.03+vec3(1.7,9.2,3.1);a*=.5;}return v;}
+vec2 vor(vec3 x,float t){vec3 n=floor(x),f=fract(x);float d1=8.,d2=8.;for(int k=-1;k<=1;k++)for(int j=-1;j<=1;j++)for(int i=-1;i<=1;i++){vec3 g=vec3(float(i),float(j),float(k));vec3 o=h33(n+g);o=.5+.45*sin(t+6.2831*o);float d=length(g+o-f);if(d<d1){d2=d1;d1=d;}else if(d<d2)d2=d;}return vec2(d1,d2);}
+void main(){float t=u_t;vec3 p=vP;
+vec3 w=p*3.+vec3(t*.02,0.,-t*.015);vec3 q=p+.05*vec3(fbm(w),fbm(w+5.2),fbm(w+9.1));
+vec2 v=vor(q*13.,t*.35);float gran=sqrt(smoothstep(.0,.7,v.y-v.x));
+float sup=fbm(q*5.+vec3(0.,t*.03,0.));
+float act=fbm(q*2.2+vec3(3.1,1.7,t*.01));
+float spot=smoothstep(.70,.78,act)*smoothstep(.45,.6,fbm(q*9.+2.));
+float fac=smoothstep(.55,.72,act)*(1.-spot);
+float mu=clamp(dot(normalize(vN),normalize(vV)),0.,1.);
+float limb=pow(mu,.7);
+float temp=(.62+.2*gran+.3*(sup-.5)+.25*fac)*mix(.35,1.,limb)*(1.-.85*spot);
+vec3 c=mix(vec3(.55,.08,.01),vec3(1.,.45,.08),smoothstep(.1,.45,temp));
+c=mix(c,vec3(1.,.78,.42),smoothstep(.4,.75,temp));
+c=mix(c,vec3(1.,.97,.9),smoothstep(.72,1.,temp));
+gl_FragColor=vec4(c*(.4+1.05*temp),1.);}`;
+// Corona: camera-facing glow with slowly drifting rays; drawn behind the disc and additively blended.
+const CORONA_FRAG=`uniform float u_t;varying vec2 vUv;
+float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float n2(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
+void main(){vec2 uv=vUv*2.-1.;float r=length(uv)*3.;if(r<.96)discard;float a=atan(uv.y,uv.x);
+float x=max(r-1.,0.);
+float glow=exp(-x*3.6)*.6+exp(-x*1.1)*.12;
+float rays=pow(n2(vec2(a*7.,u_t*.05))*.6+n2(vec2(a*19.+3.,u_t*.08))*.4,2.2)*exp(-x*1.1)*.15;
+float I=(glow+rays)*smoothstep(3.,2.1,r);
+vec3 c=mix(vec3(1.,.55,.18),vec3(1.,.9,.72),exp(-x*2.));
+gl_FragColor=vec4(c*I,1.);}`;
+const CORONA_VERT=`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
+
+
+// Same planet shaders, plus a soft sun-lit side (the star is at the origin) and a thin atmosphere rim on the lit edge.
+// The night side floor (.6) sits above the old diffuse minimum, so planets never get darker than before.
+const PVERT_LIT=`varying vec3 vP;varying vec3 vN;varying vec3 vWN;varying vec3 vWP;void main(){vP=normalize(position);vN=normalize(normalMatrix*normal);vWN=normalize(mat3(modelMatrix)*normal);vec4 wp=modelMatrix*vec4(position,1.);vWP=wp.xyz;gl_Position=projectionMatrix*viewMatrix*wp;}`;
+const litPlanet=frag=>frag.replace(PH,PH+`varying vec3 vWN;varying vec3 vWP;`).replace(PT2,`float ep=.012;vec3 pp=vP*5.;float nx=ns(pp+vec3(ep,0,0))-ns(pp-vec3(ep,0,0));float ny=ns(pp+vec3(0,ep,0))-ns(pp-vec3(0,ep,0));float nz=ns(pp+vec3(0,0,ep))-ns(pp-vec3(0,0,ep));vec3 bN=normalize(vN+vec3(nx,ny,nz)*2.2);vec3 sd=normalize(vec3(.55,.72,.45));float bump=max(dot(bN,sd),0.);vec3 WN=normalize(vWN);vec3 L=normalize(-vWP);vec3 V=normalize(cameraPosition-vWP);float lit=smoothstep(-.45,.75,dot(WN,L));float diff=(.6+.62*lit)*(.82+.2*bump);vec3 hd=normalize(L+V);float spec=pow(max(dot(WN,hd),0.),50.)*.35*lit;float fr=pow(1.-max(dot(normalize(vN),vec3(0,0,1)),0.),1.7);c*=diff;c+=vec3(1.,.94,.78)*spec;c+=rimC*fr*(1.+.55*lit);c*=(1.+u_hover*.4);gl_FragColor=vec4(c,1.);}`);
+
+// Palette planet: one shader for every category, coloured from the planet's hex (u_col).
+const PF_PAL=PH+NS+`uniform vec3 u_col;uniform float u_seed;void main(){float t=u_t;vec3 p=vP*3.4+vec3(u_seed);float v=fbm(p+vec3(t*.04,0,t*.03));float w=fbm(p*2.1+vec3(0,0,t*.08));vec3 dk=u_col*.3;vec3 hi=mix(u_col,vec3(1.),.4);vec3 c=mix(dk,u_col*.95,smoothstep(.2,.75,v));c=mix(c,hi,max(0.,v-.64)*2.8);c+=u_col*w*.14;vec3 rimC=mix(u_col,vec3(1.),.3);`+PT2;
+// Camera-facing glow in the planet colour; u_int rises on hover.
+const PGLOW_FRAG=`uniform vec3 u_col;uniform float u_int;varying vec2 vUv;void main(){float r=length(vUv*2.-1.);float g=exp(-r*r*9.)*.9+exp(-r*3.5)*.25;g*=smoothstep(1.,.7,r);gl_FragColor=vec4(u_col*g*u_int,1.);}`;
 
 const gd=id=>`https://drive.google.com/thumbnail?id=${id}&sz=w1200`;
 const GH_USER="CompCube",GH_REPO="Interactive-Porfolio",GH_BRANCH="main";
@@ -229,7 +268,7 @@ const HE_CATEGORIES=[
 ];
 
 export const STAR={hex:"#EDC32B",name:"JORDI",
-summary:"Technical Artist with 2+ years and 2,500+ hours building real-time pipelines, custom editor tools, and optimised shader systems in Unity and Unreal Engine. Solo-developed Hollow End in Unity HDRP, owning the full production pipeline across 140+ assets, reducing material count by 43% through atlas and batching strategies, and shipping 4 custom ShaderGraph systems with zero additional texture overhead. Experienced in profiling, draw call optimisation, LOD setup, and memory management.",
+summary:"I’m a Creative Technologist with 3+ years of experience in real-time 3D, working where art and code meet. I build environments, shaders, effects and tools in Unity, Unreal and Blender, always looking for visuals that are both striking and efficient.\n\nMy main project, Hollow End, is a photorealistic horror game developed entirely on my own. I handled the full process, from gathering references and building modular environments to creating materials, lighting and optimising performance. The project received High Honours as my Thesis.\n\nI’m currently pursuing a Master’s in Real-Time Art & Visual Effects at FH Salzburg, exploring motion, immersive installations and new ways to combine 3D with interactive technology.",
 bio:"Hi, I'm Jordi, a **Game Developer and Technical Artist** from Barcelona.\n\nI began studying Computer Engineering, but after my first year I realized I was more interested in **creating interactive experiences** than building abstract software. That led me to pursue a degree in **Game Design and Development** at the University of Girona, where I developed a multidisciplinary background spanning programming, game design, 3D art, level design, and technical implementation.",
 bioExtended:"Hi, I'm Jordi, a **Game Developer and Technical Artist** from Barcelona.\n\nI began studying Computer Engineering, but after my first year I realized I was more interested in **creating interactive experiences** than building abstract software. That led me to pursue a degree in **Game Design and Development** at the University of Girona, where I developed a multidisciplinary background spanning programming, game design, 3D art, level design, and technical implementation.\n\nDuring my studies, I discovered that what I enjoyed most was the **intersection between art and technology**. A Riot Games talk on Technical Art helped me put a name to the role I had naturally gravitated toward: **bridging artists and programmers to create visually ambitious experiences that remain efficient and scalable**.\n\nSince then, I've focused on building that skill set through **Unity (HDRP), Blender, Substance 3D Painter, and C#**, combining artistic workflows with technical problem-solving. My final degree project, **Hollow End**, brought those disciplines together in a solo-developed photorealistic horror game, where I designed modular environment pipelines, created custom editor tools, VFXs, and owned the project from concept to implementation, earning **High Honors** in 2025.\n\nOutside game development, I enjoy exploring disciplines that push me to think differently, whether it's web development, AI, languages, or music. I believe that curiosity translates directly into my work, helping me approach problems from different perspectives and continuously improve my workflows.\n\nI'm now looking to join a team as a **Technical Artist**, where I can contribute to building better tools, pipelines, and real-time experiences while continuing to grow alongside experienced developers.",
 skills:[{s:"Unity / C#",p:88},{s:"Blender / 3D Art",p:86},{s:"Shader Graph / VFX",p:80},{s:"Substance 3D Painter",p:78},{s:"Game Design",p:85},{s:"React / Web",p:76},{s:"Python / AI",p:72},{s:"Git",p:82}],
@@ -324,8 +363,8 @@ const CP_CATEGORIES=[
 ];
 
 export const PLANETS=[
-  {id:"props",label:"Props",icon:"🧱",hex:"#C79CD9",orbitRadius:8,orbitSpeed:.006,startAngle:3.5,radius:.62,desc:"Game-ready prop kits.",moons:[
-    {id:"subway-props-kit",label:"Subway Props Kit",icon:"📦",orbitRadius:1.7,orbitSpeed:.014,startAngle:2.5,inclination:-.24,radius:.24,hex:"#d99f88",
+  {id:"props",label:"Props",icon:"🧱",hex:"#E58261",orbitRadius:8,orbitSpeed:.006,startAngle:3.5,radius:.75,desc:"Game-ready prop kits.",moons:[
+    {id:"subway-props-kit",label:"Subway Props Kit",icon:"📦",orbitRadius:1.95,orbitSpeed:.014,startAngle:2.5,inclination:-.24,radius:.24,hex:"#d99f88",
       type:"Game-Ready Props",status:"",devPct:null,
       desc:"A collection of **80+ optimized game-ready props** created for **Hollow End** using a **low-poly to high-poly production workflow**, **texture atlases**, and a scalable asset pipeline tailored for large **Unity HDRP** environments. Each prop was designed with both **clean and abandoned variants**, allowing the same asset library to be reused across multiple locations while supporting environmental storytelling and reducing production overhead.",
       tags:["Unity","HDRP","Blender","3D Art","PBR","Substance 3D Painter"],
@@ -338,8 +377,8 @@ export const PLANETS=[
         {id:"results",label:"Results",caption:"Final integration of the prop set across both *Hollow End* environments: **L1 (Abandoned)** and **L2 (New)**. Using the same shared asset library, each space achieves a **distinct visual identity** through material variation, lighting and environmental dressing.",imgs:[{label:"L2 — View 1",src:gd("1A9wfaqn1LkuszRtDCBrpXLFBscfIC4U2")},{label:"L2 — View 2",src:gd("1Qnye20j8pV88D5j9ug3howC7pvip3xtP")}],videoId:null},
       ]},
   ]},
-  {id:"environments",label:"Environments",icon:"🌍",hex:"#9A89D9",orbitRadius:13,orbitSpeed:.004,startAngle:1.8,radius:.74,desc:"Modular environment kits for Unity HDRP.",moons:[
-    {id:"subway-modular-kit",label:"Subway Modular Kit",icon:"🏗️",orbitRadius:2.1,orbitSpeed:.011,startAngle:.8,inclination:.16,radius:.26,hex:"#c4948e",
+  {id:"environments",label:"Environments",icon:"🌍",hex:"#E56176",orbitRadius:16,orbitSpeed:.004,startAngle:1.8,radius:.85,desc:"Modular environment kits for Unity HDRP.",moons:[
+    {id:"subway-modular-kit",label:"Subway Modular Kit",icon:"🏗️",orbitRadius:2.42,orbitSpeed:.011,startAngle:.8,inclination:.16,radius:.26,hex:"#c4948e",
       type:"Environment Art",status:"",devPct:null,
       desc:"The structural foundation of *Hollow End* is built from a **reusable modular kit** designed to create **large interconnected subway environments** in Unity HDRP. The same geometry constructs both **The Backroom (L2)** and **The Abandoned Zone (L1 & L3)**, with distinct identities achieved through materials, lighting, and environmental dressing instead of additional meshes.",
       tags:["Blender","Unity HDRP","Modular Kit","Substance 3D Painter","Trim Sheets","Liminal Space","Backrooms"],
@@ -415,7 +454,7 @@ export const PLANETS=[
          text:"The final modular pipeline enabled **two visually distinct environments** to be built from a **single shared geometry set** while keeping production scalable, material count low, and the scene efficient to manage in Unity HDRP.",
         },
       ]},
-    {id:"gmtk-kit",label:"GMTK Loop Kit",icon:"🔁",orbitRadius:2.9,orbitSpeed:.008,startAngle:3.8,inclination:-.36,radius:.20,hex:"#bb8880",
+    {id:"gmtk-kit",label:"GMTK Loop Kit",icon:"🔁",orbitRadius:3.33,orbitSpeed:.008,startAngle:3.8,inclination:-.36,radius:.20,hex:"#bb8880",
       type:"Environment Art",status:"GMTK 2026",devPct:null,
       desc:"Built for GMTK Game Jam 2026 around the theme \"Loop\". The goal was to create a **modular kit** that could generate varied levels quickly without duplicating modeling work. The entire system, from concept to textured assets, was designed and produced in a **single afternoon**.",
       tags:["Blender","Unity","Modular Kit","Game Jam"],
@@ -427,16 +466,16 @@ export const PLANETS=[
         {label:"Assembly",src:gh("environments/gmtk-kit/04-result.png"),bg:"radial-gradient(ellipse at 55% 45%,#081206,#040a04)",caption:"An example room assembled from the modular kit, demonstrating how a **small set of pieces** can create varied spaces."},
       ],thumbnail:gh("environments/gmtk-kit/01-a-thumbnail.png"),cta:"View on ArtStation",ctaHref:"https://www.artstation.com/artwork/bgvy9E"},
   ]},
-  {id:"games",label:"Games",icon:"🎮",hex:"#5944A6",orbitRadius:22,orbitSpeed:.0022,startAngle:.8,radius:1.8,desc:"Game development projects.",moons:[
-    {id:"hollow-end",label:"Hollow End",icon:"🎮",orbitRadius:3.4,orbitSpeed:.009,startAngle:1,inclination:.24,radius:.40,hex:"#aa88cc",
+  {id:"games",label:"Games",icon:"🎮",hex:"#E561AD",orbitRadius:24,orbitSpeed:.0022,startAngle:.8,radius:1.7,featured:true,desc:"Game development projects.",moons:[
+    {id:"hollow-end",label:"Hollow End",icon:"🎮",orbitRadius:3.91,orbitSpeed:.009,startAngle:1,inclination:.24,radius:.40,hex:"#aa88cc",
       categories:HE_CATEGORIES,launchDate:TARGET_DATE,type:"Horror Game",status:"Steam · Oct 2026",devPct:68,
       desc:"Hollow End is a first-person horror exploration game set in an abandoned subway station, where the player must find a way out by exploring, solving puzzles, and making the right decisions. Inspired by escape rooms and liminal spaces, the game replaces combat with atmosphere, observation, and environmental storytelling. Originally developed as my Final Degree Project and awarded High Honours, it became an opportunity to focus on the career path I want to pursue: Technical Art.",
       tags:["Unity","C#","HDRP","Blender","Horror","Backrooms","Steam"],
       features:["First-person psychological horror","Unity HDRP","Environmental storytelling","Exploration, Puzzles & Decision Making","Backrooms & Liminal Spaces","PC / Steam · Oct 2026"],
       imgs:[{label:"Hollow End",src:gh("games/hollow-end/01-portada.png"),bg:"radial-gradient(ellipse at 50% 50%,#160a24,#080314)"}],videoId:null,cta:"Wishlist on Steam"},
   ]},
-  {id:"vfx",label:"VFX / Shaders",icon:"✨",hex:"#3C226B",orbitRadius:29,orbitSpeed:.0017,startAngle:2.5,radius:1.08,rings:true,desc:"Real-time VFX and custom shaders.",moons:[
-    {id:"magic-barrier",label:"Magic Barrier",icon:"🛡️",orbitRadius:2.9,orbitSpeed:.011,startAngle:.5,inclination:.42,radius:.28,hex:"#9e7292",
+  {id:"vfx",label:"VFX / Shaders",icon:"✨",hex:"#E561E3",orbitRadius:32,orbitSpeed:.0017,startAngle:2.5,radius:1,rings:true,desc:"Real-time VFX and custom shaders.",moons:[
+    {id:"magic-barrier",label:"Magic Barrier",icon:"🛡️",orbitRadius:3.33,orbitSpeed:.011,startAngle:.5,inclination:.42,radius:.28,hex:"#9e7292",
       type:"VFX / Shader",status:"",devPct:null,
       desc:"A real-time energy shield built in Unity URP, combining Shader Graph and VFX Graph into a single reusable effect. The project focuses on rendering efficiency, using a single-pass double-sided shader while layering vertex animation, bloom, and particle effects without unnecessary rendering cost.",
       tags:["Unity","URP","VFX Graph","Shader Graph","Blender"],
@@ -454,7 +493,7 @@ export const PLANETS=[
           {label:"VFX Graph",src:gh("vfx/magic-barrier/breakdown/04-vfx-graph.png"),bg:"radial-gradient(ellipse at 50% 50%,#160218,#0c010c)",caption:"VFX Graph drives **two independent effects** within the same asset: vertex displacement for the breathing pulse and a second **Mesh Output** context responsible for the outer aura. The entire system is event-driven, spawning on demand and automatically despawning after six seconds, with no continuous particle simulation."},
         ],videoId:null},
       ]},
-    {id:"waterfall",label:"Stylized Waterfall",icon:"💧",orbitRadius:3.8,orbitSpeed:.008,startAngle:3.2,inclination:-.3,radius:.22,hex:"#906080",
+    {id:"waterfall",label:"Stylized Waterfall",icon:"💧",orbitRadius:4.37,orbitSpeed:.008,startAngle:3.2,inclination:-.3,radius:.22,hex:"#906080",
       type:"VFX / Shader",status:"",devPct:null,
       desc:"A stylized waterfall built in Unity using Shader Graph, VFX Graph, and Particle Systems. The effect is split into two independent systems with different performance priorities: a shader-driven waterfall body and a lightweight splash system, balancing visual quality, runtime flexibility, and mobile-friendly performance.",
       tags:["Unity","VFX Graph","Shader Graph","Blender","Mobile Optimized"],
@@ -474,8 +513,8 @@ export const PLANETS=[
         ],videoId:null},
       ]},
   ]},
-  {id:"tools",label:"Tools",icon:"🔧",hex:"#3E1659",orbitRadius:36,orbitSpeed:.0012,startAngle:4.5,radius:.72,desc:"Custom Unity editor tools.",moons:[
-    {id:"scatter-tool",label:"Replacement & Scatter Tool",icon:"🔧",orbitRadius:2.1,orbitSpeed:.012,startAngle:2,inclination:-.28,radius:.26,hex:"#9099e2",
+  {id:"tools",label:"Tools",icon:"🔧",hex:"#B161E5",orbitRadius:40,orbitSpeed:.0012,startAngle:4.5,radius:.8,desc:"Custom Unity editor tools.",moons:[
+    {id:"scatter-tool",label:"Replacement & Scatter Tool",icon:"🔧",orbitRadius:2.42,orbitSpeed:.012,startAngle:2,inclination:-.28,radius:.26,hex:"#9099e2",
       type:"Unity Tool",status:"",devPct:null,
       desc:"A Unity Editor extension that automates scene population workflows. It operates in two modes: Replace, which swaps selected objects with weighted-random prefabs, and Scatter, which distributes instances around existing objects without modifying them.",
       tags:["Unity","C#","Editor Tools","Procedural","ScriptableObject"],
@@ -515,8 +554,8 @@ export const PLANETS=[
         },
       ]},
   ]},
-  {id:"ai",label:"AI Projects",icon:"🤖",hex:"#1BC2E3",orbitRadius:54,orbitSpeed:.00065,startAngle:5.8,radius:1.35,orbitTilt:.38,desc:"AI tools and multi-agent systems.",moons:[
-    {id:"careerpilot-ai",label:"CareerPilot AI",icon:"🧩",orbitRadius:2.6,orbitSpeed:.01,startAngle:1.2,inclination:.2,radius:.32,type:"Multi-Agent AI App",status:"Live Demo",
+  {id:"ai",label:"AI Projects",icon:"🤖",hex:"#7B61E5",orbitRadius:48,orbitSpeed:.00065,startAngle:5.8,radius:1.55,featured:true,orbitTilt:.38,desc:"AI tools and multi-agent systems.",moons:[
+    {id:"careerpilot-ai",label:"CareerPilot AI",icon:"🧩",orbitRadius:2.99,orbitSpeed:.01,startAngle:1.2,inclination:.2,radius:.32,type:"Multi-Agent AI App",status:"Live Demo",
      categories:CP_CATEGORIES,
      desc:"AI multi-agent application for job analysis, resume tailoring and interview preparation.",
      overview:"CareerPilot AI is an **AI multi-agent application** that **analyzes job descriptions** against a user's resume, **identifies the skills and requirements** the company is looking for, **highlights evidence and gaps**, **tailors the resume**, and **helps prepare for the interview**. It guides users through a multi-step conversation to produce an evidenced and optimized ATS-ready resume rather than simply rewriting it.\n\nBuilt as a hands-on project to start my career in **AI Engineering**, it focuses on the engineering problems behind reliable LLM applications: agent orchestration, structured outputs, evaluation, authentication, persistence, security and deployment.",
@@ -533,21 +572,63 @@ export const PLANETS=[
      thumbnail:gh("ai-projects/01-mainpage.png"),
      cta:"Try CareerPilot AI →",ctaHref:"https://career-pilot-ai-tan-ten.vercel.app",
      links:[{label:"View on GitHub",href:"https://github.com/CompCube/CareerPilotAI"}]},
+    {id:"sonified-data-melody-maker",label:"Sonified Data Melody Maker",title:"Sonified Data Melody Maker (Planet Pulse)",icon:"🎵",orbitRadius:4.3,orbitSpeed:.008,startAngle:4.3,inclination:-.25,radius:.3,type:"Data Sonification",status:"FH Salzburg · 2026",
+     categories:[
+       {id:"concept",label:"Concept",
+        subcategories:[
+          {id:"the-brief",label:"The Brief",caption:"An audio workshop in my **Realtime Art & VFX** master at **FH Salzburg**: build an interactive, real-time data sonification in **one day**."},
+          {id:"the-idea",label:"The Idea",caption:"Inspired by **NASA's sonifications** of planetary data, but live. The app pulls **seven public data feeds** (NOAA solar wind, Kp storm index and X-ray flux, USGS earthquakes, Wikipedia live edits, Salzburg weather and the ISS position) and gives each one a **musical role**."},
+        ]},
+       {id:"design",label:"Design",
+        subcategories:[
+          {id:"the-critique",label:"The Critique",caption:"The first version worked, but my professor said you could not hear the data anymore: it was buried under the UI. I redesigned it around one question: **can the audience tell which sound is which data?**"},
+          {id:"the-solution",label:"The Solution",caption:"**Four sound modes** that show what design does to data: **Raw** (the data as measured), **Tuned** (snapped to a scale), **Groove** (on a beat grid) and **Techno**, where the planet becomes the DJ, turning filters and deciding when the drop hits.\n\nA **signal-flow interface** (Data in, Music rules, Mix out) with a plain-language \"data to sound\" readout on every part.\n\n**Four visualizations**, including a view where each layer is a coloured ring drawn from its own live waveform.\n\nWestern and world scales (Chinese, Japanese, Arabic, Egyptian, Indian), **MIDI out** to play real synths in a DAW, and **audio recording**."},
+          {id:"sound-modes",label:"The Four Sound Modes",imgs:[
+            {label:"Raw Mode · Data view",src:gh("ai-projects/sonified-data-melody-maker/02-mode-raw.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)",caption:"**Raw**: the data exactly as measured. No beat grid, no scale: pitches follow the numbers continuously and every quake or edit sounds the instant it happens.\n\nShown in the **Data** view: the live data feeds as graphs, including the Salzburg weather and what each reading does to the pads."},
+            {label:"Tuned Mode · Spectrum view",src:gh("ai-projects/sonified-data-melody-maker/03-mode-tuned.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)",caption:"**Tuned**: same timing as Raw, but every pitch snaps to the scale, so it stays musical while you still hear each event as it happens.\n\nShown in the **Spectrum** view: a scrolling spectrogram of what you hear, with each event labelled."},
+            {label:"Groove Mode · Score view",src:gh("ai-projects/sonified-data-melody-maker/04-mode-groove.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)",caption:"**Groove**: a tempo grid. Events wait for the next 16th note, quakes become kicks, edits become hats and snares, and the solar wind plays bass and melody.\n\nShown in the **Score** view: each data feed written as a musical score on the beat grid."},
+            {label:"Techno Mode · Orbit view",src:gh("ai-projects/sonified-data-melody-maker/05-mode-techno.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)",caption:"**Techno**: the beat never stops. The data does not play the drums, it turns the knobs like a DJ: filters, layers, energy, and when the drop hits.\n\nShown in the **Orbit** view: each instrument layer drawn as a coloured ring from its own live waveform."},
+          ]},
+        ]},
+       {id:"build",label:"Build",
+        subcategories:[
+          {id:"how-i-built-it",label:"How I Built It",caption:"**AI-assisted development with Claude.** I defined the concept, the musical mappings and the UX, then directed and iterated the build through several rounds of feedback, from a first prototype to a redesigned fifth version."},
+          {id:"tech",label:"Tech",caption:"HTML, CSS, JavaScript, **Web Audio API** (custom synthesis, lookahead scheduler, sidechain, convolution reverb), **Web MIDI**, **Canvas 2D**, live **REST** and **Server-Sent Events** APIs."},
+        ]},
+       {id:"what-i-learned",label:"What I Learned",
+        subcategories:[
+          {id:"the-mapping-is-the-composition",label:"The Mapping Is the Composition",caption:"In sonification, **the mapping is the composition**. The same data can sound like noise or like music depending on the design decisions, and the interface has to make those decisions visible instead of hiding them."},
+        ]},
+     ],
+     desc:"A browser instrument that turns live data from the Sun, the Earth and the internet into music. Solar wind plays the bass, earthquakes hit the kick, Wikipedia edits drive the hi-hats, and solar flares trigger the drop.",
+     overview:"**The planet's live data, played as a track.**\n\nA browser instrument that turns live data from the Sun, the Earth and the internet into music. Solar wind plays the bass, earthquakes hit the kick, Wikipedia edits drive the hi-hats, and solar flares trigger the drop.",
+     tags:["Creative Tech","Real-time Audio","Data Sonification","AI-assisted build","Web Audio API"],
+     features:["Seven live public data feeds, each with its own musical role","Four sound modes: Raw, Tuned, Groove and Techno","Signal-flow interface: Data in, Music rules, Mix out","Four live visualizations drawn from each layer's waveform","Western and world scales, MIDI out and audio recording"],
+     imgs:[
+       {label:"Sonified Data Melody Maker",src:gh("ai-projects/sonified-data-melody-maker/01-thumbnail.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)"},
+       {label:"Raw Mode · Data view",src:gh("ai-projects/sonified-data-melody-maker/02-mode-raw.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)"},
+       {label:"Tuned Mode · Spectrum view",src:gh("ai-projects/sonified-data-melody-maker/03-mode-tuned.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)"},
+       {label:"Groove Mode · Score view",src:gh("ai-projects/sonified-data-melody-maker/04-mode-groove.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)"},
+       {label:"Techno Mode · Orbit view",src:gh("ai-projects/sonified-data-melody-maker/05-mode-techno.png"),bg:"radial-gradient(ellipse at 50% 40%,#0a1a1e,#040a0c)"},
+     ],
+     thumbnail:gh("ai-projects/sonified-data-melody-maker/01-thumbnail.png"),
+     cta:"Try the live demo →",ctaHref:"/demos/planet-pulse.html",
+     links:[{label:"View on GitHub",href:"GITHUB_URL"},{label:"Watch the video",href:"VIDEO_URL"}]},
   ]},
-  {id:"web",label:"Web Dev",icon:"🌐",hex:"#3CC87A",orbitRadius:66,orbitSpeed:.00038,startAngle:2.4,radius:.52,orbitTilt:.64,desc:"Client websites deployed for clubs, stores and hospitality.",moons:[
-    {id:"btt-valls",label:"btt-valls.com",icon:"🚵",orbitRadius:2.0,orbitSpeed:.013,startAngle:.8,inclination:.32,radius:.22,hex:"#70d4a0",
+  {id:"web",label:"Web Dev",icon:"🌐",hex:"#617EE5",orbitRadius:56,orbitSpeed:.00038,startAngle:2.4,radius:.75,orbitTilt:.64,desc:"Client websites deployed for clubs, stores and hospitality.",moons:[
+    {id:"btt-valls",label:"btt-valls.com",icon:"🚵",orbitRadius:2.3,orbitSpeed:.013,startAngle:.8,inclination:.32,radius:.22,hex:"#70d4a0",
       type:"Website",status:"Live",devPct:null,
       desc:"Club website for Club Ciclista BTT Valls. Custom WordPress build covering routes, news, events and member information for the mountain bike community of Valls.",
       tags:["WordPress","Web Design","CSS","PHP"],
       features:["Route and event listings","Member area","News and media section","Mobile-first design","Custom theme"],
       imgs:[{label:"btt-valls.com",src:gh("web/btt-valls/01-thumbnail.png"),bg:"radial-gradient(ellipse at 50% 40%,#041a0c,#020e06)",caption:"Club website for Club Ciclista BTT Valls, covering routes, news, events and member information for the local mountain bike community. Live and in use by the club, covering the full range of content needs from route publishing to event announcements."}],cta:"Visit Website",ctaHref:"https://btt-valls.com"},
-    {id:"edujuguetes",label:"edujuguetes.com",icon:"🧸",orbitRadius:2.8,orbitSpeed:.010,startAngle:2.6,inclination:-.2,radius:.22,hex:"#58cc8c",
+    {id:"edujuguetes",label:"edujuguetes.com",icon:"🧸",orbitRadius:3.22,orbitSpeed:.010,startAngle:2.6,inclination:-.2,radius:.22,hex:"#58cc8c",
       type:"Website",status:"Live",devPct:null,
       desc:"E-commerce site for an educational toy store. Product catalog, cart integration and order management for a specialty retail shop.",
       tags:["WordPress","WooCommerce","Web Design","CSS"],
       features:["Full WooCommerce product catalog","Cart and checkout integration","Category and filter system","Mobile-first design","Custom theme"],
       imgs:[{label:"edujuguetes.com",src:gh("web/edujuguetes/01-thumbnail.png"),bg:"radial-gradient(ellipse at 50% 40%,#061808,#030e04)",caption:"E-commerce site for an educational toy store. Product catalog, shopping cart integration and order management built on WooCommerce. Live store with full product catalog and checkout flow operational."}],cta:"Visit Website",ctaHref:"https://edujuguetes.com"},
-    {id:"tirambarcosta",label:"tirambarcostadaurada.com",icon:"🍹",orbitRadius:3.6,orbitSpeed:.008,startAngle:4.2,inclination:.13,radius:.22,hex:"#84e0b4",
+    {id:"tirambarcosta",label:"tirambarcostadaurada.com",icon:"🍹",orbitRadius:4.14,orbitSpeed:.008,startAngle:4.2,inclination:.13,radius:.22,hex:"#84e0b4",
       type:"Website",status:"Live",devPct:null,
       desc:"Landing page for a bar-restaurant on the Costa Daurada. Menu showcase, location and contact information for a hospitality client.",
       tags:["WordPress","Web Design","CSS","Hospitality"],
@@ -875,6 +956,7 @@ const TECH_GROUPS=[
     {n:"Substance 3D Painter",mono:"Pt",col:"#ff5a7a"},
     {n:"Photoshop",src:DEVI("photoshop/photoshop-plain")},
     {n:"Unreal Engine",src:DEVI("unrealengine/unrealengine-original"),inv:true},
+    {n:"Godot",src:DEVI("godot/godot-original")},
   ]},
   {label:"Software, Data & AI",items:[
     {n:"Python",src:DEVI("python/python-original")},
@@ -899,7 +981,7 @@ const TECH_GROUPS=[
   ]},
 ];
 const EDUCATION=[
-  {when:"2025 – Present",title:"Master's Degree in Real-Time Art and Visual Effects",org:"FH Salzburg (Salzburg University of Applied Sciences)",
+  {when:"2026 – Present",title:"Master's Degree in Real-Time Art and Visual Effects",org:"FH Salzburg (Salzburg University of Applied Sciences)",
    text:"Currently studying a master's focused on **real-time art** and **visual effects** for games and interactive media."},
   {when:"2020 – 2025",title:"Bachelor's Degree in Game Design and Development",org:"Universitat de Girona (UdG)",
    text:"A multidisciplinary degree spanning **programming**, **game design**, **3D art**, **level design** and **technical implementation**. Final Degree Project (*Hollow End*) awarded **High Honors**."},
@@ -954,7 +1036,7 @@ export function TechGrid(){
     {TECH_GROUPS.map(g=>(<div key={g.label}>
       <div style={{fontSize:".62rem",color:"rgba(232,232,240,.45)",fontFamily:"'JetBrains Mono',monospace",letterSpacing:".2em",marginBottom:".7rem",textAlign:"center"}}>{g.label.toUpperCase()}</div>
       <div style={{display:"flex",flexWrap:"wrap",justifyContent:"center",gap:".7rem"}}>
-        {g.items.map(it=>(<div key={it.n} className="pf-tech" title={it.n} style={{width:"clamp(68px,6vw,86px)",boxSizing:"border-box",background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.08)",borderRadius:14,padding:"1rem .4rem .8rem",display:"flex",flexDirection:"column",alignItems:"center",gap:".6rem",textAlign:"center"}}>
+        {g.items.map(it=>(<div key={it.n} className="pf-tech" title={it.n} style={{width:"clamp(68px,6vw,80px)",boxSizing:"border-box",background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.08)",borderRadius:14,padding:"1rem .4rem .8rem",display:"flex",flexDirection:"column",alignItems:"center",gap:".6rem",textAlign:"center"}}>
           {it.src
             ?<img src={it.src} alt="" loading="lazy" width={40} height={40} style={{width:40,height:40,objectFit:"contain",filter:it.inv?"invert(1) brightness(1.6)":"none"}}/>
             :<div style={{width:40,height:40,borderRadius:9,background:`${it.col}1c`,border:`1.5px solid ${it.col}88`,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"'JetBrains Mono',monospace",fontWeight:700,fontSize:it.mono.length>2?".7rem":".95rem",color:it.col}}>{it.mono}</div>}
@@ -995,7 +1077,7 @@ export function AboutTab({c,onContact}){
   const[bioX,setBioX]=useState(false);
   const cv=`https://raw.githubusercontent.com/${GH_USER}/${GH_REPO}/${GH_BRANCH}/src/JordiAltisen_CV.pdf`;
   const info=[
-    {icon:"user",t:"Jordi Altisèn Cortijo",d:"Game Developer focused on Technical Art that also loves creating Intelligent & interactive systems."},
+    {icon:"user",t:"Jordi Altisèn Cortijo",d:"Creative Technologist working across real-time 3D, motion and interactive experiences. Currently studying a Master’s in Real-Time Art & VFX at FH Salzburg."},
     {icon:"pin",t:"Barcelona / Salzburg",d:"Based in Barcelona, where I build Hollow End and my other projects."},
     {icon:"langs",t:"Languages",d:STAR.langs.map(({l,lv})=>`${l} (${lv})`).join(" · ")},
     {icon:"sparkles",t:"What I do",d:"I bridge art and engineering: real-time pipelines, shaders, editor tools and optimisation in Unity, plus full-stack and AI products."},
@@ -1148,7 +1230,7 @@ export function CaseStudy({project,onClose}){
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:"1rem",padding:"1rem clamp(1.2rem,4vw,3rem) .7rem",maxWidth:1500,margin:"0 auto",width:"100%",boxSizing:"border-box"}}>
         <div style={{minWidth:0}}>
           <div style={{fontSize:".6rem",color:pC,fontFamily:"'JetBrains Mono',monospace",letterSpacing:".22em",marginBottom:".2rem"}}>{[project.type,project.status].filter(Boolean).join(" · ").toUpperCase()}</div>
-          <div style={{fontSize:"1.3rem",fontWeight:700,color:"#e8e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{project.label}</div>
+          <div style={{fontSize:"1.3rem",fontWeight:700,color:"#e8e8f0",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{project.title||project.label}</div>
         </div>
         <button onClick={onClose} style={{background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.18)",color:"#e8e8f0",width:38,height:38,borderRadius:"50%",cursor:"pointer",fontSize:"1.1rem",flexShrink:0}}>✕</button>
       </div>
@@ -1183,10 +1265,10 @@ export function CaseStudy({project,onClose}){
                 <div style={{height:3,background:"rgba(255,255,255,.06)",borderRadius:2}}><div style={{height:"100%",width:`${project.devPct}%`,background:`linear-gradient(90deg,${pC}66,${pC})`,borderRadius:2}}/></div>
               </div>)}
               {project.launchDate&&<div style={{marginBottom:"1.3rem"}}><Countdown targetDate={project.launchDate} c={pC}/></div>}
-              {project.cta&&(()=>{const href=project.ctaHref||"#";const ext=href.startsWith("http");const lp=ext?{href,target:"_blank",rel:"noopener noreferrer"}:{href:"#",onClick:e=>e.preventDefault()};
+              {project.cta&&(()=>{const href=project.ctaHref||"#";const ext=href.startsWith("http")||href.startsWith("/");const lp=ext?{href,target:"_blank",rel:"noopener noreferrer"}:{href:"#",onClick:e=>e.preventDefault()};
                 return(<a {...lp} className="pf-btn" style={{display:"block",textAlign:"center",padding:".85rem",background:`${pC}22`,border:`1px solid ${pC}66`,borderRadius:"10px",color:pC,textDecoration:"none",fontSize:".9rem",fontWeight:600,transition:"filter .2s"}}>{project.cta}</a>);})()}
               {project.links?.length>0&&(<div style={{display:"flex",flexDirection:"column",gap:".55rem",marginTop:project.cta?".55rem":0}}>
-                {project.links.map(l=>{const href=l.href||"#";const ext=href.startsWith("http");const lp=ext?{href,target:"_blank",rel:"noopener noreferrer"}:{href:"#",onClick:e=>e.preventDefault()};
+                {project.links.map(l=>{const href=l.href||"#";const ext=href.startsWith("http")||href.startsWith("/");const lp=ext?{href,target:"_blank",rel:"noopener noreferrer"}:{href:"#",onClick:e=>e.preventDefault()};
                   return(<a key={l.label} {...lp} className="pf-btn" style={{display:"block",textAlign:"center",padding:".85rem",background:`${pC}14`,border:`1px solid ${pC}44`,borderRadius:"10px",color:pC,textDecoration:"none",fontSize:".9rem",fontWeight:600,transition:"filter .2s"}}>{l.label}</a>);
                 })}
               </div>)}
@@ -1324,7 +1406,7 @@ function ProjectPanel({project,onClose}){
   };
   const TagsRow=()=><div style={{display:"flex",flexWrap:"wrap",gap:".38rem"}}>{project.tags.map(t=><T key={t} t={t}/>)}</div>;
   const WishlistBtn=({c=pC})=>{
-    const href=project.ctaHref||"#";const isExt=href.startsWith("http");
+    const href=project.ctaHref||"#";const isExt=href.startsWith("http")||href.startsWith("/");
     const lp=isExt?{href,target:"_blank",rel:"noopener noreferrer"}:{href:"#",onClick:e=>e.preventDefault()};
     return(<a {...lp} className="pf-btn" style={{display:"block",textAlign:"center",padding:".85rem",background:`${c}22`,border:`1px solid ${c}66`,borderRadius:"10px",color:c,textDecoration:"none",fontSize:".9rem",fontWeight:600,transition:"filter .2s"}}>{project.cta}</a>);
   };
@@ -1920,26 +2002,30 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
     const starLight=new THREE.PointLight(0xe2943d,8,350);scene.add(starLight);
     const starLight2=new THREE.PointLight(0xffbb66,3.5,200);scene.add(starLight2);
     scene.add(new THREE.Mesh(new THREE.SphereGeometry(400,20,10),new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,vertexShader:`varying vec3 vD;void main(){vD=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,fragmentShader:NEBFRAG})));
+    [[340,1.3,.07,.00015],[280,4.7,.05,-.00022]].forEach(([r,seed,str,spin])=>{const m=new THREE.Mesh(new THREE.SphereGeometry(r,32,16),new THREE.ShaderMaterial({side:THREE.BackSide,depthWrite:false,transparent:true,blending:THREE.AdditiveBlending,vertexShader:`varying vec3 vD;void main(){vD=normalize(position);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,fragmentShader:nebShellFrag(seed,str)}));m.onBeforeRender=()=>{m.rotation.y+=spin;};scene.add(m);});
     const mkStars=(n,rMin,rMax,sz,op,t)=>{const p=new Float32Array(n*3),c=new Float32Array(n*3);for(let i=0;i<n;i++){const θ=Math.random()*Math.PI*2,φ=Math.acos(2*Math.random()-1),r=rMin+Math.random()*(rMax-rMin);p[i*3]=r*Math.sin(φ)*Math.cos(θ);p[i*3+1]=r*Math.sin(φ)*Math.sin(θ);p[i*3+2]=r*Math.cos(φ);c[i*3]=t[0]+(Math.random()*.2-.1);c[i*3+1]=t[1]+(Math.random()*.2-.1);c[i*3+2]=t[2]+(Math.random()*.2-.1);}const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.BufferAttribute(p,3));g.setAttribute("color",new THREE.BufferAttribute(c,3));return new THREE.Points(g,new THREE.PointsMaterial({size:sz,vertexColors:true,transparent:true,opacity:op,sizeAttenuation:false}));};
-    scene.add(mkStars(1400,130,350,.8,.7,[.9,.9,1.]));scene.add(mkStars(250,90,200,1.5,.88,[1.,1.,.85]));scene.add(mkStars(30,70,150,2.5,.95,[1.,.8,.6]));
+    scene.add(mkStars(3000,130,350,.8,.7,[.9,.9,1.]));scene.add(mkStars(500,90,200,1.5,.88,[1.,1.,.85]));scene.add(mkStars(60,70,150,2.5,.95,[1.,.8,.6]));scene.add(mkStars(2500,150,380,.45,.45,[.8,.85,1.]));
     const DN=400,dp=new Float32Array(DN*3),dv=new Float32Array(DN*3);
     const spD=i=>{dp[i*3]=-80+Math.random()*45;dp[i*3+1]=(Math.random()-.5)*55;dp[i*3+2]=(Math.random()-.5)*90;dv[i*3]=.012+Math.random()*.007;dv[i*3+1]=(Math.random()-.5)*.003;dv[i*3+2]=(Math.random()-.5)*.004;};
     for(let i=0;i<DN;i++)spD(i);
     const dustGeo=new THREE.BufferGeometry();dustGeo.setAttribute("position",new THREE.BufferAttribute(dp,3));
     scene.add(new THREE.Points(dustGeo,new THREE.PointsMaterial({color:0xccccee,size:.04,transparent:true,opacity:.28,sizeAttenuation:false})));
-    const starMat=new THREE.ShaderMaterial({uniforms:{u_t:{value:0}},vertexShader:VERT,fragmentShader:FRAG});
-    const starMesh=new THREE.Mesh(new THREE.SphereGeometry(3.2,32,32),starMat);
+    const starMat=new THREE.ShaderMaterial({uniforms:{u_t:{value:0}},vertexShader:SUN_VERT,fragmentShader:SUN_FRAG});
+    const starMesh=new THREE.Mesh(new THREE.SphereGeometry(3.2,96,64),starMat);
     starMesh.userData={type:"star"};scene.add(starMesh);
-    [[5.2,.06],[8,.028],[13,.016],[22,.007]].forEach(([r,o])=>scene.add(new THREE.Mesh(new THREE.SphereGeometry(r,16,16),new THREE.MeshBasicMaterial({color:0xe2943d,transparent:true,opacity:o,side:THREE.BackSide,depthWrite:false}))));
+    const corona=new THREE.Mesh(new THREE.PlaneGeometry(19.2,19.2),new THREE.ShaderMaterial({uniforms:{u_t:starMat.uniforms.u_t},vertexShader:CORONA_VERT,fragmentShader:CORONA_FRAG,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));corona.onBeforeRender=(r,sc,cam)=>{corona.quaternion.copy(cam.quaternion);};scene.add(corona);
     const SS=Array.from({length:6},()=>{const pa=new Float32Array(6);const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.BufferAttribute(pa,3));const m=new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:0});const l=new THREE.Line(g,m);scene.add(l);return{line:l,mat:m,geo:g,pa,active:false,life:0,x:0,y:0,z:0,dx:0,dy:0,dz:0};});
     let nextSST=8;
     const mkBelt=(n,inn,out,sz,op)=>{const p=new Float32Array(n*3);for(let i=0;i<n;i++){const a=Math.random()*Math.PI*2,r=inn+Math.random()*(out-inn);p[i*3]=Math.cos(a)*r;p[i*3+1]=(Math.random()-.5)*2.5;p[i*3+2]=Math.sin(a)*r;}const g=new THREE.BufferGeometry();g.setAttribute("position",new THREE.BufferAttribute(p,3));return new THREE.Points(g,new THREE.PointsMaterial({color:0x998877,size:sz,transparent:true,opacity:op}));};
-    const innerBelt=mkBelt(450,15.5,19,.20,.55),innerBelt2=mkBelt(55,16,18.5,.48,.40);
+    // Belts sit centred between two neighbouring orbits (Environments|Games and Tools|AI), so they follow any orbit changes.
+    const beltBetween=(a,b,w)=>{const m=(a.orbitRadius+b.orbitRadius)/2,h=(b.orbitRadius-a.orbitRadius)*w/2;return [m-h,m+h];};
+    const [ib0,ib1]=beltBetween(PLANETS[1],PLANETS[2],.32),[ob0,ob1]=beltBetween(PLANETS[4],PLANETS[5],.4);
+    const innerBelt=mkBelt(450,ib0,ib1,.20,.55),innerBelt2=mkBelt(55,ib0+.25,ib1-.25,.48,.40);
     scene.add(innerBelt);scene.add(innerBelt2);
-    [15.5,19].forEach(r=>{const pts=[];for(let i=0;i<=128;i++){const a=(i/128)*Math.PI*2;pts.push(new THREE.Vector3(Math.cos(a)*r,0,Math.sin(a)*r));}const g=new THREE.BufferGeometry().setFromPoints(pts);const l=new THREE.Line(g,new THREE.LineDashedMaterial({color:0x665544,transparent:true,opacity:.04,dashSize:r*.2,gapSize:r*.12}));l.computeLineDistances();scene.add(l);});
-    const outerBelt=mkBelt(700,40,48,.22,.62),outerBelt2=mkBelt(90,41,47,.55,.42);
+    [ib0,ib1].forEach(r=>{const pts=[];for(let i=0;i<=128;i++){const a=(i/128)*Math.PI*2;pts.push(new THREE.Vector3(Math.cos(a)*r,0,Math.sin(a)*r));}const g=new THREE.BufferGeometry().setFromPoints(pts);const l=new THREE.Line(g,new THREE.LineDashedMaterial({color:0x665544,transparent:true,opacity:.04,dashSize:r*.2,gapSize:r*.12}));l.computeLineDistances();scene.add(l);});
+    const outerBelt=mkBelt(700,ob0,ob1,.22,.62),outerBelt2=mkBelt(90,ob0+.5,ob1-.5,.55,.42);
     scene.add(outerBelt);scene.add(outerBelt2);
-    [40,48].forEach(r=>{const pts=[];for(let i=0;i<=128;i++){const a=(i/128)*Math.PI*2;pts.push(new THREE.Vector3(Math.cos(a)*r,0,Math.sin(a)*r));}const g=new THREE.BufferGeometry().setFromPoints(pts);const l=new THREE.Line(g,new THREE.LineDashedMaterial({color:0x776655,transparent:true,opacity:.05,dashSize:r*.2,gapSize:r*.12}));l.computeLineDistances();scene.add(l);});
+    [ob0,ob1].forEach(r=>{const pts=[];for(let i=0;i<=128;i++){const a=(i/128)*Math.PI*2;pts.push(new THREE.Vector3(Math.cos(a)*r,0,Math.sin(a)*r));}const g=new THREE.BufferGeometry().setFromPoints(pts);const l=new THREE.Line(g,new THREE.LineDashedMaterial({color:0x776655,transparent:true,opacity:.05,dashSize:r*.2,gapSize:r*.12}));l.computeLineDistances();scene.add(l);});
     const TRAIL_N=55,TRAIL_ARC=.72,trails={};
     PLANETS.forEach(p=>{const pos=new Float32Array(TRAIL_N*3),col=new Float32Array(TRAIL_N*3);const geo=new THREE.BufferGeometry();geo.setAttribute("position",new THREE.BufferAttribute(pos,3));geo.setAttribute("color",new THREE.BufferAttribute(col,3));const mat=new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:.65});const line=new THREE.Line(geo,mat);scene.add(line);const pC=new THREE.Color(p.hex);trails[p.id]={geo,pos,col,mat,line,r:pC.r,g:pC.g,b:pC.b};});
     const pMeshes={},angles={},moonOrbitLines={},allTargets=[starMesh];
@@ -1948,21 +2034,13 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
     PLANETS.forEach(p=>{
       angles[p.id]=p.startAngle;const inc=p.orbitTilt||0;
       const oPts=[];for(let i=0;i<=128;i++){const a=(i/128)*Math.PI*2;oPts.push(new THREE.Vector3(Math.cos(a)*p.orbitRadius,0,Math.sin(a)*p.orbitRadius));}
-      const oLine=new THREE.Line(new THREE.BufferGeometry().setFromPoints(oPts),new THREE.LineDashedMaterial({color:new THREE.Color(p.hex),transparent:true,opacity:.22,dashSize:p.orbitRadius*.18,gapSize:p.orbitRadius*.09}));
+      const oLine=new THREE.Line(new THREE.BufferGeometry().setFromPoints(oPts),new THREE.LineDashedMaterial({color:new THREE.Color(p.hex),transparent:true,opacity:.1,dashSize:p.orbitRadius*.18,gapSize:p.orbitRadius*.09}));
       if(inc)oLine.rotation.x=-inc;oLine.computeLineDistances();scene.add(oLine);
-      const pfrag=PF[p.id];let pMat;
-      if(pfrag){pMat=new THREE.ShaderMaterial({uniforms:{u_t:{value:0},u_hover:{value:0}},vertexShader:PVERT,fragmentShader:pfrag});}
-      else{const pC=new THREE.Color(p.hex);pMat=new THREE.MeshStandardMaterial({color:pC.clone().multiplyScalar(.5),emissive:pC,emissiveIntensity:.42,roughness:.55,metalness:.1});}
+      const pMat=new THREE.ShaderMaterial({uniforms:{u_t:{value:0},u_hover:{value:0},u_col:{value:new THREE.Color(p.hex)},u_seed:{value:p.orbitRadius*.41}},vertexShader:PVERT_LIT,fragmentShader:litPlanet(PF_PAL)});
       const pMesh=new THREE.Mesh(new THREE.SphereGeometry(p.radius,32,32),pMat);pMesh.userData={type:"planet",id:p.id};scene.add(pMesh);allTargets.push(pMesh);
       const pOrbHit=new THREE.Mesh(new THREE.RingGeometry(Math.max(.15,p.orbitRadius-p.radius*3.8),p.orbitRadius+p.radius*3.8,96),new THREE.MeshBasicMaterial({transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false}));
       pOrbHit.rotation.x=-Math.PI/2+(p.orbitTilt||0);pOrbHit.userData={type:"planet",id:p.id};scene.add(pOrbHit);allTargets.push(pOrbHit);
       const pC2=new THREE.Color(p.hex);
-      const atmoMat=new THREE.MeshBasicMaterial({color:pC2,transparent:true,opacity:.14,side:THREE.BackSide,depthWrite:false});
-      const atmo=new THREE.Mesh(new THREE.SphereGeometry(p.radius*1.32,16,16),atmoMat);scene.add(atmo);
-      const haloMat=new THREE.MeshBasicMaterial({color:pC2,transparent:true,opacity:.07,side:THREE.BackSide,depthWrite:false});
-      const halo=new THREE.Mesh(new THREE.SphereGeometry(p.radius*2.3,12,12),haloMat);scene.add(halo);
-      const bloomMat=new THREE.MeshBasicMaterial({color:pC2,transparent:true,opacity:.025,side:THREE.BackSide,depthWrite:false});
-      const bloom=new THREE.Mesh(new THREE.SphereGeometry(p.radius*3.8,10,10),bloomMat);scene.add(bloom);
       let ring=null,ring2=null;
       if(p.rings){
         const rGeo=new THREE.RingGeometry(p.radius*1.55,p.radius*2.55,64);
@@ -1972,7 +2050,9 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
         const rMat2=new THREE.MeshBasicMaterial({color:pC2.clone().multiplyScalar(.5),side:THREE.DoubleSide,transparent:true,opacity:.16,depthWrite:false});
         ring2=new THREE.Mesh(rGeo2,rMat2);ring2.rotation.x=Math.PI/2;ring2.rotation.z=0.48;scene.add(ring2);
       }
-      pMeshes[p.id]={mesh:pMesh,mat:pMat,isShader:!!pfrag,atmo,atmoMat,halo,haloMat,bloom,bloomMat,mMeshes:{},ring,ring2};
+      const glowSpr=new THREE.Mesh(new THREE.PlaneGeometry(p.radius*7,p.radius*7),new THREE.ShaderMaterial({uniforms:{u_col:{value:new THREE.Color(p.hex)},u_int:{value:.55}},vertexShader:CORONA_VERT,fragmentShader:PGLOW_FRAG,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));
+      glowSpr.onBeforeRender=(r,sc,cam)=>{glowSpr.quaternion.copy(cam.quaternion);};scene.add(glowSpr);
+      pMeshes[p.id]={mesh:pMesh,mat:pMat,glowSpr,oLine,mMeshes:{},ring,ring2};
       p.moons.forEach(m=>{angles[m.id]=m.startAngle;
         const mOPts=[];for(let i=0;i<=64;i++){const a=(i/64)*Math.PI*2;mOPts.push(new THREE.Vector3(Math.cos(a)*m.orbitRadius,0,Math.sin(a)*m.orbitRadius));}
         const mol=new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(mOPts),new THREE.LineBasicMaterial({color:new THREE.Color(m.hex),transparent:true,opacity:.16}));mol.rotation.x=m.inclination;mol.visible=false;scene.add(mol);moonOrbitLines[m.id]={line:mol};
@@ -2069,13 +2149,15 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
       PLANETS.forEach(p=>{
         const frozen=camS.mode==="planet"&&camS.planetId===p.id;if(!frozen)angles[p.id]+=p.orbitSpeed;
         const inc=p.orbitTilt||0;const px=Math.cos(angles[p.id])*p.orbitRadius,py=Math.sin(angles[p.id])*p.orbitRadius*Math.sin(inc),pz=Math.sin(angles[p.id])*p.orbitRadius*Math.cos(inc);
-        const pm=pMeshes[p.id];pm.mesh.position.set(px,py,pz);pm.atmo.position.set(px,py,pz);pm.halo.position.set(px,py,pz);pm.bloom.position.set(px,py,pz);pm.mesh.rotation.y+=.005;
+        const pm=pMeshes[p.id];pm.mesh.position.set(px,py,pz);pm.mesh.rotation.y+=.005;
         if(pm.ring){pm.ring.position.set(px,py,pz);pm.ring2.position.set(px,py,pz);}
         const hv=hov.current?.id===p.id&&hov.current?.type==="planet",active=camS.mode==="planet"&&camS.planetId===p.id;
-        pm.atmoMat.opacity=active?.32:hv?.24:.14;pm.haloMat.opacity=active?.14:hv?.10:.07;pm.bloomMat.opacity=active?.055:hv?.04:.025;
+        // Featured planets (Games, AI) glow brighter and breathe slowly; the rest stay still.
+        pm.glowSpr.position.set(px,py,pz);{const F=!!p.featured,pulse=F?Math.sin(t*1.6+angles[p.id]*3.):0;const u=pm.glowSpr.material.uniforms.u_int;u.value+=(((active||hv)?1.1:F?.95+.15*pulse:.5)-u.value)*.1;
+          const sc=(hv?1.15:1)*(1+.035*pulse);pm.mesh.scale.setScalar(pm.mesh.scale.x+(sc-pm.mesh.scale.x)*.12);
+          pm.oLine.material.opacity+=(((active||hv)?.45:.1)-pm.oLine.material.opacity)*.1;}
         if(pm.ring){pm.ring.material.opacity=active?.45:hv?.40:.35;}
-        if(pm.isShader){pm.mat.uniforms.u_t.value=t;const th=active?.9:hv?.55:0;pm.mat.uniforms.u_hover.value+=(th-pm.mat.uniforms.u_hover.value)*.1;}
-        else pm.mat.emissiveIntensity=active?.65:hv?.58:.42+Math.sin(t*.7+angles[p.id])*.08;
+        pm.mat.uniforms.u_t.value=t;{const th=active?.9:hv?.55:0;pm.mat.uniforms.u_hover.value+=(th-pm.mat.uniforms.u_hover.value)*.1;}
         if(trails[p.id]){const tr=trails[p.id];for(let i=0;i<TRAIL_N;i++){const a=angles[p.id]-(i/TRAIL_N)*TRAIL_ARC;tr.pos[i*3]=Math.cos(a)*p.orbitRadius;tr.pos[i*3+1]=Math.sin(a)*p.orbitRadius*Math.sin(inc);tr.pos[i*3+2]=Math.sin(a)*p.orbitRadius*Math.cos(inc);const al=((TRAIL_N-i)/TRAIL_N)*.6;tr.col[i*3]=tr.r*al;tr.col[i*3+1]=tr.g*al;tr.col[i*3+2]=tr.b*al;}tr.geo.attributes.position.needsUpdate=true;tr.geo.attributes.color.needsUpdate=true;}
         p.moons.forEach(m=>{angles[m.id]+=m.orbitSpeed;const a2=angles[m.id],ci=Math.cos(m.inclination),si=Math.sin(m.inclination);
           const mx=px+Math.cos(a2)*m.orbitRadius,my=py-Math.sin(a2)*m.orbitRadius*si,mz=pz+Math.sin(a2)*m.orbitRadius*ci;
@@ -2109,7 +2191,8 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
   },[]);
   return(<div style={{position:"relative",width:"100%",height:"100%"}}>
     <canvas ref={cvRef} style={{position:"absolute",inset:0,width:"100%",height:"100%",touchAction:"none"}}/>
-    {ALL_ITEMS.map(item=>(<div key={item.id} ref={el=>{labRefs.current[item.id]=el;}} style={{position:"absolute",pointerEvents:"none",fontFamily:"'Space Grotesk',sans-serif",transition:"opacity .2s,transform .2s",userSelect:"none"}}><div style={{fontSize:item.type==="moon"?".65rem":".73rem",fontWeight:600,color:"#e8e8f0",whiteSpace:"nowrap",background:"rgba(5,5,14,.78)",backdropFilter:"blur(6px)",padding:item.type==="moon"?".15rem .42rem":".2rem .58rem",borderRadius:"5px",border:`1px solid ${item.hex}33`,textShadow:`0 0 12px ${item.hex}`}}>{item.label}</div></div>))}
+    {ALL_ITEMS.map(item=>(<div key={item.id} ref={el=>{labRefs.current[item.id]=el;}} style={{position:"absolute",pointerEvents:"none",fontFamily:"'Space Grotesk',sans-serif",transition:"opacity .2s,transform .2s",userSelect:"none"}}>{(()=>{const pl=item.type==="planet"?PLANETS.find(p=>p.id===item.id):null;const hx=pl?.hex||item.hex;const feat=!!pl?.featured;
+      return(<div style={{fontSize:item.type==="moon"?".65rem":".73rem",fontWeight:feat?700:600,color:feat?"#fff":"#e8e8f0",whiteSpace:"nowrap",background:"rgba(5,5,14,.78)",backdropFilter:"blur(6px)",padding:item.type==="moon"?".15rem .42rem":".2rem .58rem",borderRadius:"5px",border:`1px solid ${hx}${feat?"77":"33"}`,textShadow:`0 0 12px ${hx}`}}>{item.label}</div>);})()}</div>))}
     <div ref={hintRef} style={{position:"absolute",bottom:"1.5rem",left:"1.5rem",fontFamily:"'JetBrains Mono',monospace",fontSize:".57rem",color:`${STAR.hex}44`,letterSpacing:".12em",userSelect:"none"}}/>
     <div style={{position:"absolute",inset:0,pointerEvents:"none",background:"radial-gradient(ellipse at center,transparent 40%,rgba(0,0,8,.5) 100%)"}}/>
   </div>);

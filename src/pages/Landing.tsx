@@ -105,18 +105,18 @@ export default function Landing() {
   const pillars = [
     {
       icon: "✦",
-      title: "Intelligent Systems",
-      text: "Design and build end-to-end tools, agents, and workflows powered by Generative AI.",
+      title: "Real-Time 3D & Environments",
+      text: "Games, immersive installations and interactive spaces built in Unity and Unreal Engine, from modular environments to lighting, atmosphere and scene composition.",
     },
     {
       icon: "✦",
-      title: "Game Development",
-      text: "Design and build games, from gameplay systems and mechanics to complete interactive experiences, with a strong focus on environment art, game design and player experience.",
+      title: "Motion & VFX",
+      text: "Shaders, real-time effects and procedural animation using tools like Houdini, Unreal Engine and Blender, balancing visual impact with performance.",
     },
     {
       icon: "✦",
-      title: "Technical Art",
-      text: "Bridge art and engineering with custom tools, shaders, and real-time production pipelines.",
+      title: "Tools & Interactive Tech",
+      text: "Custom editor tools, procedural workflows, interactive web experiences and AI-powered applications that simplify workflows and speed up production.",
     },
   ];
 
@@ -253,16 +253,6 @@ export default function Landing() {
                   >
                     Jordi.
                   </span>
-                  <br />
-                  {["Welcome", "to", "my", "portfolio!"].map((w, i) => (
-                    <span
-                      key={i}
-                      className="word"
-                      style={{ animationDelay: `${0.42 + i * 0.07}s`, marginRight: ".32em" }}
-                    >
-                      {w}
-                    </span>
-                  ))}
                 </h1>
                 <p
                   style={{
@@ -274,8 +264,10 @@ export default function Landing() {
                     animation: "introIn .8s .3s both",
                   }}
                 >
-                  Game Developer focused on Technical Art, with a passion for building
-                  AI-powered systems and interactive experiences.
+                  <span style={{ display: "block", color: "rgba(255,248,240,.88)", marginBottom: ".6rem" }}>
+                    Creative Technologist working across real-time 3D, motion and interactive experiences.
+                  </span>
+                  From games and immersive installations to interactive web experiences.
                 </p>
                 <div
                   className="hero-ctas"
