@@ -693,7 +693,6 @@ export const CSS=`
 .qn-grid{grid-template-columns:repeat(3,1fr)}
 @media(max-width:900px){.qn-grid{grid-template-columns:repeat(2,1fr)!important}}
 @media(max-width:560px){.qn-grid{grid-template-columns:1fr!important}}
-@media(max-width:760px){.about-info-grid{grid-template-columns:1fr!important}}
 @media(max-width:560px){.about-info-grid{grid-template-columns:1fr!important}}
 @media(max-width:640px){.hdr-nav-desktop{display:none!important}.hdr-burger{display:flex!important;align-items:center;justify-content:center}.status-bar-chrome,.planet-nav-chrome{display:none!important}}
 @keyframes shimmer{0%{background-position:-180% 0}100%{background-position:180% 0}}
@@ -1076,7 +1075,9 @@ export function ExperienceGrid({c}){
 export function AboutTab({c,onContact}){
   const[bioX,setBioX]=useState(false);
   const cv=`https://raw.githubusercontent.com/${GH_USER}/${GH_REPO}/${GH_BRANCH}/src/JordiAltisen_CV.pdf`;
+  const now=new Date(),age=now.getFullYear()-2001-((now.getMonth()<9||(now.getMonth()===9&&now.getDate()<17))?1:0);
   const info=[
+    {icon:"user",t:"Jordi Altisèn Cortijo",d:`${age} years old · born 17 October 2001`},
     {icon:"pin",t:"Salzburg, Austria",d:"Originally from Barcelona"},
     {icon:"langs",t:"Languages",d:STAR.langs.map(({l,lv})=>`${l} (${lv})`).join(" · ")},
     {icon:"sparkles",t:"Currently",d:"Master’s in Real-Time Art & VFX at FH Salzburg"},
@@ -1097,7 +1098,7 @@ export function AboutTab({c,onContact}){
       </div>
     </div>
 
-    <div className="about-info-grid" style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:"1rem",marginTop:"2.2rem"}}>
+    <div className="about-info-grid" style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:"1rem",marginTop:"2.2rem"}}>
       {info.map(it=>(<div key={it.t} style={aboutCard}>
         <div style={{display:"flex",alignItems:"center",gap:".8rem",marginBottom:".7rem"}}><IcoBox n={it.icon} c={c}/><span style={{fontSize:"1.05rem",fontWeight:700,color:"#f0f0f6"}}>{it.t}</span></div>
         <p style={{fontSize:".85rem",lineHeight:1.65,color:"rgba(232,232,240,.66)",margin:0}}>{it.d}</p>
