@@ -191,8 +191,10 @@ export default function Landing() {
                     animation: "introIn .8s .3s both",
                   }}
                 >
-                  Creative Technologist working across real-time 3D, motion and interactive experiences. From games
-                  and immersive installations to interactive web experiences.
+                  <strong style={{ fontWeight: 600, color: "rgba(255,248,240,.88)" }}>
+                    Creative Technologist working across real-time 3D, motion and interactive experiences.
+                  </strong>{" "}
+                  From games and immersive installations to interactive web experiences.
                 </p>
                 <div
                   className="hero-ctas"
