@@ -272,7 +272,7 @@ summary:"I’m a Creative Technologist with 3+ years of experience in real-time 
 bio:"I’ve always been curious about how things work, and I love to explore new options, either mentally or geographically. I started out in Computer Engineering, moved into Game Development, and eventually found my way into real-time art. Along the way, I realised I enjoy the space between disciplines most: where art meets code, and ideas become things people can actually experience.\n\nThat curiosity goes well beyond 3D. I can easily lose an evening reading about the cosmos, biology or how the mind works, just because a question caught my attention. I play the piano almost every day, enjoy cooking for friends, and I’m always learning a new language. Right now, it’s German, one grammar rule at a time.",
 bioExtended:"I’ve always been curious about how things work, and I love to explore new options, either mentally or geographically. I started out in Computer Engineering, moved into Game Development, and eventually found my way into real-time art. Along the way, I realised I enjoy the space between disciplines most: where art meets code, and ideas become things people can actually experience.\n\nThat curiosity goes well beyond 3D. I can easily lose an evening reading about the cosmos, biology or how the mind works, just because a question caught my attention. I play the piano almost every day, enjoy cooking for friends, and I’m always learning a new language. Right now, it’s German, one grammar rule at a time.\n\nI also like to stay active. I train calisthenics, I’m looking forward to exploring the Alps on skis, and back home I was part of a castellers group, building human towers. It taught me a lot about trust, coordination and relying on the people around you. I’ve also worked as a heritage tour guide and history teacher, which I loved for the chance to share the stories behind places and see them through someone else’s eyes.\n\nA few years ago, I passed through Salzburg on an Interrail trip. Now I live here. I guess that’s quite typical of me: when something sparks my curiosity, I usually end up following it.",
 skills:[{s:"Unity / C#",p:88},{s:"Blender / 3D Art",p:86},{s:"Shader Graph / VFX",p:80},{s:"Substance 3D Painter",p:78},{s:"Game Design",p:85},{s:"React / Web",p:76},{s:"Python / AI",p:72},{s:"Git",p:82}],
-langs:[{l:"English",lv:"C1"},{l:"German",lv:"B1, learning"},{l:"Catalan",lv:"Native"},{l:"Spanish",lv:"Native"},{l:"Italian",lv:"B1"}],
+langs:[{l:"English",lv:"C1"},{l:"German",lv:"(studying B1)"},{l:"Catalan",lv:""},{l:"Spanish",lv:""},{l:"Italian",lv:"B1"}],
 timeline:[{y:"Q4 2026",l:"Steam release",d:"Planned launch of Hollow End."},{y:"2025",l:"Graduated in Game Design & Development",d:"Final Degree Project awarded High Honors."},{y:"2024",l:"Began developing Hollow End",d:"A solo photorealistic horror game in Unity HDRP."},{y:"2024",l:"Joined DXC Technology",d:"ServiceNow Software Developer."},{y:"2020",l:"Switched to Game Design & Development",d:"University of Girona."},{y:"2019",l:"Started Computer Engineering",d:""},{y:"2019",l:"Graduated High School",d:""}]};
 
 const CP_CATEGORIES=[
@@ -469,6 +469,7 @@ export const PLANETS=[
   {id:"games",label:"Games",icon:"🎮",hex:"#E561AD",orbitRadius:24,orbitSpeed:.0022,startAngle:.8,radius:1.7,featured:true,desc:"Game development projects.",moons:[
     {id:"hollow-end",label:"Hollow End",icon:"🎮",orbitRadius:3.91,orbitSpeed:.009,startAngle:1,inclination:.24,radius:.40,hex:"#aa88cc",
       categories:HE_CATEGORIES,launchDate:TARGET_DATE,type:"Horror Game",status:"Steam · Oct 2026",devPct:68,
+      cardDesc:"A photorealistic first-person horror game with two worlds in one: an abandoned subway station and a liminal backroom. Solo-developed, awarded High Honours.",
       desc:"Hollow End is a first-person horror exploration game set in an abandoned subway station, where the player must find a way out by exploring, solving puzzles, and making the right decisions. Inspired by escape rooms and liminal spaces, the game replaces combat with atmosphere, observation, and environmental storytelling. Originally developed as my Final Degree Project and awarded High Honours, it became an opportunity to focus on the career path I want to pursue: Technical Art.",
       tags:["Unity","C#","HDRP","Blender","Horror","Backrooms","Steam"],
       features:["First-person psychological horror","Unity HDRP","Environmental storytelling","Exploration, Puzzles & Decision Making","Backrooms & Liminal Spaces","PC / Steam · Oct 2026"],
@@ -1079,7 +1080,7 @@ export function AboutTab({c,onContact}){
   const info=[
     {icon:"user",t:"Jordi Altisèn Cortijo",d:`${age} years old · born 17 October 2001`},
     {icon:"pin",t:"Salzburg, Austria",d:"Originally from Barcelona"},
-    {icon:"langs",t:"Languages",d:STAR.langs.map(({l,lv})=>`${l} (${lv})`).join(" · ")},
+    {icon:"langs",t:"Languages",d:STAR.langs.map(({l,lv})=>lv?`${l} ${lv}`:l).join(" · ")},
     {icon:"sparkles",t:"Currently",d:"Master’s in Real-Time Art & VFX at FH Salzburg"},
   ];
   const sec={marginTop:"3.2rem"};
@@ -1782,7 +1783,7 @@ export function FeaturedCarousel({onOpen,big}){
           <div style={{padding:big?"1.15rem 1.3rem 1.4rem":"1rem 1.15rem 1.25rem"}}>
             <div style={{fontSize:".58rem",color:m.catHex,fontFamily:TK.mono,letterSpacing:".18em",marginBottom:".4rem"}}>{m.catLabel.toUpperCase()}</div>
             <div style={{fontSize:big?"1.1rem":".98rem",fontWeight:700,color:"#e8e8f0",marginBottom:".45rem"}}>{m.label}</div>
-            <div style={{fontSize:".76rem",color:TK.tx.mid,lineHeight:1.55,marginBottom:".8rem",display:"-webkit-box",WebkitLineClamp:3,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{m.desc||m.type}</div>
+            <div style={{fontSize:".76rem",color:TK.tx.mid,lineHeight:1.55,marginBottom:".8rem",display:"-webkit-box",WebkitLineClamp:4,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{m.cardDesc||m.desc||m.type}</div>
             <div style={{display:"flex",flexWrap:"wrap",gap:".3rem"}}>
               {(m.tags||[]).slice(0,4).map(tg=><span key={tg} style={{fontSize:".58rem",padding:".18rem .5rem",background:`${m.catHex}18`,border:`1px solid ${m.catHex}38`,borderRadius:"5px",color:m.catHex,fontFamily:TK.mono}}>{tg}</span>)}
             </div>
@@ -1897,7 +1898,7 @@ export function QuickNav({open,onClose,onSelectProject,filter,onFilterChange,jum
               </div>
               <div style={{padding:"1rem 1.15rem 1.2rem"}}>
                 <div style={{fontSize:".95rem",fontWeight:700,color:"#e8e8f0",marginBottom:".35rem"}}>{m.label}</div>
-                <div style={{fontSize:".73rem",color:"rgba(232,232,240,.55)",lineHeight:1.55,marginBottom:".75rem",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{m.desc||m.type}</div>
+                <div style={{fontSize:".73rem",color:"rgba(232,232,240,.55)",lineHeight:1.55,marginBottom:".75rem",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{m.cardDesc||m.desc||m.type}</div>
                 <div style={{display:"flex",flexWrap:"wrap",gap:".32rem"}}>
                   {(m.tags||[]).slice(0,4).map(tg=><span key={tg} style={{fontSize:".6rem",padding:".2rem .5rem",background:`${m.hex}14`,border:`1px solid ${m.hex}33`,borderRadius:"5px",color:m.hex,fontFamily:"'JetBrains Mono',monospace"}}>{tg}</span>)}
                 </div>
@@ -1917,7 +1918,7 @@ export function QuickNav({open,onClose,onSelectProject,filter,onFilterChange,jum
                 </div>
                 <div style={{padding:"1rem 1.15rem 1.2rem"}}>
                   <div style={{fontSize:".95rem",fontWeight:700,color:"#e8e8f0",marginBottom:".35rem"}}>{m.label}</div>
-                  <div style={{fontSize:".73rem",color:"rgba(232,232,240,.55)",lineHeight:1.55,marginBottom:".75rem",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{m.desc||m.type}</div>
+                  <div style={{fontSize:".73rem",color:"rgba(232,232,240,.55)",lineHeight:1.55,marginBottom:".75rem",display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{m.cardDesc||m.desc||m.type}</div>
                   <div style={{display:"flex",flexWrap:"wrap",gap:".32rem"}}>
                     {(m.tags||[]).slice(0,4).map(tg=><span key={tg} style={{fontSize:".6rem",padding:".2rem .5rem",background:`${m.hex}14`,border:`1px solid ${m.hex}33`,borderRadius:"5px",color:m.hex,fontFamily:"'JetBrains Mono',monospace"}}>{tg}</span>)}
                   </div>

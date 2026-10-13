@@ -35,18 +35,18 @@ export default function Landing() {
   const pillars = [
     {
       icon: "✦",
-      title: "Real-Time 3D & Environments",
-      text: "Games, immersive installations and interactive spaces, from modular environments to lighting, atmosphere and scene composition.",
+      title: "Real-Time 3D",
+      text: "Environments and games built in Unity, Unreal and Blender.",
     },
     {
       icon: "✦",
-      title: "Motion & VFX",
-      text: "Shaders, real-time effects and procedural animation balancing visual impact with performance.",
+      title: "Shaders & VFX",
+      text: "Custom shaders and real-time effects optimised for performance.",
     },
     {
       icon: "✦",
-      title: "Tools & Interactive Tech",
-      text: "Custom editor tools, procedural workflows, interactive web experiences and AI-powered applications that simplify workflows and speed up production.",
+      title: "Tools & AI",
+      text: "Production tools, pipeline automation and AI applications.",
     },
   ];
 
@@ -192,9 +192,9 @@ export default function Landing() {
                   }}
                 >
                   <strong style={{ fontWeight: 600, color: "rgba(255,248,240,.88)" }}>
-                    Creative Technologist working across real-time 3D, motion and interactive experiences.
+                    3D &amp; Technical Artist with a background in game development and software engineering.
                   </strong>{" "}
-                  From games and immersive installations to interactive web experiences.
+                  Real-time environments, shaders, tools, and AI-powered workflows.
                 </p>
                 <div
                   className="hero-ctas"
@@ -369,10 +369,10 @@ export default function Landing() {
               }}
             >
               {[
-                ["140+", "Production assets"],
-                ["3+", "Years in game dev"],
-                ["3,000+", "Hours in Blender"],
-                ["High Honors", "Final degree project"],
+                ["+155", "Production assets"],
+                ["+3", "Years of experience"],
+                ["+3,000", "Hours in Blender"],
+                ["High Honours", "Final Degree Project"],
               ].map(([n, l]) => (
                 <div
                   key={l}
