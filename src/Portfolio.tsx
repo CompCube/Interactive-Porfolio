@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback, createContext, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import * as THREE from "three";
 
 const PH=`uniform float u_t;uniform float u_hover;varying vec3 vP;varying vec3 vN;`;
@@ -2202,7 +2202,18 @@ function SolarScene({onStarClick,onMoonClick,onEnterPlanet,onExitPlanet,onHoverM
 export default function Portfolio(){
   const navigate=useNavigate();
   const[activePlanetId,setActivePlanetId]=useState(null);
-  const[panelData,setPanelData]=useState(null);
+  const[searchParams,setSearchParams]=useSearchParams();
+  const[panelData,setPanelData]=useState(()=>{
+    const id=searchParams.get("project");
+    const m=id&&PLANETS.flatMap(p=>p.moons).find(m=>m.id===id);
+    return m?{type:"project",project:m}:null;
+  });
+  // Keep ?project=<id> in the address bar in sync with the open project, so the link can be shared.
+  useEffect(()=>{
+    const id=panelData?.type==="project"?panelData.project.id:null;
+    if((searchParams.get("project")||null)===id)return;
+    setSearchParams(id?{project:id}:{},{replace:true});
+  },[panelData]);
   const[warp,setWarp]=useState(false);
   const[hovMoon,setHovMoon]=useState({data:null,x:0,y:0});
   const[showNavHint,setShowNavHint]=useState(true);
